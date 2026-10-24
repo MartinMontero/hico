@@ -227,15 +227,17 @@ Gate G0 is closed by waiver (D-12); the open measures in `docs\spikes\G0-framewo
 §4 are exercised here: the plugin works with Preact (measure 6) and axe finds no serious or
 critical violation on the shell (measure 3).
 
-The next step is Phase 1b-1 (the staff sign-in spike). Its plan is written
-(`docs\plans\2026-10-24-phase-1b-1-staff-auth-spike.md`) and **waits for Martin's GO**; nothing
-from it has been run. It asks Martin to approve registry installs in a separate `spike\auth\`
-folder and web reading of public documentation, and records what is already known: Better Auth
-1.7.12 and its passkey plugin exist but its documentation does not mention D1 or Workers; the
-Cloudflare Access limits page gives no Free-plan seat limit; Cloudflare Email Sending is Beta
-and sending to arbitrary recipients needs Workers Paid (all `[V]` from pages read 2026-10-24).
-O-02 stays open.
-
+Phase 1b-1 (the staff sign-in spike) ran on 2026-10-24 with Martin's GO. The report is
+`docs\spikes\staff-auth-report.md`; the throwaway code and run output are in `spike\auth\` (own
+`package.json`, never imported by shipped code, a test enforces that). `[V]`: our own WebAuthn with
+SimpleWebAuthn 14 passes 14 of 14 browser tests under Chromium's virtual authenticator; Better Auth
+1.7.12 with its passkey plugin passes 11 of 11 on workerd with local D1; the Worker half of Cloudflare
+Access passes 2 of 2 against a local stand-in. Cloudflare Access itself could not be tested. Nothing was
+sent, no account or remote resource was created, and the report recommends a route without deciding.
+**O-02 is still open: Martin calls it.** New open items: O-20 (person-level audit events) and O-21
+(how invite and recovery links are delivered). `npm run validate` still passes (153 tests, raw output in
+`docs\spikes\phase-1b-1-validate-output.txt`). The next step after O-02 is the Phase 1b-2 plan, which
+needs Martin's GO.
 ## 5. Stale documents
 
 - `docs\05-ARCHITECTURE.md` §16 shows the proposed layout; the real one is above. §13 says

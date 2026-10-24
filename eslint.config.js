@@ -25,7 +25,7 @@ const rawDb = [
 ];
 
 export default tseslint.config(
-  { ignores: ['dist/**', 'node_modules/**', '.wrangler/**', 'playwright-report/**', 'test-results/**', 'reference/**', 'public/**'] },
+  { ignores: ['spike/**', 'dist/**', 'node_modules/**', '.wrangler/**', 'playwright-report/**', 'test-results/**', 'reference/**', 'public/**'] },
   ...tseslint.configs.recommended,
   {
     rules: {

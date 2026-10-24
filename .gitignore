@@ -13,3 +13,14 @@ _package
 playwright-report
 test-results
 .vite
+
+# Phase 1b-1 spike (local state, bundles and raw server logs; the run summaries in spike/auth/logs/*.txt are kept)
+spike/auth/.state
+spike/auth/.state-better
+spike/auth/.bundle-*
+spike/auth/own/.bundle-*
+spike/auth/better/.bundle-*
+spike/auth/logs/*.log
+spike/auth/logs/try*.txt
+spike/auth/own/public/client.js
+spike/auth/better/public/client.js

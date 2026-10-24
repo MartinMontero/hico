@@ -1,0 +1,15 @@
+{
+  "name": "hico-spike-auth",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Throwaway staff-auth spike (Phase 1b-1). Not imported by worker/, web/ or shared/. Never deployed.",
+  "dependencies": {
+    "@better-auth/passkey": "1.7.12",
+    "@simplewebauthn/browser": "14.0.0",
+    "@simplewebauthn/server": "14.0.3",
+    "better-auth": "1.7.12",
+    "jose": "6.2.13",
+    "kysely-d1": "^0.4.0"
+  }
+}

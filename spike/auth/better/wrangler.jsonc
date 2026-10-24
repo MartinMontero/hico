@@ -1,0 +1,15 @@
+{
+  // SPIKE ONLY. Local dev server, never deployed. Better Auth needs nodejs_compat (AsyncLocalStorage), per its docs.
+  "name": "hico-spike-auth-better",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-08-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*", "/ours/*", "/staff/*", "/__test/*"]
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "spike-auth-better", "database_id": "00000000-0000-0000-0000-000000000000" }
+  ]
+}

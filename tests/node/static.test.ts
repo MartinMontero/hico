@@ -12,7 +12,9 @@ const ROOT = process.cwd();
 function files(dir: string, exts: string[]): string[] {
   const out: string[] = [];
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    if (['node_modules', 'dist', '.wrangler', 'reference', 'docs', '.git', 'test-results', 'playwright-report'].includes(entry.name)) continue;
+    // spike/ is throwaway research code (Phase 1b-1): raw SQL, test routes. It is excluded from these
+    // scans and never imported by shipped code; the "spike stays outside" test below enforces that.
+    if (['node_modules', 'dist', '.wrangler', 'reference', 'docs', '.git', 'test-results', 'playwright-report', 'spike'].includes(entry.name)) continue;
     const full = join(dir, entry.name);
     if (entry.isDirectory()) out.push(...files(full, exts));
     else if (exts.some((e) => entry.name.endsWith(e))) out.push(full);
@@ -104,6 +106,22 @@ describe('database access', () => {
       for (const m of text.matchAll(/\.prepare\(\s*`([\s\S]*?)`/g)) {
         expect(m[1], `${f}: ${(m[1] ?? '').slice(0, 60)}`).toMatch(/property_id|\bp\.id = \?1/);
       }
+    }
+  });
+});
+
+describe('spike code stays outside', () => {
+  it('nothing in worker, web, shared, seed or scripts imports from spike/', () => {
+    const shipped = ['worker', 'web', 'shared', 'seed', 'scripts'].flatMap((d) => files(join(ROOT, d), ['.ts', '.tsx', '.js', '.mjs', '.css', '.html']));
+    const hits = shipped.filter((f) => /(from|import)\s*\(?\s*['"][^'"]*\bspike\//.test(readFileSync(f, 'utf8'))).map(rel);
+    expect(hits).toEqual([]);
+  });
+
+  it('the repository root package.json does not depend on any spike package', () => {
+    const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')) as { dependencies?: Record<string, string>; devDependencies?: Record<string, string> };
+    const names = Object.keys({ ...pkg.dependencies, ...pkg.devDependencies });
+    for (const spikeOnly of ['better-auth', '@better-auth/passkey', '@simplewebauthn/server', '@simplewebauthn/browser', 'jose', 'kysely-d1']) {
+      expect(names, spikeOnly).not.toContain(spikeOnly);
     }
   });
 });

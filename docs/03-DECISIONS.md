@@ -252,6 +252,22 @@ autumn change on 1 November. Toronto, Edmonton, Los Angeles and Paris still chan
   the demo, and add a launch-check line that a phone on an older OS shows the right times.
 - Reversible: Y.
 
+### O-20 Where person-level audit events go
+Found in the staff sign-in spike (`docs\spikes\staff-auth-report.md` §7.1). `audit_log` has a required
+`property_id`, but a sign-in, sign-out or recovery belongs to a person who may hold roles in several properties.
+- **Recommended:** keep one `audit_log`, write one row per property the person holds a role in (as the spike did), and
+  say so in `06` §2. A person with no role produces no row and cannot sign in.
+- Alternative: a separate platform-level audit table the operator reads. More to build; one more place to purge.
+- Reversible: M. Decide with O-02.
+
+### O-21 How staff invite and recovery links are delivered
+From the same report (§6). The demo has a handful of staff.
+- **Recommended for the demo:** the admin is shown a one-time link or QR code and hands it over in person; recovery is
+  another admin issuing a link, or the person's second passkey. No email, no sender, no new data flow.
+- Alternative: email through Cloudflare Email Service (Beta; arbitrary recipients need Workers Paid; the sending domain
+  needs DNS records, a change that needs your GO) or a third-party sender (Resend, Postmark; a new data flow).
+- Reversible: Y.
+
 ## Gates
 
 **G0 — framework gate. Closed by waiver on 2026-10-23 (D-12).** Phase 0.2 was not run. The evidence is the sandbox benchmark, summarised in `docs\spikes\G0-framework-report.md`, which says what was and was not measured. Phase 1 adds D-13 (the validation library).

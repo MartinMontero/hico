@@ -1,0 +1,14 @@
+{
+  // SPIKE ONLY. Local dev server, never deployed. Test-only vars are passed on the command line.
+  "name": "hico-spike-auth-own",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-08-07",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/auth/*", "/staff/*", "/__test/*"]
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "spike-auth", "database_id": "00000000-0000-0000-0000-000000000000" }
+  ]
+}

@@ -1,0 +1,27 @@
+
+Running 11 tests using 1 worker
+
+(node:8996) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+migrate: 200 {"created":["user","session","account","verification","passkey"],"added":[]}
+tables: _cf_METADATA,account,activities,activity_exceptions,activity_offered_at,audit_log,email_capture,entry_codes,event_counts,offers,passkey,places,platform_flags,properties,property_features,property_hosts,session,sqlite_sequence,staff_memberships,staff_tokens,staff_users,user,verification,zones
+  ok  1 [chromium] › tests\better.spec.ts:38:1 › programmatic migration creates Better Auth tables on D1 (the documented route for D1) (133ms)
+cookies: [{"name":"better-auth.session_token","httpOnly":true,"sameSite":"Lax","secure":false,"path":"/"}]
+user.id == staff_users.id and user.name == email: {"n":1}
+  ok  2 [chromium] › tests\better.spec.ts:49:1 › invite token as registration context: first passkey creates the person, the session and the membership (367ms)
+  ok  3 [chromium] › tests\better.spec.ts:69:1 › sign out revokes the session; the passkey signs back in with no username (265ms)
+  ok  4 [chromium] › tests\better.spec.ts:76:1 › roles are read from our database on every request (80ms)
+list-sessions count: 2 fields: expiresAt,token,createdAt,updatedAt,ipAddress,userAgent,userId,id
+  ok  5 [chromium] › tests\better.spec.ts:87:1 › sessions: list, revoke another, revoke all (the library routes) (332ms)
+  ok  6 [chromium] › tests\better.spec.ts:99:1 › passkeys: the library lists them (33ms)
+delete only passkey: status 200 passkeys left {"n":0}
+  ok  7 [chromium] › tests\better.spec.ts:105:1 › deleting a person's only passkey: what the library does (a separate person, so later tests are unaffected) (296ms)
+reuse recovery token without context status: 404
+  ok  8 [chromium] › tests\better.spec.ts:119:1 › recovery: our token as the registration context, then old sessions and passkeys are removed by our hook (440ms)
+audit actions seen: staff.invite.accepted,staff.signout,staff.signin,staff.recovery.requested,staff.recovery.completed
+  ok  9 [chromium] › tests\better.spec.ts:138:1 › audit rows exist for the actions our code and our wrappers cover (13ms)
+wrong-origin page status text: "register-403"
+  ok 10 [chromium] › tests\better.spec.ts:146:1 › wrong origin: registration is refused (2.7s)
+  ok 11 [chromium] › tests\better.spec.ts:164:1 › logs hold no email, token or cookie (4ms)
+
+  11 passed (13.1s)
