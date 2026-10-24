@@ -317,7 +317,7 @@ a {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 1rem;
+  top: 0.75rem; /* at the top: a toast at the bottom covered the buttons of a bottom sheet */
   z-index: 40;
   display: flex;
   justify-content: center;
@@ -402,6 +402,8 @@ textarea {
 }
 .chip {
   display: inline-block;
+  margin: 0.125rem 0.25rem 0.125rem 0;
+  line-height: 1.4;
   padding: 0.125rem 0.5rem;
   border: 1px solid var(--c-stone);
   border-radius: 0.5rem;

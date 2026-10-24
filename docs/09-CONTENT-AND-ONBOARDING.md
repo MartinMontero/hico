@@ -14,7 +14,7 @@ Staff are the authors. Every text field exists in English and French.
 | Activity | Title, description, category, offered at (one or more properties, D-15), zone or place, host label, start and end or weekly recurrence with local time, capacity (optional), status (active or cancelled), verified-on, verified-by | Cancelling one date does not delete the series |
 | Place | Name, category, staff pick, staff note, walk time as text, hours text, phone (optional), "open in maps" address, verified-on, verified-by | No rating |
 | Offer | Partner name, terms in plain words, valid from and to, requires-membership flag, how we know, verified-on, verified-by | Hidden from guests if expired or unchecked for 90 days `[A]` |
-| QR code | Location label, created, revoked | Token is shown once, then only its hash exists |
+| QR code | Location label, created, retired | In Stage 0 a code is a labelled link (`/p/<slug>#l=<label>`) the console draws as a QR code and prints; no token exists. Rotating a code and ending its sessions arrive in Stage 2 (Phase 1b-2 point 3). The entry token, shown once with only its hash kept, comes with guest sessions |
 
 An activity can be offered at more than one property (D-15). It is one record with one set of
 verification stamps. The zone or place it meets at belongs to one property.
@@ -31,9 +31,13 @@ moderation; they come only if a property asks and staff have the time (`[A]`).
 ## 2. Provenance rules
 
 1. Anything a guest might rely on (hours, prices, discounts, phone numbers, event
-   times) has `verified_on` and `verified_by`. Saving an edit sets them. A "re-verify"
-   button sets them without editing.
-2. The guest screen shows the stamp in words ("Checked by staff on 12 October").
+   times) has `verified_on` and `verified_by`. Saving an edit sets them, from the
+   signed-in person and the server's clock: a request cannot supply them, and a test sends
+   forged ones on every create, update and re-verify. A "re-verify" button ("Still correct")
+   sets them without editing. The console marks a board item or a place "Check overdue" past the
+   expiry in rule 3, and shows an offer as hidden from guests once it is past it.
+2. The guest screen shows the stamp in words ("Checked by staff on 12 October"). It never
+   shows the staff member's name; the name is for staff and the audit log.
 3. Past the expiry (`[A]` 90 days for places and offers, 7 days for the board) the
    item says "Check at the desk" or is hidden, as `04` specifies. It never looks
    current when it is not.

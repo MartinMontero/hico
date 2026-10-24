@@ -51,7 +51,8 @@ at once.
 | RSVPs | Shared counts | D1 | Event end plus 7 days | Purge job |
 | Signals, responses | Connect | D1, plus the room object while live | Expiry plus 24 hours | Alarm and purge job |
 | Reports | Review | D1 | Resolved plus 90 days | Purge job |
-| Staff accounts | Staff login | D1 | While active, plus 30 days | Admin or operator removal |
+| Staff accounts | Staff login: email, display name, passkey public keys and credential ids, hashes of session tokens (12 hours) and of invite and recovery tokens (30 minutes, single use). No password is held | D1 | While active, plus 30 days. Session and token rows stop working when they expire or are used; deleting the dead rows is the purge job's task (Phase 2, **not built yet**) | Admin or operator removal |
+| Verification stamps | Which staff member last checked an item: a display name stored with the item | D1 | With the item | Shown to staff only. Guest responses carry the date, never the name (decision of 2026-10-24, Phase 1b-2 point 1); a test lists the guest fields |
 | Audit log | Accountability. A person-level event (sign-in, sign-out, recovery, session or passkey change) is written once for each property the person holds a role in (D-27) | D1 | One year | Purge job |
 | Rate-limit counters | Abuse control | D1 or room object | 24 hours; keyed by a hash whose key is derived each day from `RATE_LIMIT_SECRET` and the UTC date, so counters cannot be linked across days | Expiry |
 | Aggregate counters | Measurement | D1 | Indefinite; contains no personal data | n/a |

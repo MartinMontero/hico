@@ -21,6 +21,11 @@ async function axe(label: string) {
   console.log(`axe ${label}: ${results.violations.length} violation(s), 0 serious or critical`);
 }
 
+// Screenshots for the walkthrough (docs\walkthrough-phase-1b-2.md): only when HICO_SCREENSHOTS=1, so a normal run changes no files.
+async function shot(name: string) {
+  if (process.env['HICO_SCREENSHOTS'] === '1') await page.screenshot({ path: `docs/screenshots/phase-1b-2/${name}.png` });
+}
+
 async function noSideScroll() {
   const { scroll, width } = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, width: window.innerWidth }));
   expect(scroll).toBeLessThanOrEqual(width);
@@ -54,17 +59,20 @@ test('sign in with the invite, open the hostel, and the overview is axe-clean at
   await expect(page.getByRole('navigation', { name: 'This hostel' })).toBeVisible();
   await expect(page.getByText('What needs your attention today')).toBeVisible();
   await axe('console overview');
+  await shot('01-overview');
   await noSideScroll();
 });
 
 test('board: add an activity, see the check line, and every control has a name', async () => {
   await goSection('Board', 'Board');
   await axe('board');
+  await shot('02-board');
   await noSideScroll();
   await page.getByRole('button', { name: 'Add an activity' }).click();
   const dialog = page.getByRole('dialog', { name: 'Add an activity' });
   await expect(dialog).toBeVisible();
   await axe('activity form');
+  await shot('03-activity-form');
   await dialog.getByLabel('Title (English)').fill('E2E Trivia');
   await dialog.getByLabel('Description (English)').fill('Bring a friend');
   await dialog.getByRole('button', { name: 'Save' }).click();
@@ -95,6 +103,7 @@ test('two people editing: the second save gets the conflict screen, and keeps it
   await expect(conflict).toContainText('E2E Trivia, my version');
   await expect(conflict).toContainText('E2E Trivia, their version');
   await axe('conflict screen');
+  await shot('04-conflict');
   await conflict.getByRole('button', { name: 'Save mine over theirs' }).click();
   await page.getByRole('dialog', { name: 'Edit the activity' }).getByRole('button', { name: 'Save' }).click();
   await expect(page.getByRole('heading', { name: 'E2E Trivia, my version' })).toBeVisible();
@@ -123,6 +132,7 @@ test('a shared activity: the owner sees where it shows and cannot add a hostel t
   await expect(dialog.getByRole('button', { name: /Stop showing here/ })).toBeVisible();
   await expect(dialog).toContainText('There is no other hostel where you also work.');
   await axe('where it shows');
+  await shot('05-where-it-shows');
   await page.keyboard.press('Escape');
   await expect(dialog).toBeHidden();
 });
@@ -170,6 +180,7 @@ test('places and offers: add, mark as still correct', async () => {
   await page.getByRole('button', { name: 'Still correct E2E Cafe' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Marked as checked today.' })).toBeVisible();
   await axe('places');
+  await shot('06-places');
   await goSection('Offers', 'Offers');
   await page.getByRole('button', { name: 'Add an offer' }).click();
   const offer = page.getByRole('dialog', { name: 'Add an offer' });
@@ -199,6 +210,7 @@ test('zones, translations, QR labels (with the QR code), and switches', async ()
   await page.getByRole('button', { name: 'Add a label' }).click();
   await expect(page.getByRole('heading', { name: 'front-desk' })).toBeVisible();
   await expect(page.getByText('arrive in Stage 2')).toBeVisible();
+  await axe('QR codes');
   await page.getByRole('button', { name: 'Show QR code front-desk' }).click();
   const qr = page.getByRole('dialog', { name: 'QR code: front-desk' });
   const img = qr.getByRole('img', { name: /labelled front-desk/ });
@@ -206,6 +218,7 @@ test('zones, translations, QR labels (with the QR code), and switches', async ()
   expect(await img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0); // the SVG decoded
   await expect(qr).toContainText(`/p/${SLUG}#l=front-desk`);
   await axe('QR code');
+  await shot('07-qr-code');
   await page.keyboard.press('Escape');
 
   await goSection('Switches', 'Switches');
@@ -223,6 +236,7 @@ test('people: an invite link with its QR code, shown once; then the audit log an
   await expect(dialog.getByLabel('The link')).toHaveValue(/\/staff\/accept#invite=[A-Za-z0-9_-]{43}$/);
   await expect(dialog.getByRole('img', { name: 'QR code of the link below' })).toBeVisible();
   await axe('invite link');
+  await shot('08-invite-link');
   await page.keyboard.press('Escape');
   await expect(dialog).toBeHidden();
   await expect(page.getByRole('heading', { name: 'Fawzie Both' })).toBeVisible(); // a person joins the list when they use the link, not before
@@ -232,6 +246,7 @@ test('people: an invite link with its QR code, shown once; then the audit log an
   await expect(page.getByText('Activity added').first()).toBeVisible();
   await expect(page.getByText('Invite link created').first()).toBeVisible();
   await axe('audit log');
+  await shot('09-audit-log');
 
   await goSection('Export', 'Export');
   const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Download the export' }).click()]);
@@ -248,6 +263,7 @@ test('French: the console follows the language, and the screens still fit', asyn
   await expect(page.getByRole('heading', { level: 1, name: 'Tableau' })).toBeFocused();
   await expect(page.getByRole('button', { name: 'Ajouter une activité' })).toBeVisible();
   await axe('board (French)');
+  await shot('10-board-french');
   await noSideScroll();
 });
 

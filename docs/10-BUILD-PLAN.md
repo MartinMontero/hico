@@ -402,6 +402,13 @@ and which documents are now stale.
 
 ## Phase 1b-2 — Staff authentication and console
 
+**Status, 2026-10-24: built** in four slices (plan: `docs\plans\2026-10-24-phase-1b-2-staff-console.md`; raw
+validate output per slice in `docs\spikes\phase-1b-2-validate-slice*.txt`). Items 1 to 7 below are done, with these
+differences from the text: Translations is a list of what still lacks French, with the edit forms holding the fix, not a
+side-by-side editor; QR codes are labelled links, and "rotate" and "revoke sessions" are shown as arriving in Stage 2;
+the fifth operator script, `issue-recovery-link`, was added by D-28; `-Remote` prints, asks for the slug and then stops
+without running anything. Not tried: a real phone or security key, and scanning a printed QR code (`[U]`).
+
 Claude Code prompt (start only after O-02 is decided in `docs\03-DECISIONS.md`):
 
 ```text

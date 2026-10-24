@@ -236,8 +236,8 @@ Access passes 2 of 2 against a local stand-in. Cloudflare Access itself could no
 sent, no account or remote resource was created, and the report recommends a route without deciding.
 **Martin called O-02 on 2026-10-24: D-26, our own WebAuthn, passkey-first.** O-20 and O-21 were
 accepted as recommended (D-27, D-28). `npm run validate` still passes (153 tests, raw output in
-`docs\spikes\phase-1b-1-validate-output.txt`). Phase 1b-2 (staff authentication and console) is **in progress with Martin's GO of 2026-10-24**, built in four
-slices, each committed only when `npm run validate` passes. Plan: `docs\plans\2026-10-24-phase-1b-2-staff-console.md`.
+`docs\spikes\phase-1b-1-validate-output.txt`). Phase 1b-2 (staff authentication and console) was **built on Martin's GO of 2026-10-24** in four
+slices, each committed only when `npm run validate` passed. Plan: `docs\plans\2026-10-24-phase-1b-2-staff-console.md`.
 - **Slice 1 (auth and schema), done:** migration `0002` (passkeys, sessions, links, challenges, rate limits, a
   `version` column for optimistic concurrency); staff sign-in, sessions, passkeys, admin-issued invite and
   recovery links, person-level audit written per property (D-27), rate limits, the people routes with the
@@ -260,14 +260,27 @@ slices, each committed only when `npm run validate` passes. Plan: `docs\plans\20
   links, and the invite and recovery links handed over by an admin. Walked at 360 px, axe-clean on every
   screen, main flows by keyboard alone (`tests\e2e\staff-console.spec.ts`, 12 tests). Staff chunk 29 KB gzip
   (budget 90 KB), guest JavaScript 15.6 KB (budget 60 KB). Raw output: `docs\spikes\phase-1b-2-validate-slice3.txt`.
-- **Slice 4 (operator scripts, walkthrough, documents): not started.**
+- **Slice 4 (operator scripts, walkthrough, documents), done:** `scripts\operator.ts` now has all five commands
+  (`create-property`, `add-hostname`, `invite-first-admin`, `load-zones`, `issue-recovery-link`) with a
+  PowerShell wrapper each (`scripts\*.ps1`), local by default and validated with the app's own limits. `-Remote` prints
+  what it would do, needs `-Slug` and a person typing it, and then stops: it never runs anything on a remote database.
+  Tests run the commands and the wrappers against a throwaway local database (`tests\node\operator.test.ts`).
+  Walkthrough with ten screenshots: `docs\walkthrough-phase-1b-2.md`. Documents updated: 05 (§4, §11, §16), 06 (§2),
+  09 (§1, §2), 10 (status), 03 (D-29).
+- **Phase 1b-2 final state:** `npm run validate` passes (462 unit and isolation tests in 23 files, 29 browser tests,
+  24 contrast pairs; raw output in `docs\spikes\phase-1b-2-validate-final.txt`). Guest JavaScript 15.6 KB gzip (budget
+  60 KB); staff chunk 29 KB gzip (budget 90 KB). Not tried: a real phone or security key, scanning a printed QR code,
+  a screen reader, anything on Cloudflare (nothing was deployed or created remotely). Staff sign-in answers 503 on
+  `hico-preview` and `hico-prod` until `RP_ID`, `ALLOWED_ORIGINS` and `RATE_LIMIT_SECRET` are set (O-03).
 ## 5. Stale documents
 
-- `docs\05-ARCHITECTURE.md` §16 shows the proposed layout; the real one is above. §13 says
-  tests cover both daylight-saving changes; in this runtime BC has only the spring one
-  (O-19).
+- `docs\05-ARCHITECTURE.md` §13 says tests cover both daylight-saving changes; in this runtime BC has only the
+  spring one (O-19). (§4, §11 and §16 were brought up to date in Phase 1b-2.)
 - `docs\09-CONTENT-AND-ONBOARDING.md` §1 now carries the activity edit rule.
-- `docs\10-BUILD-PLAN.md` Phase 1 lists tasks that are now done.
+- `docs\10-BUILD-PLAN.md` Phase 1 lists tasks that are now done (Phase 1b-2 carries a status note).
+- `docs\04-PRODUCT-SPEC.md` §4.8 (the console screens) was not re-read against what was built: Translations is a
+  missing-French list, QR rotate and revoke are Stage 2. `docs\11-DEPLOY.md` was not re-read for the staff-sign-in
+  variables and secret (see above).
 - `docs\01-project-instructions.md` line 70 and `docs\11-DEPLOY.md`'s status paragraph still
   describe the shell tools as they were before D-16 and the preflight runs.
 - `docs\spikes\preflight.md` says PowerShell 7 and Wrangler are not installed; true when

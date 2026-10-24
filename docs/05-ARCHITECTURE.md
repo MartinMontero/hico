@@ -291,7 +291,8 @@ proved by test.
 
 1. **Where the property comes from.** A guest session belongs to one property. A staff
    member may hold roles in several, so each staff request names the property it acts
-   on in the path (`/staff/p/<slug>/...`) and the server checks that staff member's
+   on in the path (pages at `/staff/p/<slug>/...`, API at `/api/staff/p/<slug>/...`) and
+   the server checks that staff member's
    role in that property on every request; naming a property gives no access by itself.
    For a public content read with no session, the property is looked up server-side
    from the request's hostname (`property_hosts`); that is safe because the content is
@@ -465,17 +466,32 @@ therefore stores no guest data at all.
 
 ## 11. Staff authentication
 
-Open: O-02. All three candidate routes share the requirements: passkey-capable,
-recoverable without a ticket to Martin, sessions revocable, every login and invite
-written to the audit log, no shared logins.
+Decided: O-02 was called as Route 3 (D-26), our own WebAuthn with SimpleWebAuthn 14 and
+D1 sessions. Built in Phase 1b-2 (2026-10-24, `[V]` by the test suites and the browser
+tests with Chromium's virtual authenticator; **not tried on a real phone or security
+key**, `[U]`). The requirements that every candidate had to meet are all met: passkey,
+recoverable without a ticket to Martin, sessions revocable, every sign-in and invite in
+the audit log, no shared logins.
 
-| Route | What is known | What is not |
-| --- | --- | --- |
-| Cloudflare Access in front of the staff path | Least code | Free-plan seat limit and login methods `[U]`; mapping a login to a property role is manual |
-| Better Auth with the passkey plugin | The plugin exists and builds on SimpleWebAuthn `[V]` its docs | Whether it runs on D1 and Workers `[U]` |
-| Own WebAuthn with SimpleWebAuthn-class library and D1 sessions | Most control | Most code to own; recovery flow must be built |
-
-Phase 1b runs a small spike on each and reports before anything is built.
+- **Sign-in.** Discoverable passkeys: no username, no password. Origin and relying-party
+  id are checked against the Worker's `ALLOWED_ORIGINS` and `RP_ID` (the production
+  environment sets neither yet, so staff sign-in answers 503 there: O-03).
+- **Session.** An `hc_staff` cookie (`HttpOnly`, `Secure`, `SameSite=Lax`), 12 hours,
+  no sliding window. Only the SHA-256 of the token is stored. Roles are read from
+  `staff_memberships` on every request, not from the session.
+- **Invite and recovery (D-28).** An admin hands over a one-time link (30 minutes, single
+  use, kept in the URL fragment and removed from the address bar when used), shown as
+  text and a QR code. No email. Using a recovery link revokes the person's earlier
+  passkeys and sessions. An admin may issue one only for a person whose roles are all at
+  properties where that admin is also an admin; otherwise it is the operator's script.
+- **Guards.** A person with only one passkey is nudged to add a second; the last admin of a
+  property cannot be demoted or removed; the last passkey cannot be removed.
+- **Rate limits.** Sign-in, invite and recovery endpoints, in D1, keyed by a daily-rotating
+  HMAC of the caller's address (`RATE_LIMIT_SECRET`), so counters cannot be linked across days.
+- **Audit.** Person-level events are written once per property the person holds a role
+  in (D-27).
+- **Recorded risk.** We own the session, token and recovery code and nobody independent
+  has reviewed it; an outside review before production is `[U]` and belongs on `12`.
 
 ## 12. Offline and PWA
 
@@ -522,7 +538,7 @@ as HTML.
 
 ## 16. Repository layout
 
-As built in Phase 1 (2026-10-23, `[V]`). The full tree, with what each part does, is in
+As built in Phase 1 (2026-10-23) and extended in Phase 1b-2 (2026-10-24), `[V]`. The full tree, with what each part does, is in
 `02-STATE.md` §4. In short:
 
 ```text
@@ -533,10 +549,13 @@ hico\
   reference\            hi-co-prototype.jsx (never edited)
   worker\               API (Hono), tenant middleware, repositories\, projections, preview-gate\
   web\src\              Preact front end; index.html is at the repository root
+  web\src\staff\        the staff console, a lazily loaded chunk guests never download
   shared\               limits, Valibot schemas, types, design tokens, contrast, i18n catalogs
   migrations\           D1 migrations
   seed\                 demo seed (local D1 only)
-  scripts\              validate and its parts
+  scripts\              validate and its parts; the operator scripts (operator.ts and the five
+                        .ps1 wrappers: create-property, add-hostname, invite-first-admin,
+                        load-zones, issue-recovery-link), local by default
   public\fonts\         DM Sans (self-hosted) and its licence
   tests\                worker\ (workerd + D1), node\, web\ (jsdom), e2e\ (Playwright)
 ```

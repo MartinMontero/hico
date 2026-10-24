@@ -45,7 +45,9 @@ that is not in this file has not been made.
 | D-28 | **Staff invite and recovery links are handed over by an admin: a one-time link or QR code shown once, no email** (O-21 accepted as recommended). Recovery is another admin of that property issuing a link, or the person's own second passkey. A property with one admin who loses their only device needs the operator (Martin) to issue a link, so staff should register two passkeys. Email stays a later add-on and needs its own decision | Martin, 2026-10-24. No sender, no new data flow, no DNS change | Martin | 2026-10-24 | Y |
 | D-29 | **The QR library is lean-qr 2.7.4** (MIT, no dependencies), used only in the staff chunk, pinned to the exact version. It draws a code as an SVG image with a text alternative; invite and recovery links and the labelled links of a property are drawn with it | Chosen by Claude Code in Phase 1b-2 under Martin's approval of one QR package (2026-10-24, "approve the npm install of one QR library, chosen in the build"). Candidates: uqr 0.1.3 (MIT, no dependencies, pre-1.0), qrcode-generator 2.0.4 (MIT, 555 KB unpacked), lean-qr 2.7.4 (MIT, 69 KB unpacked, 2.x, updated September 2026). lean-qr was the smallest stable-major one. The whole staff chunk, console and library together, is 29 KB gzip against its 90 KB budget; the guest bundle is unchanged (15.6 KB of 60 KB). The `npm audit` findings (undici, zod) are in the existing tooling, not in this package. A code was checked to render as a decoded image, but **not scanned with a reader**: that check is `[U]` on a phone | Claude Code | 2026-10-24 | Y |
 
-The next free number after D-29 is D-30.
+| D-30 | **Phase 1b-2 rules, ten points accepted as recommended** (plan §0): (1) guests see only "Checked by staff on <date>", never a staff name; (2) an owner admin may add to a shared activity's offered-at list only a property where they also hold a role; (3) QR codes in Stage 0 are labelled links, and "rotate" and "revoke sessions" wait for Stage 2; (4) the audit log is admin only; (5) a staff session lasts 12 hours with no sliding window; (6) staff tokens are stored as plain SHA-256; (7) sign-in, invite and recovery endpoints are rate limited in D1; (8) one npm QR library, chosen in the build (D-29); (9) staff pages are at `/staff/p/<slug>/...` and the API at `/api/staff/p/<slug>/...`; (10) the phase is built in four slices | Martin, 2026-10-24, "GO for Phase 1b-2, accept the recommendations on all ten points in section 0". Reasoning is in `docs\plans\2026-10-24-phase-1b-2-staff-console.md` §0 | Martin | 2026-10-24 | M |
+
+The next free number after D-30 is D-31.
 
 ## Open — decisions Martin owes
 
@@ -275,6 +277,13 @@ From the same report (§6). The demo has a handful of staff.
   needs DNS records, a change that needs your GO) or a third-party sender (Resend, Postmark; a new data flow).
 - Reversible: Y.
 
+### O-22 How the staff console's navigation fits a phone
+Found while walking the console at 360 px (`docs\walkthrough-phase-1b-2.md`). Eleven navigation buttons wrap to five
+rows and push the first card down by about 330 px. It meets the 44 px target rule but is not a good phone screen.
+- **Recommended:** one "Menu" button that opens the list, showing the current section's name, so the content starts
+  near the top. Same links, same keyboard order, one extra control.
+- Alternative: keep the wrapped buttons. Nothing to build; staff on phones scroll past it every time.
+- Reversible: Y.
 ## Gates
 
 **G0 — framework gate. Closed by waiver on 2026-10-23 (D-12).** Phase 0.2 was not run. The evidence is the sandbox benchmark, summarised in `docs\spikes\G0-framework-report.md`, which says what was and was not measured. Phase 1 adds D-13 (the validation library).
