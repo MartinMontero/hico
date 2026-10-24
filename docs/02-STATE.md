@@ -123,10 +123,12 @@ re-verify it before HI Whistler goes live. The café at HI Whistler is **Cheekye
 
 The repository exists at `C:\Users\User\dev\hico`. The documents are in `docs\`,
 `CLAUDE.md` is at the root, and the prototype is in `reference\hi-co-prototype.jsx`.
-No application code exists, nothing is installed and nothing is deployed. Phase 0 is
-complete except its preflight (step 2), the package's PowerShell run on Windows,
-which has not been run. The next steps are that preflight and the framework spike in
-`10-BUILD-PLAN.md`, Phase 0.2.
+No application code exists, nothing is installed and nothing is deployed. The
+Windows preflight has run `[V]` on 2026-10-23: Windows PowerShell 5.1 (Desktop
+edition, build 26100) is the only PowerShell on this machine — PowerShell 7
+(`pwsh`) is not installed, so every preflight step ran under 5.1 only. No step
+failed. Raw output is in `docs\spikes\preflight.md`. The next step is the framework
+spike in `10-BUILD-PLAN.md`, Phase 0.2.
 
 ## 5. Stale documents
 
