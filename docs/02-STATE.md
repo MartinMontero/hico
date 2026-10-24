@@ -144,8 +144,13 @@ same results and the same desktop-app conclusion):
 Gate G0 is closed by waiver: D-12 chose Preact 11 on the sandbox benchmark, and
 `docs\spikes\G0-framework-report.md` says what that did and did not measure. Decisions
 D-12 and D-17 to D-22 were called on 2026-10-23. The demo path is Phases 1, 1b-1, 1b-2, 2
-and 3 of `10-BUILD-PLAN.md` (D-22). The next step is the Phase 1 plan, which stops for
-Martin's GO.
+and 3 of `10-BUILD-PLAN.md` (D-22). The Phase 1 plan is written
+(`docs\plans\2026-10-23-phase-1-foundation.md`) and **waits for Martin's GO**; nothing
+from it is built. It asks Martin to call two decisions (O-17, the D-15 data shape, and
+O-18, how one domain serves two hostels), approve the downloads, and answer four small
+points. Package versions it relies on were read from the npm registry on 2026-10-23
+`[V]`: Vitest must stay on 4.x (the Workers test pool needs it) and TypeScript on 6.0.x
+(typescript-eslint needs `<6.1`), although 5.0.5 and 7.0.2 are the latest.
 
 ## 5. Stale documents
 

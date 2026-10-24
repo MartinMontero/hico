@@ -211,6 +211,23 @@ and do not decide this for you.
   on the numbers.
 - Reversible: Y.
 
+### O-17 Data shape for an activity offered by one or two properties
+Settles the open part of D-15. Full options, costs and tests: `docs\plans\2026-10-23-phase-1-foundation.md` §1.
+- **Recommended: Option A.** One activity record owned by one property, with an
+  "offered at" list of the properties that show it. Any property in the list can edit
+  its content; only the owner's admin changes the list or deletes. D-02 does not change.
+- Alternative B: one tenant ("the Vancouver hostels") with two sites. D-02 would change.
+- Reversible: M.
+
+### O-18 How one domain serves two hostels
+Settles the open part of D-21. Options, costs and tests: plan §2.
+- **Recommended: Option 1.** The property is chosen by a path segment (`/p/<slug>`), accepted only if
+  it is in that host's own list in `property_hosts`. This changes `05` §4 rule 1 and the
+  matching line in `CLAUDE.md`, so it needs Martin's approval.
+- Alternative 2: one hostname per hostel (rule 1 unchanged; needs more DNS, certificate
+  and route changes, and preview on `workers.dev` can serve only one hostel).
+- Reversible: Y for the demo.
+
 ## Gates
 
 **G0 — framework gate. Closed by waiver on 2026-10-23 (D-12).** Phase 0.2 was not run. The evidence is the sandbox benchmark, summarised in `docs\spikes\G0-framework-report.md`, which says what was and was not measured. Phase 1 adds D-13 (the validation library).
