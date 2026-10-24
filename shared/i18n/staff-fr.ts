@@ -81,6 +81,7 @@ export const staffFr: Record<StaffKey, string> = {
   'console.notFound': 'Page introuvable',
   'console.notFoundHelp': "Cette page n'existe pas ici, ou vous ne travaillez pas dans cette auberge.",
   'console.nav': 'Cette auberge',
+  'console.menu': 'Menu : {name}',
   'console.allHostels': 'Toutes les auberges',
 
   'err.signedOut': "Vous avez été déconnecté. Reconnectez-vous; rien de ce que vous avez fait n'est perdu.",

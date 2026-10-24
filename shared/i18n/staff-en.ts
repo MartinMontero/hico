@@ -80,6 +80,7 @@ export const staffEn = {
   'console.notFound': 'Page not found',
   'console.notFoundHelp': 'There is no such page here, or you do not work at this hostel.',
   'console.nav': 'This hostel',
+  'console.menu': 'Menu: {name}',
   'console.allHostels': 'All hostels',
 
   'err.signedOut': 'You were signed out. Sign in again; nothing you did was lost.',

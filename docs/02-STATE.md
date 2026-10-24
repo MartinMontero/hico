@@ -267,6 +267,7 @@ slices, each committed only when `npm run validate` passed. Plan: `docs\plans\20
   Tests run the commands and the wrappers against a throwaway local database (`tests\node\operator.test.ts`).
   Walkthrough with ten screenshots: `docs\walkthrough-phase-1b-2.md`. Documents updated: 05 (§4, §11, §16), 06 (§2),
   09 (§1, §2), 10 (status), 03 (D-29).
+- **After the walkthrough (D-31):** the console navigation is a single "Menu" button; screenshots 01 to 10 predate it.
 - **Phase 1b-2 final state:** `npm run validate` passes (462 unit and isolation tests in 23 files, 29 browser tests,
   24 contrast pairs; raw output in `docs\spikes\phase-1b-2-validate-final.txt`). Guest JavaScript 15.6 KB gzip (budget
   60 KB); staff chunk 29 KB gzip (budget 90 KB). Not tried: a real phone or security key, scanning a printed QR code,

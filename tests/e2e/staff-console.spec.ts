@@ -32,8 +32,11 @@ async function noSideScroll() {
 }
 
 async function goSection(name: string, heading: string) {
-  await page.getByRole('navigation', { name: 'This hostel' }).getByRole('link', { name, exact: true }).click();
+  const nav = page.getByRole('navigation', { name: 'This hostel' });
+  await nav.getByRole('button', { name: /^Menu/ }).click();
+  await nav.getByRole('link', { name, exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: heading })).toBeFocused();
+  await expect(nav.getByRole('link', { name, exact: true })).toBeHidden(); // the menu closed
 }
 
 const send = (path: string, data: unknown) => context.request.post(`/api/staff/p/${SLUG}${path}`, { headers: { Origin: ORIGIN, 'Content-Type': 'application/json' }, data });
@@ -56,10 +59,18 @@ test('sign in with the invite, open the hostel, and the overview is axe-clean at
   await expect(page.getByRole('heading', { level: 1, name: 'Your hostels' })).toBeVisible();
   await page.getByRole('link', { name: 'Vancouver Downtown' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Overview' })).toBeFocused();
-  await expect(page.getByRole('navigation', { name: 'This hostel' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Menu: Overview' })).toBeVisible();
   await expect(page.getByText('What needs your attention today')).toBeVisible();
   await axe('console overview');
   await shot('01-overview');
+  // The menu: closed at first, opens from its button, Escape closes it and returns focus to the button.
+  const toggle = page.getByRole('button', { name: 'Menu: Overview' });
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await toggle.click();
+  await expect(page.getByRole('link', { name: 'Board', exact: true })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('link', { name: 'Board', exact: true })).toBeHidden();
+  await expect(toggle).toBeFocused();
   await noSideScroll();
 });
 
@@ -259,6 +270,7 @@ test('French: the console follows the language, and the screens still fit', asyn
   await page.getByRole('radio', { name: 'Français' }).check();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('heading', { level: 1, name: 'Exportation' })).toBeVisible();
+  await page.getByRole('button', { name: /^Menu/ }).click();
   await page.getByRole('navigation', { name: 'Cette auberge' }).getByRole('link', { name: 'Tableau', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Tableau' })).toBeFocused();
   await expect(page.getByRole('button', { name: 'Ajouter une activité' })).toBeVisible();
@@ -280,6 +292,7 @@ test('an editor sees no admin sections and the server agrees', async ({ browser 
   await p2.goto(`/staff/accept#invite=${token}`);
   await p2.getByRole('button', { name: 'Create my passkey' }).click();
   await p2.getByRole('link', { name: 'Vancouver Downtown' }).click();
+  await p2.getByRole('button', { name: /^Menu/ }).click();
   const nav = p2.getByRole('navigation', { name: 'This hostel' });
   await expect(nav.getByRole('link', { name: 'Board', exact: true })).toBeVisible();
   for (const hidden of ['People', 'Audit log', 'Export']) await expect(nav.getByRole('link', { name: hidden, exact: true })).toHaveCount(0);

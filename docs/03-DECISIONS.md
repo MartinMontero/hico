@@ -47,7 +47,9 @@ that is not in this file has not been made.
 
 | D-30 | **Phase 1b-2 rules, ten points accepted as recommended** (plan §0): (1) guests see only "Checked by staff on <date>", never a staff name; (2) an owner admin may add to a shared activity's offered-at list only a property where they also hold a role; (3) QR codes in Stage 0 are labelled links, and "rotate" and "revoke sessions" wait for Stage 2; (4) the audit log is admin only; (5) a staff session lasts 12 hours with no sliding window; (6) staff tokens are stored as plain SHA-256; (7) sign-in, invite and recovery endpoints are rate limited in D1; (8) one npm QR library, chosen in the build (D-29); (9) staff pages are at `/staff/p/<slug>/...` and the API at `/api/staff/p/<slug>/...`; (10) the phase is built in four slices | Martin, 2026-10-24, "GO for Phase 1b-2, accept the recommendations on all ten points in section 0". Reasoning is in `docs\plans\2026-10-24-phase-1b-2-staff-console.md` §0 | Martin | 2026-10-24 | M |
 
-The next free number after D-30 is D-31.
+| D-31 | **The staff console's navigation is one "Menu: <current screen>" button that opens the list of screens** (O-22 accepted as recommended). Same links, same order; Escape closes it and returns focus to the button; choosing a screen closes it | Martin, 2026-10-24, "Accept O-22 as recommended". Alternative rejected: the wrapped buttons, which pushed the first card down about 330 px at 360 px | Martin | 2026-10-24 | Y |
+
+The next free number after D-31 is D-32.
 
 ## Open — decisions Martin owes
 
@@ -278,6 +280,7 @@ From the same report (§6). The demo has a handful of staff.
 - Reversible: Y.
 
 ### O-22 How the staff console's navigation fits a phone
+**Resolved by D-31.**
 Found while walking the console at 360 px (`docs\walkthrough-phase-1b-2.md`). Eleven navigation buttons wrap to five
 rows and push the first card down by about 330 px. It meets the 44 px target rule but is not a good phone screen.
 - **Recommended:** one "Menu" button that opens the list, showing the current section's name, so the content starts

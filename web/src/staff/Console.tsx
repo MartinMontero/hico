@@ -1,5 +1,5 @@
 import type { ComponentChildren } from 'preact';
-import { useEffect } from 'preact/hooks';
+import { useEffect, useLayoutEffect, useState } from 'preact/hooks';
 import { pick } from '../../../shared/i18n/index.ts';
 import type { StaffKey } from '../../../shared/i18n/staff-en.ts';
 import { useUi } from '../context.tsx';
@@ -45,6 +45,20 @@ export function PropertyConsole({ path, me, onSignedOut }: { path: string; me: M
   const parsed = parseConsolePath(path);
   const slug = parsed?.slug ?? '';
   const api = useApi(slug, onSignedOut);
+  const [menuOpen, setMenuOpen] = useState(false);
+  // The menu closes when a screen is chosen, and on Escape (focus goes back to its button).
+  useEffect(() => setMenuOpen(false), [path]);
+  // A layout effect so the listener exists the moment the menu is on screen (as in Dialog).
+  useLayoutEffect(() => {
+    if (!menuOpen) return undefined;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      setMenuOpen(false);
+      document.querySelector<HTMLElement>('.menu-toggle')?.focus();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [menuOpen]);
   const info = useResource<{ role: 'editor' | 'admin'; property: { slug: string; name: { en: string; fr: string }; timezone: string } | null }>(api, '/me', parsed !== null);
 
   useEffect(() => {
@@ -71,7 +85,16 @@ export function PropertyConsole({ path, me, onSignedOut }: { path: string; me: M
       <Heading>{t(section ? section.title : 'console.notFound')}</Heading>
       <p class="muted">{pick(name, lang as 'en' | 'fr')}</p>
       <nav aria-label={t('console.nav')}>
-        <ul class="subnav">
+        <button
+          type="button"
+          class="btn menu-toggle"
+          aria-expanded={menuOpen}
+          aria-controls="console-menu"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {t('console.menu', { name: section ? t(section.nav) : '' })}
+        </button>
+        <ul class="subnav" id="console-menu" hidden={!menuOpen}>
           <li>
             <Link class="btn btn-quiet" href="/staff">
               {t('console.allHostels')}

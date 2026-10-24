@@ -41,7 +41,7 @@ Any new colour pair went through the contrast gate (`ink` on `paper`, 21:1).
 
 ## What I did not like, and left
 
-1. **The navigation is tall at 360 px.** Eleven buttons wrap to five rows and push the content down by about 330 px
+1. **The navigation was tall at 360 px (fixed after the walkthrough, D-31: a "Menu" button).** The screenshots were taken before the fix and still show the wrapped buttons. It was: Eleven buttons wrap to five rows and push the content down by about 330 px
    before the first card. Targets are 44 px, so it is correct, but it is not good. A "Menu" disclosure or a select would
    fix it; that is a design choice, so it is yours.
 2. **A toast now appears at the top** (it covered the buttons of a bottom sheet when it was at the bottom). For four
