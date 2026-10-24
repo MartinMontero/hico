@@ -227,8 +227,14 @@ Gate G0 is closed by waiver (D-12); the open measures in `docs\spikes\G0-framewo
 §4 are exercised here: the plugin works with Preact (measure 6) and axe finds no serious or
 critical violation on the shell (measure 3).
 
-The next step is Phase 1b-1 (the staff sign-in spike) in `10-BUILD-PLAN.md`, which needs a
-plan and Martin's GO.
+The next step is Phase 1b-1 (the staff sign-in spike). Its plan is written
+(`docs\plans\2026-10-24-phase-1b-1-staff-auth-spike.md`) and **waits for Martin's GO**; nothing
+from it has been run. It asks Martin to approve registry installs in a separate `spike\auth\`
+folder and web reading of public documentation, and records what is already known: Better Auth
+1.7.12 and its passkey plugin exist but its documentation does not mention D1 or Workers; the
+Cloudflare Access limits page gives no Free-plan seat limit; Cloudflare Email Sending is Beta
+and sending to arbitrary recipients needs Workers Paid (all `[V]` from pages read 2026-10-24).
+O-02 stays open.
 
 ## 5. Stale documents
 
