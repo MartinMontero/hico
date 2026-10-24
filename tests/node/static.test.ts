@@ -157,7 +157,7 @@ describe('Worker names', () => {
 describe('no third-party hosts or scripts', () => {
   it('web sources, the HTML and the stylesheets name no external host', () => {
     const own = [...files(join(ROOT, 'web'), ['.ts', '.tsx', '.css']), join(ROOT, 'index.html')];
-    const offenders = own.filter((f) => /https?:\/\/(?!localhost)/i.test(readFileSync(f, 'utf8'))).map(rel);
+    const offenders = own.filter((f) => /https?:\/\/(?!localhost|www\.w3\.org\/)/i.test(readFileSync(f, 'utf8'))).map(rel);
     expect(offenders).toEqual([]);
   });
 

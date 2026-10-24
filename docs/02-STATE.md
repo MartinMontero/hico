@@ -253,7 +253,14 @@ slices, each committed only when `npm run validate` passes. Plan: `docs\plans\20
   `/api/staff/p/` route and an audit meta-test (`tests\worker\staff-matrix.test.ts`, `tests\node\staff-audit.test.ts`).
   `npm run validate` passes (450 unit and isolation tests, 17 browser tests; raw output in
   `docs\spikes\phase-1b-2-validate-slice2.txt`).
-- **Slices 3 and 4 (console screens and QR library D-29; operator scripts and finish): not started.**
+- **Slice 3 (console screens), done:** `/staff/p/<slug>/...` with Overview, Board, Places, Offers, Zones,
+  Translations, QR codes, Switches, People, Audit log and Export, in English and French. Editors are not
+  offered the admin sections; the server refuses them anyway. A save that loses a race shows both versions
+  side by side and lets the person keep theirs or take the saved one. QR codes use lean-qr (D-29): labelled
+  links, and the invite and recovery links handed over by an admin. Walked at 360 px, axe-clean on every
+  screen, main flows by keyboard alone (`tests\e2e\staff-console.spec.ts`, 12 tests). Staff chunk 29 KB gzip
+  (budget 90 KB), guest JavaScript 15.6 KB (budget 60 KB). Raw output: `docs\spikes\phase-1b-2-validate-slice3.txt`.
+- **Slice 4 (operator scripts, walkthrough, documents): not started.**
 ## 5. Stale documents
 
 - `docs\05-ARCHITECTURE.md` §16 shows the proposed layout; the real one is above. §13 says

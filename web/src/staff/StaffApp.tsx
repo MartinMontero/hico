@@ -1,21 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
-import { makeTranslator } from '../../../shared/i18n/index.ts';
-import { staffEn, type StaffKey } from '../../../shared/i18n/staff-en.ts';
-import { staffFr } from '../../../shared/i18n/staff-fr.ts';
+import type { StaffKey } from '../../../shared/i18n/staff-en.ts';
 import { pick } from '../../../shared/i18n/index.ts';
 import { useUi } from '../context.tsx';
 import { Dialog } from '../Dialog.tsx';
-import { consumeNavigation, Link, markMoved, navigate } from '../router.tsx';
+import { Link, markMoved, navigate } from '../router.tsx';
 import { AUTH, staffGet, staffPost, type Me } from './api.ts';
+import { PropertyConsole } from './Console.tsx';
 import { register, signIn, type Outcome } from './passkeys.ts';
+import { useStaffT } from './t.ts';
+import { Heading } from './ui.tsx';
 
-const translate = makeTranslator<StaffKey>(staffEn, staffFr);
-
-/** The staff console's translator: its own catalogs, the same fallback rule as the guest app. */
-export function useStaffT() {
-  const { lang } = useUi();
-  return useCallback((key: StaffKey, params?: Record<string, string>) => translate(lang, key, params), [lang]);
-}
+export { useStaffT };
 
 /** The signed-in person, or null when signed out. `reload` re-reads it after a sign-in or sign-out. */
 function useMe() {
@@ -31,20 +26,6 @@ function useMe() {
   }, [reload]);
   return { state, reload };
 }
-
-function Heading({ children }: { children: string }) {
-  const ref = useRef<HTMLHeadingElement>(null);
-  useEffect(() => {
-    document.title = children;
-    if (consumeNavigation()) ref.current?.focus({ preventScroll: true });
-  }, [children]);
-  return (
-    <h1 ref={ref} tabIndex={-1} data-page-heading>
-      {children}
-    </h1>
-  );
-}
-
 function outcomeText(t: ReturnType<typeof useStaffT>, outcome: Outcome, prefix: 'signin' | 'accept'): string {
   if (outcome === 'cancelled') return t(`${prefix}.cancelled` as StaffKey);
   if (outcome === 'rate_limited') return t('staff.rateLimited');
@@ -441,5 +422,6 @@ export default function StaffApp({ path }: { path: string }) {
   if (path.startsWith('/staff/accept')) return <Accept me={me} reload={reload} />;
   if (!me) return <SignIn onDone={() => void reload()} />;
   if (path === '/staff/account') return <Account me={me} reload={reload} />;
+  if (path.startsWith('/staff/p/')) return <PropertyConsole path={path} me={me} onSignedOut={() => void reload()} />;
   return <Home me={me} reload={reload} />;
 }

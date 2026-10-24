@@ -19,6 +19,9 @@ export const COLORS = {
   // Additions: `stone` on `ridge` is 3.94:1 and fails, and `coral` text on dark fails (02 row 13).
   stoneLt: '#a9b8c4',
   coralLt: '#f08a8a',
+  // QR codes and the print sheet: black on white, so a code scans whatever the page theme is.
+  paper: '#ffffff',
+  ink: '#000000',
 } as const;
 
 export type ColorName = keyof typeof COLORS;
@@ -56,6 +59,7 @@ export const PAIRS: Pair[] = [
   { text: 'stone', background: 'deep', kind: 'ui', use: 'borders and dividers' },
   { text: 'stone', background: 'timber', kind: 'ui', use: 'form field borders on cards' },
   { text: 'stone', background: 'ridge', kind: 'ui', use: 'form field borders on raised surfaces' },
+  { text: 'ink', background: 'paper', kind: 'normal', use: 'QR sheet and printed page' },
 ];
 
 export const MIN_RATIO: Record<Pair['kind'], number> = { normal: 4.5, large: 3, ui: 3 };
