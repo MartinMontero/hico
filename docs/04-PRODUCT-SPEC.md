@@ -63,8 +63,8 @@ or changes another property's data, including operators acting through the app.
 - The screen opens from cache with no network, and says it is offline.
 
 Acceptance: switching days and filters takes under `[A]` 100 ms on a mid-range phone
-throttled to four times slower than a typical laptop CPU (measured in the G0 spike
-and then in CI). In the sandbox benchmark the work for a day switch was 6 to 8 ms with
+throttled to four times slower than a typical laptop CPU (the G0 spike was waived, D-12,
+so this is first measured on the real screens `[A]`, and then in CI). In the sandbox benchmark the work for a day switch was 6 to 8 ms with
 6 cards and 83 to 92 ms with 200 cards at that slowdown, in all four frameworks
 (`05` §2.1), so a day with hundreds of cards would need paging `[I]`. The list is operable by keyboard and screen reader; the day strip
 and a recurring 8 pm activity are correct on both sides of each daylight-saving
@@ -234,8 +234,9 @@ Initial JavaScript for the guest app at most 60 KB gzip (the prototype ships 71 
 and contains one screen's worth of data). Largest Contentful Paint at most 2.5 s,
 Interaction to Next Paint at most 200 ms, Cumulative Layout Shift at most 0.1, on a
 mid-range Android phone with throttled mobile network `[I]` (the "good" thresholds
-for these Core Web Vitals; not re-fetched this session). G0 replaces the proposed
-60 KB with a measured figure.
+for these Core Web Vitals; not re-fetched this session). G0 was waived (D-12), so the
+proposed 60 KB stands `[A]` until the real app is built; the sandbox build of one plain
+screen was 6.4 KB gzip in Preact (`05` §2.1).
 
 ## 8. Stages
 

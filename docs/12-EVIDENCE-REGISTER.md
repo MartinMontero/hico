@@ -18,7 +18,7 @@ proposal; **U** unknown.
 | E-04 | Radar positions use `Math.random()`; the parent re-renders every second and redraws them | V | Source lines 736, 606–608, 748; read 2026-10-23 |
 | E-05 | Signal cards show dorm names; client-side countdown; device-clock day filter | V | Source read 2026-10-23 |
 | E-06 | Contrast pairs in `02` §2 row 13 | V | Computed with the WCAG formula, 2026-10-23 |
-| E-07 | "Cheekye's" appears in the prototype (line 71) and is Martin's spelling for the café at HI Whistler | V | Source and Martin, 2026-10-23 |
+| E-07 | The café at HI Whistler is spelled "Cheaky's Cafe" (D-14). The prototype (line 71) spells it "Cheekye's" | V | Martin, 2026-10-23, and HI Canada's own discounts page |
 | E-08 | Serendipty gate behaviour (constant-time key check, hashed HttpOnly cookie, flat 404, fail closed, security headers) | V | `packages\gate\index.js` read 2026-10-23 |
 | E-09 | `hico` Worker config: SPA fallback, `run_worker_first: ["/*"]`, compatibility date 2026-08-07 | V | `wrangler.jsonc` read 2026-10-23 |
 | E-10 | Deployed prototype bundle is 234,091 B raw, 71,209 B gzip | V | `dist\assets\index-l_thFI2C.js`, measured 2026-10-23 |
@@ -131,6 +131,6 @@ proposal; **U** unknown.
 
 | ID | Claim | Status | Source and date |
 | --- | --- | --- | --- |
-| E-100 | The PowerShell in `00`, `10` and `11` is syntactically valid, uses no PowerShell-7-only syntax, and the key recipe, the timestamp line and the `Expand-Archive` no-overwrite behaviour work | V | PowerShell 7.6.8 (download checked against the published SHA-256) on Linux, 2026-10-23: 11 of 11 blocks parse; a 43-character URL-safe key, two runs differ; a second extract raised an error and left an edited file intact. Not Windows |
+| E-100 | The PowerShell in `00`, `10` and `11` is syntactically valid, uses no PowerShell-7-only syntax, and the key recipe, the timestamp line and the `Expand-Archive` no-overwrite behaviour work | V | Parse: PowerShell 7.6.8 on Linux, 2026-10-23, 11 of 11 blocks. Run on Windows 11 under Windows PowerShell 5.1 and PowerShell 7.6.8, 2026-10-23 (`docs\spikes\preflight-desktop.md`, `preflight-pwsh7.md`, `preflight-rerun.md`): a 43-character URL-safe key, two runs differ; a second extract with `-ErrorAction Stop` raised an error and left an edited file intact. Without `-ErrorAction Stop`, 5.1 printed a non-terminating error per existing file and carried on, still without overwriting. Not tested on Windows: whether every block parses under 5.1 and under 7; `Set-Clipboard` beyond its existence; PowerShell 7 without `-ErrorAction Stop` `[U]` |
 | E-113 | The same PowerShell works on Windows PowerShell 5.1 and on PowerShell 7 on Windows, including `$HOME\dev` paths and `Set-Clipboard` | U | Not run on Windows. The Phase 0 preflight runs it and saves the output |
 | E-101 | The package contains none of the program names Martin ruled out on 2026-10-23, and no access key | V | Text search of every file for those names and for key-like strings, 2026-10-23 |

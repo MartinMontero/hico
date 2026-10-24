@@ -67,9 +67,11 @@ gap. When I have answered, deliver the whole thing in one block, never a fragmen
 
 ## Environment
 
-Windows, PowerShell. Never give me bash or macOS commands. Node, wrangler and
-Claude Code are installed and authenticated and the Cloudflare account is live
-(account holds several Workers already, including `hico`, `mec-trails`, `lume`).
+Windows, PowerShell (Windows PowerShell 5.1 and PowerShell 7.6.8 are both installed).
+Never give me bash or macOS commands. Node and Claude Code are installed and
+authenticated, and I run Claude Code in the desktop app, not from a terminal. Wrangler
+4.152.0 is installed (D-16); whether it is logged in is unchecked. The Cloudflare account
+is live (it holds several Workers already, including `hico`, `mec-trails`, `lume`).
 Never write install, login or prerequisite steps.
 
 `$HOME` is `C:\Users\User`. Sources live under `C:\Users\User\dev`. HI CO's production repo is
@@ -143,7 +145,7 @@ one is wrong. Do not quietly cross one.
   OpenAI, xAI. Everything else is permitted by default, including Google. Never write
   "only X and Y", never narrow it without my explicit instruction. Whether a project
   that began at an excluded vendor (React began at Meta) counts as that vendor is my
-  call, not yours (O-16).
+  call, not yours (O-16). I called it for React and Preact in D-12.
 
 ## Deployment invariants
 

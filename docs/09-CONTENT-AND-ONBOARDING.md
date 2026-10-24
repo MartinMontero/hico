@@ -11,10 +11,13 @@ Staff are the authors. Every text field exists in English and French.
 | --- | --- | --- |
 | Property | Name EN/FR, slug, hostnames, IANA timezone, address, supported languages, privacy contact title and address, centre and radius for the on-device check | Set by the operator, edited by the admin |
 | Zones | Label EN/FR, ring | The named places in the hostel (Common Room, Deck, Kitchen, Lobby) plus "Out and about". Each belongs to one ring: in the hostel, a short walk away, or further out. "Out and about" is further out |
-| Activity | Title, description, category, zone or place, host label, start and end or weekly recurrence with local time, capacity (optional), status (active or cancelled), verified-on, verified-by | Cancelling one date does not delete the series |
+| Activity | Title, description, category, offered at (one or more properties, D-15), zone or place, host label, start and end or weekly recurrence with local time, capacity (optional), status (active or cancelled), verified-on, verified-by | Cancelling one date does not delete the series |
 | Place | Name, category, staff pick, staff note, walk time as text, hours text, phone (optional), "open in maps" address, verified-on, verified-by | No rating |
 | Offer | Partner name, terms in plain words, valid from and to, requires-membership flag, how we know, verified-on, verified-by | Hidden from guests if expired or unchecked for 90 days `[A]` |
 | QR code | Location label, created, revoked | Token is shown once, then only its hash exists |
+
+An activity can be offered at more than one property (D-15). It is one record with one set of
+verification stamps. The zone or place it meets at belongs to one property.
 
 Images are not part of Stage 0. Uploaded images need storage, review and
 moderation; they come only if a property asks and staff have the time (`[A]`).
@@ -69,7 +72,7 @@ Facts, with their status. Re-verify with the property before any is shown to a g
 | Free wifi, coworking space, shared kitchen, games room with billiards, patio, library | `[V]` same listing (the listing says "sunny patio") |
 | No hostel-run activities listed on the listing | `[V]` same listing |
 | 232 pillows; reopened June 2023 after a three-year closure; 24-hour front desk; free continental breakfast 7 to 9; rooftop patio; TV lounge | `[I]` from an earlier research note (30 May). Not on the listing page read today. Treat as unverified |
-| The General Manager is Rhian, who manages both Vancouver hostels | `[I]` same earlier note. Confirm before using the name anywhere |
+| The General Manager of both Vancouver hostels is Rhian | `[R]` Martin, 2026-10-23, who confirmed the spelling. The surname in the earlier note is `[I]` and is not confirmed; do not use it |
 
 Downtown has **no content yet** for the app. Its first board, places and offers come
 from the property, not from the prototype's Whistler content (`02` §3).
@@ -84,7 +87,7 @@ It is never deployed to production. Invented guest names in the prototype
 
 When HI Whistler becomes tenant two (Phase 8), its real content replaces the seed and
 every item is verified by Whistler staff first. The café there is spelled
-**Cheekye's** (D-03; the spelling also appears in the prototype source, line 71 `[V]`).
+**Cheaky's Cafe** (D-14, which supersedes D-03; the prototype source, line 71, spells it Cheekye's and is wrong on this point `[V]`).
 The Life Member page lists 15% off food and drink at HI Whistler's café for Life
 Members `[V]` 2026-10-23; the terms and whether they apply to the app's offer are for
 Whistler and HI Canada to confirm.

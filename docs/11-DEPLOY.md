@@ -3,14 +3,17 @@
 How HI CO is put on Cloudflare, checked, and rolled back. Labels as in
 `00-README.md`.
 
-**Status of the PowerShell.** On 2026-10-23 every PowerShell block in `00`, `10` and
-`11` was parsed with PowerShell 7.6.8, and the key recipe, the timestamp line and the
-extract-without-overwrite behaviour were run, on a Linux machine, not Windows `[V]`.
-None of it has run on Windows. The Windows path forms (`$HOME\dev`), `Set-Clipboard`
-and the Wrangler commands were not exercised there `[U]`. The Wrangler command names
-and flags were checked against `wrangler --help` for version 4.152.0 on 2026-10-23
-`[V]`. The Phase 0 preflight (`10`) runs the local parts on your machine and shows the
-output before you rely on them.
+**Status of the PowerShell.** On 2026-10-23 the local parts of this file ran on Windows 11
+under both Windows PowerShell 5.1 and PowerShell 7.6.8: the key recipe (43 characters,
+URL-safe, two runs differ), the timestamp and backup-folder lines, and the
+extract-without-overwrite behaviour `[V]` (`docs\spikes\preflight-desktop.md`,
+`preflight-pwsh7.md`, `preflight-rerun.md`). Every PowerShell block in `00`, `10` and `11`
+was also parsed with PowerShell 7.6.8 on Linux. Whether every block parses under 5.1 and
+7 on Windows has not been run, and `Set-Clipboard` was checked for existence only `[U]`.
+The Wrangler command names and flags were checked against `wrangler --help` for version
+4.152.0 on 2026-10-23 `[V]`. No Wrangler command beyond `--version` has run, and whether
+it is logged in is unchecked `[U]`. The Phase 0 preflight (`10`) ran the local parts on
+your machine and showed the output.
 
 **Nothing in this file is run without your GO, announced in advance.** That covers
 `d1 create`, `secret put`, `deploy`, remote migrations, restores, route or DNS
@@ -30,6 +33,12 @@ changes, and the plan upgrade.
 **Never** use the Worker names `hico`, `mec-trails`, `lume` or `lume-city`. `hico` is
 the live prototype; deploying under that name would replace it. The build fails if a
 configuration resolves to one of them (Phase 1).
+
+**The demo (D-21)** is a preview deployment (`hico-preview`, behind the preview key)
+that is meant to be reached under `hico.builderworkshop.ca`. That needs `builderworkshop.ca`
+to be a zone on the Cloudflare account Wrangler logs in to `[U]`, and a custom-domain
+route on `hico-preview`. Attaching a route changes DNS for that hostname and is a GO of its
+own. Until then the demo's address is the `workers.dev` one in the table.
 
 ## 2. Secrets
 

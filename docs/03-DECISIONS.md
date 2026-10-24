@@ -26,11 +26,18 @@ that is not in this file has not been made.
 | D-09 | No native app, no booking gate, no reliance on push for core retention | Adoption research (`08`) | Inherited | — | M |
 | D-10 | Location is foreground, per-use and on-device. Never continuous or background. Wallet pass is the only background route and it is OS-mediated and opt-in | Feasibility report (`07`) | Inherited | — | M |
 | D-11 | Vendor policy is an exclusion list (Meta, OpenAI, xAI). Everything else is permitted | Martin's standing rule | Inherited | — | Y |
+| D-12 | The front-end framework is **Preact 11**, as a Vite single-page app with a Hono Worker behind it. Phase 0.2 (the framework spike, gate G0) is waived. React stays only as the measuring baseline and is not a candidate for HI CO. This resolves O-16 | Martin, 2026-10-23, on the sandbox benchmark in `05` §2.1, summarised in `docs\spikes\G0-framework-report.md`. In it Preact reached first content 49% to 57% sooner than React at 4× and 6× CPU slowdown and at 1× about 50% sooner, and its one-screen build is 6.4 KB gzip against React's 68.2 KB. Update costs were mostly not significantly different from React's; five cells in the larger lists were more than 10% slower (report §2). What it did not measure: styled screens, a real phone, Windows, Lighthouse, axe on the running page, developer experience, the Cloudflare Vite plugin, and Preact's React-compatibility layer `[U]`. Strongest argument against Preact: version 11 is about three weeks old (`05` §2.3). Svelte 5 stays the documented alternative. Preact is a separate project from React; choosing it is Martin's call on the part of O-16 that asked whether that suffices | Martin | 2026-10-23 | M |
 | D-14 | The café at HI Whistler is spelled **Cheaky's Cafe**. This supersedes D-03 | Martin, 2026-10-23. It is also how HI Canada's own discounts page spells it. The prototype source spells it Cheekye's and is wrong on this point | Martin | 2026-10-23 | Y |
 | D-15 | An activity that HI Vancouver Downtown and HI Vancouver Jericho Beach both offer is **one shared record**, edited once and shown to guests of both hostels. Most activities meet at HI Vancouver Downtown for guests of both hostels, and the Jericho front desk tells guests how to get there, so the app carries no transport information | Martin, 2026-10-23. Replaces separate copies per hostel, which already differ on the two boards (`docs\external\jericho-2026-10-23\jericho-transcription.md` §1 and §3). How the data model carries it (a list of properties on the activity, or one tenant with two sites) is settled in the Phase 1 plan, which waits for Martin's GO. D-02 stands as written until then | Martin | 2026-10-23 | M |
 | D-16 | PowerShell 7.6.8 (`winget`, `Microsoft.PowerShell`) and Wrangler 4.152.0 (`npm install -g`) are installed on this machine, on Martin's instruction in chat. Both are machine-wide, not project dependencies; no `package.json` exists | Martin chose both when asked, 2026-10-23, after the preflight found neither. PowerShell 7 lets the scripts be run under both shells (`11-DEPLOY.md`); Wrangler is needed from the deploy phases. Wrangler is not logged in as far as checked, and no Wrangler command beyond `--version` has been run | Martin | 2026-10-23 | Y |
+| D-17 | **No numeric place ratings** (O-13 accepted as recommended). A place shows "Staff pick", a one-line staff note and a verification stamp | The prototype's stars on all 24 places have no stated source `[V]`; a rating nobody can trace is the kind of thing that masquerades as real (`01`) | Martin | 2026-10-23 | Y |
+| D-18 | **"I'm In" saves the activity to the guest's own plan on their device and shows no count** (O-14 accepted as recommended). Shared counts and capacity wait for Stage 2, when sessions and the consent screen exist | Keeps Stage 0 single-player (D-07) and independent of the QR session flow | Martin | 2026-10-23 | Y |
+| D-19 | **English and French from day one** (O-10 accepted as recommended). French needs a native Québécois review before any Quebec-facing deployment | The architecture needs both regardless (`05` §13). Nobody has been named as the reviewer `[U]` | Martin | 2026-10-23 | Y |
+| D-20 | **Fawzie owns content updates and the report queue** for HI Vancouver Downtown and HI Vancouver Jericho Beach (O-09) | Martin's call. Fawzie runs programs for HI Jericho, Downtown and Whistler `[R]`. His own agreement and whether this fits the "a few minutes a day" budget `[A]` are not recorded `[U]`. Martin says events change monthly, not daily `[R]` | Martin | 2026-10-23 | Y |
+| D-21 | **For the demo only,** the app's domain is **hico.builderworkshop.ca** and it shows **no HI logo**. The production hostname, who owns the domain, and whether HI marks may be used stay open (O-03) | Martin, 2026-10-23. Whether builderworkshop.ca is on the Cloudflare account Wrangler will use is not checked `[U]`. How the two hostels are told apart (one host with the property carried in the link, or a subdomain each) is for the Phase 1 plan | Martin | 2026-10-23 | Y |
+| D-22 | **Demo scope.** The demo is for HI Canada's head office: Rhian, General Manager of both Vancouver hostels, asked for it so she can present it to the head of programs `[R]`. It is Phases 1, 1b-1, 1b-2, 2 and 3 of `10-BUILD-PLAN.md`, with Phase 3 covering both HI Vancouver Downtown and HI Vancouver Jericho Beach (D-15). Staff sign-in (O-02) is part of the demo; its method is chosen by the Phase 1b-1 spike and then called by Martin. Phase 0.2 is waived (D-12). Phase 3b onward (production, savings, membership verification, shared counts, wallet pass, a second tenant) is not part of the demo. Nothing is deployed without Martin's GO in advance | Martin, 2026-10-23: "you are overcomplicating this MVP build for the demo to senior management" and "staff sign-in (O-02) is part of the demo". HI Canada head office's agreement is not recorded `[U]` | Martin | 2026-10-23 | Y |
 
-D-12 (the framework) and D-13 (the validation library) are reserved. They are added when gate G0 closes and in Phase 1, so the numbers the build plan uses stay valid.
+D-13 (the validation library) is reserved. It is added in Phase 1, so the number the build plan uses stays valid. The next free number after D-22 is D-23.
 
 ## Open — decisions Martin owes
 
@@ -53,6 +60,8 @@ How does a guest get in, and what proves they are actually at the hostel?
 - Reversible: Y.
 
 ### O-02 Staff authentication
+**Staff sign-in is part of the demo (D-22). The method is still open: the Phase 1b-1 spike reports, then Martin calls it.**
+
 Three options, none verified to work on this stack yet (Phase 1 spike decides):
 1. **Cloudflare Access** in front of `/admin`: least code. `[U]` seat limit and
    login methods on the free plan (the pricing page did not state them), and
@@ -67,6 +76,8 @@ Three options, none verified to work on this stack yet (Phase 1 spike decides):
   spike result. Reversible: M.
 
 ### O-03 Hostnames, domain and marks
+**Resolved for the demo only by D-21 (hico.builderworkshop.ca, no HI logo). The production half is still open.**
+
 One subdomain per property (`downtown-vancouver.<domain>`) or one host with
 `/p/<slug>`? Who owns the domain: Martin or HI Canada? May HI CO use "HI" marks, and
 the HI Canada logo? `[U]` — ask HI Canada. Recommendation: subdomain per property
@@ -127,11 +138,15 @@ HI CO treats membership as something a guest declares, never something it
 verifies. Reversible: Y.
 
 ### O-09 Who edits content and who moderates
+**Resolved by D-20.**
+
 Staff are the content authors. Who at HI Vancouver Downtown owns the weekly update
 and the report queue, and is that within the "a few minutes a day" budget `[A]`? Ask
 before launch. Reversible: Y.
 
 ### O-10 Languages at launch
+**Resolved by D-19.**
+
 English plus French from day one (the architecture needs both regardless). Others
 (Spanish, Japanese, Korean, German) are a content-and-review cost per language.
 Recommendation: EN and FR at launch for Downtown; FR needs a native Québécois
@@ -150,6 +165,8 @@ review history and CI. Recommendation: a private remote repository and CI that r
 `npm run validate`. Reversible: Y.
 
 ### O-13 Place ratings
+**Resolved by D-17.**
+
 The prototype shows a star rating on all 24 places with no stated source `[V]`.
 - **Recommended:** remove numeric ratings. Show "Staff pick", a one-line staff note
   and a verification stamp. A rating nobody can trace is the kind of thing that
@@ -160,6 +177,8 @@ The prototype shows a star rating on all 24 places with no stated source `[V]`.
 - Reversible: Y.
 
 ### O-14 "I'm In" before Stage 2
+**Resolved by D-18.**
+
 Stage 0 is single-player. **Recommended:** "I'm In" saves the activity to the
 guest's own plan on their device and shows no count. Shared counts and capacity
 arrive in Stage 2, when sessions and the consent screen exist.
@@ -176,6 +195,8 @@ report); `[U]` any fee waiver for HI Canada (Apple's own fee-waiver pages return
 "not found" when I tried them on 2026-10-23). Reversible: M.
 
 ### O-16 Does the Meta exclusion cover React?
+**Resolved by D-12: React is the measuring baseline only. Preact was chosen.**
+
 Your vendor exclusion list names Meta. React began at Meta and is now governed by the
 React Foundation (Linux Foundation, launched 2026-02-24), where Meta is one of eight
 founding platinum members `[V]`. The project instructions state your list as written
@@ -190,9 +211,6 @@ and do not decide this for you.
   on the numbers.
 - Reversible: Y.
 
-## Pending gate
+## Gates
 
-**G0 — framework gate.** Closes when the Phase 0.2 spike report is in and Martin has
-read it and chosen. Closing it adds decision D-12 (the framework). Until then no
-application code is written in a framework. Phase 1 adds D-13 (the validation
-library).
+**G0 — framework gate. Closed by waiver on 2026-10-23 (D-12).** Phase 0.2 was not run. The evidence is the sandbox benchmark, summarised in `docs\spikes\G0-framework-report.md`, which says what was and was not measured. Phase 1 adds D-13 (the validation library).

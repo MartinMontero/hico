@@ -141,16 +141,13 @@ same results and the same desktop-app conclusion):
   authentication is `[U]`. Steps 2a–2e gave the same results under 5.1 and 7, apart
   from newer cmdlet versions under 7.
 
-The next step is the framework spike in `10-BUILD-PLAN.md`, Phase 0.2.
+Gate G0 is closed by waiver: D-12 chose Preact 11 on the sandbox benchmark, and
+`docs\spikes\G0-framework-report.md` says what that did and did not measure. Decisions
+D-12 and D-17 to D-22 were called on 2026-10-23. The demo path is Phases 1, 1b-1, 1b-2, 2
+and 3 of `10-BUILD-PLAN.md` (D-22). The next step is the Phase 1 plan, which stops for
+Martin's GO.
 
 ## 5. Stale documents
 
-- `docs\01-project-instructions.md` line 70 says Node, wrangler and Claude Code are
-  installed and authenticated. Wrangler was not installed until 2026-10-23 and its
-  login is unchecked. Not edited; Martin to decide.
-- `docs\11-DEPLOY.md` status paragraph says none of its PowerShell has run on Windows.
-  Its local parts have now run on Windows under 5.1 and 7 (the key recipe, the
-  timestamp line, extract-without-overwrite). The Wrangler flags were checked
-  against 4.152.0 help text, which is the version now installed. Not edited.
 - `docs\spikes\preflight.md` says PowerShell 7 and Wrangler are not installed; true
   when written, no longer true. It is a dated record and is left as written.

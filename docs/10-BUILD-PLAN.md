@@ -5,13 +5,10 @@ phase. Every prompt below is whole and ready to paste. Labels as in `00-README.m
 
 ## How to use this file
 
-1. Start each phase in a fresh Claude Code session in the repo. In PowerShell:
-
-```powershell
-Set-Location "$HOME\dev\hico"
-claude
-```
-
+1. Start each phase in a fresh session in the Claude Code desktop app, with the folder
+   `C:\Users\User\dev\hico` open. There is no launch command: the app starts the session,
+   and the session runs its own commands in PowerShell `[V]`
+   (`docs\spikes\preflight-rerun.md`).
 2. Paste that phase's prompt. `CLAUDE.md` is loaded automatically, so prompts do not
    repeat its rules; they restate only what the phase needs.
 3. Anything larger than a one-file change starts with a written plan in
@@ -27,12 +24,12 @@ claude
 | Phase | What | Needs before it starts | Blocked until you call |
 | --- | --- | --- | --- |
 | 0 | Repository bootstrap | The package zip in `Downloads` | nothing |
-| 0.2 | Framework spike, gate G0 | Phase 0 | O-16, ideally before you read the report |
-| 1 | Foundation | G0 closed and D-12 recorded | framework (D-12) |
+| 0.2 | Framework spike, gate G0 | **Waived (D-12).** Not run for the demo | nothing |
+| 1 | Foundation | D-12 recorded (done) and `docs\spikes\G0-framework-report.md` | your GO on its plan, which settles the D-15 data model |
 | 1b-1 | Staff-auth spike | Phase 1 | nothing |
-| 1b-2 | Staff auth and console | 1b-1 report | O-02 |
-| 2 | Guest Stage 0 | 1b-2 | O-13 and O-14 (or accept the recommendations) |
-| 3 | Downtown onboarding and gated preview | 2; content from Downtown | O-03, O-09, O-10 |
+| 1b-2 | Staff auth and console (in the demo, D-22) | 1b-1 report | O-02 |
+| 2 | Guest Stage 0 | 1b-2 | nothing (O-13 and O-14 are D-17 and D-18) |
+| 3 | Downtown and Jericho Beach onboarding and gated preview | 2; content from both hostels | nothing for the demo (O-03, O-09, O-10 are D-21, D-20, D-19) |
 | 3b | Stage 0 to production | 3; HI Canada's answers to `06` §7 items 1 to 6; Workers Paid | O-05, O-07, O-11 (the baseline has to exist before launch) |
 | 4 | Stage 1: Unlock your savings (declared membership) | 3b live and the Stage 0 gate met | the HI Canada offer terms |
 | 4b | Membership verification | Answers from Cobber via HI Canada | O-08 |
@@ -41,8 +38,10 @@ claude
 | 7 | Wallet pass spikes, then build | Stage 3 running | O-15 |
 | 8 | Tenant two and hardening | Any stage live | nothing new |
 
-Phases 0 and 0.2 can run today. Everything after Phase 0.2 waits for you. O-12 (a
-private remote repository and CI) blocks nothing; local git works until you decide.
+**The demo path (D-22) is Phases 1, 1b-1, 1b-2, 2 and 3,** with Phase 3 covering both
+Vancouver hostels. Phase 0 is done and Phase 0.2 is waived. Phase 3b onward is not part
+of the demo. Every phase waits for your GO. O-12 (a private remote repository and CI)
+blocks nothing; local git works until you decide.
 
 ## What only HI Canada can supply
 
@@ -54,7 +53,7 @@ them has been asked.
 | --- | --- | --- |
 | HI Canada's and Downtown's agreement to take part (D-02 records only your decision) | Showing the preview to the property | No tenant; the demo stays internal |
 | Permission to use the "HI" name and logo (O-03) | Phase 3b | HI CO gets a neutral name and look, or does not launch under the mark |
-| Downtown's content and a named owner for the weekly update (O-09) | Phase 3 | Demo content only; no launch |
+| Content for Downtown and Jericho Beach; the owner of updates is Fawzie (D-20) | Phase 3 | Demo content only; no launch |
 | The Stage 0 measure, baseline and threshold (O-11) | Phase 3b | Stages cannot be promoted by evidence; promotion becomes your judgment call |
 | HI Canada's privacy officer, and answers to `06` §7 items 1 to 6 | Phase 3b | Production stays at the gated preview |
 | Answers to `06` §7 items 7 to 9; HI Canada's policy on minors (O-06) | Phase 5 | Stages 2 and 3 are not built |
@@ -62,6 +61,7 @@ them has been asked.
 | Exact membership offer terms | Phase 4 | Offers appear with no membership claim |
 | Answers to the four questions to Cobber (`07` §6) | Phase 4b | Membership stays self-declared |
 | A domain on your Cloudflare account, and who pays for Workers Paid (O-03, O-07) | Phase 3b | No production |
+| `builderworkshop.ca` as a zone on the Cloudflare account Wrangler logs in to, for the demo domain (D-21) | Attaching the demo domain in Phase 3 | The demo stays on its `workers.dev` address |
 | A native Québécois French reviewer | Any Quebec-facing deployment | English and French drafts only; no Quebec launch |
 
 
@@ -134,6 +134,10 @@ and which documents are now stale.
 ---
 
 ## Phase 0.2 — Framework spike (gate G0)
+
+**Waived on 2026-10-23 (D-12). Do not run this phase for the demo.** The report that says
+what the sandbox benchmark did and did not cover is `docs\spikes\G0-framework-report.md`.
+The prompt below is kept in case measurements on the real screens are wanted later.
 
 Claude Code prompt:
 
@@ -216,19 +220,42 @@ and which documents are now stale.
 
 ## Phase 1 — Foundation
 
-Claude Code prompt (start only after D-12 exists in `docs\03-DECISIONS.md`):
+Claude Code prompt (D-12 exists: Preact 11, gate G0 waived):
 
 ```text
 Objective: build the multi-tenant foundation of HI CO with no guest features yet: the
 project scaffold, database schema, tenant isolation, shell, language and theme
-layers, and the preview gate. Use the framework recorded as D-12 in
-docs\03-DECISIONS.md. If there is no D-12, stop and tell me.
+layers, and the preview gate. This is the base of the demo for HI Canada's head office
+(D-22). Use the framework recorded as D-12 in docs\03-DECISIONS.md (Preact 11). If there
+is no D-12, stop and tell me.
 
-Read first: docs\05-ARCHITECTURE.md (all), docs\06-PRIVACY-AND-COMPLIANCE.md sections
-2 and 4, docs\04-PRODUCT-SPEC.md sections 5 to 7, docs\09-CONTENT-AND-ONBOARDING.md
-section 1, docs\spikes\G0-framework-report.md.
+Read first: docs\03-DECISIONS.md (all; D-12, D-14, D-15, D-21 and D-22 shape this phase),
+docs\05-ARCHITECTURE.md (all), docs\06-PRIVACY-AND-COMPLIANCE.md sections 2 and 4,
+docs\04-PRODUCT-SPEC.md sections 5 to 7, docs\09-CONTENT-AND-ONBOARDING.md section 1,
+docs\spikes\G0-framework-report.md (the spike was waived; the report says what was and
+was not measured), and docs\external\jericho-2026-10-23\jericho-transcription.md sections
+1 and 3 (what the two Vancouver boards share and where they differ).
 
-First write the plan to docs\plans\<today>-phase-1-foundation.md and stop for my GO.
+Before the plan, commit the documentation changes already in the working tree. Run
+git status first; if anything other than the files below is modified, or anything is
+staged, stop and tell me. Add these files by name (never git add . or -A) and leave
+docs\external\ untracked: docs\00-README.md, docs\01-project-instructions.md,
+docs\02-STATE.md, docs\03-DECISIONS.md, docs\04-PRODUCT-SPEC.md, docs\05-ARCHITECTURE.md,
+docs\09-CONTENT-AND-ONBOARDING.md, docs\10-BUILD-PLAN.md, docs\11-DEPLOY.md,
+docs\12-EVIDENCE-REGISTER.md and docs\spikes\G0-framework-report.md. Message: "Record demo
+decisions D-12 and D-17 to D-22, waive G0, plan both Vancouver hostels". Show the
+git log -1 --stat line.
+
+Then write the plan to docs\plans\<today>-phase-1-foundation.md and stop for my GO.
+The plan must answer these two questions, each with a recommendation, what each option
+costs and how it will be tested, because I decide them at GO:
+- D-15: how the schema carries an activity that one or two properties offer, as one
+  record edited once, while keeping every rule in 05 section 4. Say plainly whether D-02
+  (each property is a tenant) has to change, and how.
+- D-21: how the domain hico.builderworkshop.ca serves two hostels when public content is
+  looked up by hostname (05 section 4, rule 1). The options I know of are one host with
+  the property in the link (a QR parameter, a path segment or a picker) and a subdomain
+  for each hostel.
 Then build:
 
 1. Scaffold per 05 sections 2.5 and 16: TypeScript strict, Vite with the Cloudflare
@@ -238,17 +265,19 @@ Then build:
    explicit "prod" environment sets name hico-prod and its own D1 binding. A test
    fails the build if any resolved Worker name equals hico, mec-trails, lume or
    lume-city. Assets are served with SPA fallback. Local D1 only: do not run
-   wrangler d1 create, do not deploy, do not set secrets.
+   wrangler d1 create, do not deploy, do not set secrets. Confirm, and report what you
+   saw, that Vitest and Playwright with Chromium run on this machine and that the
+   Cloudflare Vite plugin runs the Worker, static assets and a local D1 binding with
+   Preact.
 2. Migration 0001 for: platform_flags, properties, property_hosts, property_features,
-   zones, staff_users, staff_memberships, entry_codes (token hash empty
-   until Stage 2), activities, activity_exceptions, places, offers, audit_log, event_counts (05
-   section 5). Every
-   child table has a composite foreign key to (parent id, property_id); every parent
-   has UNIQUE (id, property_id); every text column has a length CHECK that equals the
-   limit in the shared schema, with a test proving the two agree; enumerations have
-   CHECKs; instants are UTC epoch seconds; ids are random 128-bit. Prove with a test
-   that D1 actually enforces the foreign keys and CHECKs before relying on them. If it
-   does not, stop and tell me.
+   zones, staff_users, staff_memberships, entry_codes (token hash empty until Stage 2),
+   activities, activity_exceptions, places, offers, audit_log, event_counts (05 section
+   5), shaped by the D-15 answer I approve. Every child table has a composite foreign key
+   to (parent id, property_id); every parent has UNIQUE (id, property_id); every text
+   column has a length CHECK that equals the limit in the shared schema, with a test
+   proving the two agree; enumerations have CHECKs; instants are UTC epoch seconds; ids
+   are random 128-bit. Prove with a test that D1 actually enforces the foreign keys and
+   CHECKs before relying on them. If it does not, stop and tell me.
 3. Tenant middleware and repository layer exactly as 05 section 4: property from the
    session or, for public content reads, from the hostname lookup; never from client
    input. Named public projections for every type with exact field allow-lists.
@@ -258,9 +287,10 @@ Then build:
    database access outside worker\repositories, and on SELECT * anywhere.
 5. Isolation suite: create two properties; for every repository function and API route,
    act as property A and try to read, list, update and delete property B's rows by id;
-   all must find nothing. A meta-test fails if any exported repository function has no
-   isolation test. Anonymous-surface test: call every route with no cookie and compare
-   each response's field names with an allow-list.
+   all must find nothing. Include the D-15 case (an activity offered by both properties)
+   using the edit rule your plan states. A meta-test fails if any exported repository
+   function has no isolation test. Anonymous-surface test: call every route with no
+   cookie and compare each response's field names with an allow-list.
 6. i18n: English and French catalogs, the lookup rule in 05 section 13 (the guest's
    language if present, else English with a visible marker, never blank or a key), and
    a build test that fails if any key lacks French.
@@ -269,41 +299,51 @@ Then build:
    text that passes on the ridge surface). Print a table of every text/background pair
    with its computed ratio and fail the build if one is under 4.5:1 (3:1 for large
    text). Self-host DM Sans (check and record its licence); no request to Google.
-8. App shell: header showing the property name from tenant config, four-tab navigation
-   (What's On, Explore, Common Room, Connect) with routing, Common Room and Connect
-   showing "Not turned on for this property" until their switch is on. An accessible
-   Dialog/Sheet component (role dialog, labelled, focus moves in and returns on close,
-   focus trapped, Escape closes) and a Toast with a live region. Unit tests for the
-   dialog behaviour.
+8. App shell: header showing the property name from tenant config as text (no HI logo
+   or other HI mark anywhere, D-21; the plan says what stands in for the brand mark, 02
+   row 18), four-tab navigation (What's On, Explore, Common Room, Connect) with routing,
+   Common Room and Connect showing "Not turned on for this property" until their switch
+   is on. An accessible Dialog/Sheet component (role dialog, labelled, focus moves in
+   and returns on close, focus trapped, Escape closes) and a Toast with a live region.
+   Unit tests for the dialog behaviour.
 9. Seed: demo-whistler built from the prototype's data. Drop ratings, drop invented
    guest names, mark every row is_placeholder, leave verification fields empty, and
-   render the "Sample content" band. The seed must refuse to run against anything but
-   a local database.
+   render the "Sample content" band. Spell the Whistler cafe Cheaky's Cafe (D-14); the
+   prototype source spells it Cheekye's and is wrong. The seed must refuse to run
+   against anything but a local database.
 10. Preview gate: copy (do not import across repositories)
     C:\Users\User\dev\Serendipty\packages\gate\index.js into worker\preview-gate\ and
     adapt it as middleware active only when the PREVIEW_GATE variable is "on". Keep its
     behaviour: constant-time comparison, HttpOnly Secure SameSite=Lax cookie holding a
     hash, flat 404 for everything else, fail closed with no key. It must cover the API
     as well as assets. Cookie name hc_preview. Tests: gate on and no key gives 404 on
-    every path including /api/* except /robots.txt, which answers Disallow as the original gate does; correct key passes; the key never appears in a log,
-    a response body or a redirect URL after the first redirect.
+    every path including /api/* except /robots.txt, which answers Disallow as the
+    original gate does; correct key passes; the key never appears in a log, a response
+    body or a redirect URL after the first redirect.
 11. A global read-only switch: when the platform_flags row "read_only" is "on", every
     state-changing route returns 503 with a plain message in the guest's language and
     reads keep working. Read the flag on each request (a few seconds of caching is
     fine). Test it. docs\11-DEPLOY.md section 9 uses it to stop writes in an incident.
-12. npm run validate runs typecheck, lint, all tests and the build, and fails on any
-    failure.
+12. npm run validate runs typecheck, lint, all tests (including an axe-core check of the
+    rendered shell at 360 px width that fails on any serious or critical violation) and
+    the build, and fails on any failure.
 
-Do not: deploy, create any remote resource, set any secret, put the preview key in a
-file, or add any third-party script.
+Do not: deploy, create any remote resource, set any secret, run any wrangler command
+that contacts Cloudflare (its login is unchecked), put the preview key in a file, add
+any third-party script, or change framework without asking me.
 
 Done when: npm run validate passes and you have pasted its raw output; the isolation
-suite and anonymous-surface test pass; the contrast table is shown; the app runs
-locally with wrangler dev or the Vite dev server and you have shown the shell at 360 px
-width and navigated it by keyboard only; docs\02-STATE.md describes the real layout.
+suite and anonymous-surface test pass; the contrast table is shown; what you found for
+the Cloudflare plugin with Preact, Vitest and Playwright on this machine is stated; the
+app runs locally with wrangler dev or the Vite dev server and you have shown the shell at
+360 px width and navigated it by keyboard only; docs\02-STATE.md describes the real
+layout.
 
 Stop and ask if: D1 does not enforce a constraint the design relies on; the Cloudflare
-Vite plugin cannot do something 05 assumes; any decision I have not made is needed.
+Vite plugin cannot do something 05 assumes; Preact, its build plugin or axe fails in a way
+that points at the framework (do not switch framework and do not use React: tell me what
+failed and what moving to Svelte 5, the alternative in 05 section 2.3, would cost); any
+decision I have not made is needed.
 
 Finish by reporting: what changed, decisions I still owe, what you could not verify,
 and which documents are now stale.
@@ -496,38 +536,44 @@ and which documents are now stale.
 
 ---
 
-## Phase 3 — HI Vancouver Downtown onboarding and preview launch
+## Phase 3 — HI Vancouver Downtown and Jericho Beach onboarding and preview launch
 
-Before this phase: put Downtown's content in `C:\Users\User\dev\hico\content\downtown\`
-as files, per the inputs list in `09` §3. Do not let Claude Code invent any. If you do
-not yet have the file format, run the prompt as it is: with no content it writes
-templates and stops, and you fill them in.
+Before this phase: put the content for HI Vancouver Downtown in
+`C:\Users\User\dev\hico\content\downtown\` and the content for HI Vancouver Jericho Beach in
+`C:\Users\User\dev\hico\content\jericho\`, as files, per the inputs list in `09` §3. An
+activity both hostels offer is one record with both properties in its "offered at" field
+(D-15); the Phase 1 plan says which file holds it. Do not let Claude Code invent any
+content. If you do not yet have the file format, run the prompt as it is: with no content
+it writes templates and stops, and you fill them in.
 
 Claude Code prompt:
 
 ```text
-Objective: onboard HI Vancouver Downtown as the first tenant with its own real content
-and take the Stage 0 app to a gated preview. Decisions O-03, O-09 and O-10 must be
-recorded in docs\03-DECISIONS.md; if any is missing, stop and tell me.
+Objective: onboard HI Vancouver Downtown and HI Vancouver Jericho Beach with their own
+real content, activities they both offer kept as one shared record (D-15), and take the
+Stage 0 app to a gated preview. Decisions D-19, D-20 and D-21 (O-10, O-09 and O-03 for
+the demo) must be recorded in docs\03-DECISIONS.md; if any is missing, stop and tell me.
 
 Read first: docs\09-CONTENT-AND-ONBOARDING.md (all), docs\11-DEPLOY.md, docs\04
 section 4.8, docs\06 section 7.
 
-Content is in content\downtown\. If that folder is missing or empty, write one clearly
-marked SAMPLE template file per content type into docs\content-templates\ (derived
-from the shared schema, in the format the import will accept), tell me where they are,
-and stop. Never write content for the property yourself. Anything you cannot find in
-the files, list as missing.
+Content is in content\downtown\ and content\jericho\. If either folder is missing or
+empty, write one clearly marked SAMPLE template file per content type into
+docs\content-templates\ (derived from the shared schema, in the format the import will
+accept), tell me where they are, and stop. Never write content for a property
+yourself. Anything you cannot find in the files, list as missing.
 
-First write the plan to docs\plans\<today>-phase-3-downtown.md and stop for my GO.
+First write the plan to docs\plans\<today>-phase-3-vancouver.md and stop for my GO.
 Then build:
 
 1. A bulk import in the staff console for admins: accepts the content files, validates
    every field against the shared schema, shows a dry-run preview of exactly what will
    be created or changed, and applies only after confirmation. Imports set verified-by
    to the importing user and leave verified-on empty until staff re-verify each item.
-2. The operator scripts run against the LOCAL database to create the Downtown property
-   with its timezone, languages, zones, hostnames from O-03 and first admin invite.
+2. The operator scripts run against the LOCAL database to create the Downtown and
+   Jericho Beach properties, each with its timezone, languages, zones and first admin
+   invite, served from the demo domain in D-21 (the Phase 1 plan says how a request
+   selects a property).
    Show me the exact commands for the remote equivalents, as in 11-DEPLOY.md, but do
    not run any remote command.
 3. scripts\launch-check.ps1 implementing the list in 09 section 8. It prints a pass or
@@ -536,17 +582,19 @@ Then build:
    per-person data.
 5. A written list of everything in Downtown's content that is missing, stale-looking
    or unverified, for the property to resolve.
-6. Prepare, but do not apply, the production configuration: the custom-domain route
-   from O-03, the hico-prod environment, and the secrets the app needs by name (not
-   value).
+6. Prepare, but do not apply, the demo's configuration on hico-preview: the
+   custom-domain route or routes for the demo domain in D-21 (attaching one is a DNS
+   change and needs its own GO from me; whether builderworkshop.ca is a zone on this Cloudflare account is
+   unchecked), and the secrets the app needs by name (not value). Do not prepare
+   hico-prod: production is not part of the demo (D-22).
 7. scripts\verify-deploy.ps1 as specified in docs\11-DEPLOY.md section 7. Run it against
    the local server on this machine, print the PowerShell version it ran under, and
    show that it fails when it should (for example against a page with an injected
    third-party script).
 
-Do not: invent content, deploy, create remote resources, run remote commands, or set
-secrets. Deploying to preview is a separate step I will authorise using
-docs\11-DEPLOY.md.
+Do not: invent content, put an HI logo anywhere in the app (D-21), deploy, create
+remote resources, run remote commands, or set secrets. Deploying to preview is a
+separate step I will authorise using docs\11-DEPLOY.md.
 
 Done when: npm run validate passes with raw output pasted; launch-check.ps1 runs
 locally and its output is shown (it is expected to flag whatever is missing); the

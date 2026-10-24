@@ -67,21 +67,22 @@ Do these once.
    into the instructions field. Upload `00` and `02` to `12` as project knowledge.
 2. Also upload the source documents below, unchanged, as reference.
 3. Put `hico-project-package.zip` (the 14 files at its top level, no folder inside it) in
-   `Downloads`, then run this in PowerShell. It unpacks the
-   package into the new repo folder and opens Claude Code there. It does not
-   overwrite anything: `Expand-Archive` stops with an error if a file already exists.
+   `Downloads`, then run this in PowerShell. It unpacks the package into the new repo
+   folder. It does not overwrite anything. With `-ErrorAction Stop`, `Expand-Archive` stops
+   at the first file that already exists. Without it, Windows PowerShell 5.1 prints an
+   error for each existing file and carries on, still without overwriting `[V]`
+   (`docs\spikes\preflight-desktop.md`); PowerShell 7 without it was not tested `[U]`.
 
 PowerShell, run in a terminal:
 
 ```powershell
 New-Item -ItemType Directory -Force -Path "$HOME\dev\hico" | Out-Null
-Expand-Archive -LiteralPath "$HOME\Downloads\hico-project-package.zip" -DestinationPath "$HOME\dev\hico\_package"
-Set-Location "$HOME\dev\hico"
-claude
+Expand-Archive -LiteralPath "$HOME\Downloads\hico-project-package.zip" -DestinationPath "$HOME\dev\hico\_package" -ErrorAction Stop
 ```
 
-4. In Claude Code, paste the Phase 0 prompt from `10-BUILD-PLAN.md`. It starts with a
-   preflight that runs the package's PowerShell on your machine and shows the output.
+4. In the Claude Code desktop app, open the folder `C:\Users\User\dev\hico` and paste the
+   Phase 0 prompt from `10-BUILD-PLAN.md`. It starts with a preflight that runs the
+   package's PowerShell on your machine and shows the output.
 
 ## Source documents (not in this package)
 

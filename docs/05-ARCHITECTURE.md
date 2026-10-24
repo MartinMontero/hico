@@ -181,9 +181,12 @@ governed by the React Foundation, where Meta is one of eight founding platinum m
 `[V]`. Whether that brings React under the exclusion is your call (O-16). If it does,
 React remains in the spike only as the baseline. Preact is a separate project that
 implements React's programming interface, and the page I read does not connect it to
-Meta `[R]`; whether that suffices is part of O-16.
+Meta `[R]`; whether that suffices is part of O-16. D-12 resolves O-16: React is the
+measuring baseline only, and Preact was chosen.
 
 ### 2.3 Recommendation (not a decision)
+
+Martin adopted this recommendation as D-12 on 2026-10-23.
 
 **Preact 11 as a Vite single-page app, with a Hono Worker behind it.** In the sandbox
 it and Solid were the two fastest to load at every CPU speed and list size, within
@@ -221,6 +224,10 @@ Cloudflare plugin. That is why G0 exists.
 
 ### 2.4 Gate G0 — the spike decides
 
+**Status: waived on 2026-10-23 (D-12). The spike was not run.** What the sandbox
+benchmark did and did not cover, measure by measure, is in
+`docs\spikes\G0-framework-report.md`. The rule below is kept as written.
+
 No application code is written until G0 closes. The spike (`10` Phase 0.2) builds
 What's On in Preact, Svelte 5 and Solid, and ports the prototype's version as the
 React baseline. It starts from the benchmark pack where that helps, and it records:
@@ -242,7 +249,8 @@ A framework **qualifies** if it is no larger than React on (1), no worse than Re
 on (2) and (4) (a timing difference under 10% counts as equal, because laptop
 measurements are noisy), has no more serious axe violations on (3), and works on (6). If more than
 one qualifies, the report recommends one with reasons and Martin decides (D-12 is
-recorded then). If none but React qualifies, React stays, and the report says so.
+recorded then). If none qualifies, the report says so and comes back to Martin before any framework is
+used; React is a measuring baseline only (D-12).
 
 ### 2.5 Everything else in the stack
 
@@ -252,7 +260,7 @@ recorded then). If none but React qualifies, React stays, and the report says so
 | Build | Vite with the Cloudflare Vite plugin: front end and Worker in one project, with Durable Objects, D1 and static assets. v1.0 went GA on 2025-04-08, with Hono among the supported frameworks | `[V]` Cloudflare blog; current version to be checked in Phase 1 |
 | API | Hono on the Worker | `[I]`; check current version and Workers support in Phase 1 |
 | Validation | One schema library shared by browser and Worker, with every length limit declared once | `[A]`; chosen in Phase 1 and recorded |
-| Tests | Vitest for units and API tests against local D1; Playwright for end-to-end and axe | `[I]`; Phase 0.2 confirms they run on Windows |
+| Tests | Vitest for units and API tests against local D1; Playwright for end-to-end and axe | `[I]`; Phase 1 confirms they run on Windows (Phase 0.2 was waived, D-12) |
 | PWA | Web app manifest plus a service worker | `[A]`; see §12 |
 | Fonts | DM Sans, self-hosted. No Google Fonts request in production | `[A]`; the prototype loads it from Google |
 
