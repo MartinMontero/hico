@@ -25,8 +25,11 @@ made, and you do not build on it.
 ## Shell
 
 Windows, PowerShell only. No bash, no `&&` chaining, no heredocs, no forward-slash
-paths, no `~/`. Use `$HOME\dev\hico` style paths. Node, wrangler and Claude Code are
-installed and authenticated; never write install or login steps.
+paths, no `~/`. Use `$HOME\dev\hico` style paths. Node and Claude Code are installed
+and authenticated. Wrangler 4.152.0 (global, npm) and PowerShell 7.6.8 (`pwsh`,
+winget) were installed on 2026-10-23 (D-16, `docs\spikes\preflight-pwsh7.md`); whether
+Wrangler is logged in to Cloudflare has not been checked. Never write install or login
+steps.
 
 ## Files
 

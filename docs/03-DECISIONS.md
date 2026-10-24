@@ -26,6 +26,11 @@ that is not in this file has not been made.
 | D-09 | No native app, no booking gate, no reliance on push for core retention | Adoption research (`08`) | Inherited | — | M |
 | D-10 | Location is foreground, per-use and on-device. Never continuous or background. Wallet pass is the only background route and it is OS-mediated and opt-in | Feasibility report (`07`) | Inherited | — | M |
 | D-11 | Vendor policy is an exclusion list (Meta, OpenAI, xAI). Everything else is permitted | Martin's standing rule | Inherited | — | Y |
+| D-14 | The café at HI Whistler is spelled **Cheaky's Cafe**. This supersedes D-03 | Martin, 2026-10-23. It is also how HI Canada's own discounts page spells it. The prototype source spells it Cheekye's and is wrong on this point | Martin | 2026-10-23 | Y |
+| D-15 | An activity that HI Vancouver Downtown and HI Vancouver Jericho Beach both offer is **one shared record**, edited once and shown to guests of both hostels. Most activities meet at HI Vancouver Downtown for guests of both hostels, and the Jericho front desk tells guests how to get there, so the app carries no transport information | Martin, 2026-10-23. Replaces separate copies per hostel, which already differ on the two boards (`docs\external\jericho-2026-10-23\jericho-transcription.md` §1 and §3). How the data model carries it (a list of properties on the activity, or one tenant with two sites) is settled in the Phase 1 plan, which waits for Martin's GO. D-02 stands as written until then | Martin | 2026-10-23 | M |
+| D-16 | PowerShell 7.6.8 (`winget`, `Microsoft.PowerShell`) and Wrangler 4.152.0 (`npm install -g`) are installed on this machine, on Martin's instruction in chat. Both are machine-wide, not project dependencies; no `package.json` exists | Martin chose both when asked, 2026-10-23, after the preflight found neither. PowerShell 7 lets the scripts be run under both shells (`11-DEPLOY.md`); Wrangler is needed from the deploy phases. Wrangler is not logged in as far as checked, and no Wrangler command beyond `--version` has been run | Martin | 2026-10-23 | Y |
+
+D-12 (the framework) and D-13 (the validation library) are reserved. They are added when gate G0 closes and in Phase 1, so the numbers the build plan uses stay valid.
 
 ## Open — decisions Martin owes
 

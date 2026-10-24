@@ -116,20 +116,41 @@ The prototype content is HI Whistler's board content as transcribed by the proto
 author `[I]` from the file's own header comment; I have not seen the boards. HI
 Vancouver Downtown, the first tenant, **has no content yet**. Treat the whole
 prototype dataset as placeholder for any property other than HI Whistler, and
-re-verify it before HI Whistler goes live. The café at HI Whistler is **Cheekye's**
-(spelling as stated by Martin, 2026-10-23).
+re-verify it before HI Whistler goes live. The café at HI Whistler is **Cheaky's Cafe**
+(D-14, stated by Martin, 2026-10-23; the prototype spells it Cheekye's).
 
 ## 4. In flight
 
 The repository exists at `C:\Users\User\dev\hico`. The documents are in `docs\`,
 `CLAUDE.md` is at the root, and the prototype is in `reference\hi-co-prototype.jsx`.
-No application code exists, nothing is installed and nothing is deployed. The
-Windows preflight has run `[V]` on 2026-10-23: Windows PowerShell 5.1 (Desktop
-edition, build 26100) is the only PowerShell on this machine — PowerShell 7
-(`pwsh`) is not installed, so every preflight step ran under 5.1 only. No step
-failed. Raw output is in `docs\spikes\preflight.md`. The next step is the framework
-spike in `10-BUILD-PLAN.md`, Phase 0.2.
+No application code exists, no project dependency is installed and nothing is
+deployed. The Windows preflight has run `[V]` on 2026-10-23, four times (the fourth,
+`docs\spikes\preflight-rerun.md`, repeats everything under both shells and gives the
+same results and the same desktop-app conclusion):
+
+- `docs\spikes\preflight.md`: first run, Windows PowerShell 5.1 only (no `pwsh`, no
+  Wrangler at that time). No step failed.
+- `docs\spikes\preflight-desktop.md`: second run under 5.1. The process chain shows the
+  session was launched by the Claude desktop application (bundled Claude Code
+  2.1.308); `claude --version` on the PATH is 2.1.310, a different binary `[V]`.
+- `docs\spikes\preflight-pwsh7.md`: third run, under PowerShell 7.6.8, after two
+  installs approved by Martin on 2026-10-23 (D-16): PowerShell 7.6.8 (`winget`,
+  `Microsoft.PowerShell`, `pwsh.exe` in `%LOCALAPPDATA%\Microsoft\WindowsApps`) and
+  Wrangler 4.152.0 (`npm install -g`, no `package.json` created). Wrangler was only run
+  with `--version`; it was not logged in or pointed at Cloudflare, so its
+  authentication is `[U]`. Steps 2a–2e gave the same results under 5.1 and 7, apart
+  from newer cmdlet versions under 7.
+
+The next step is the framework spike in `10-BUILD-PLAN.md`, Phase 0.2.
 
 ## 5. Stale documents
 
-None yet; this is the first issue of the set.
+- `docs\01-project-instructions.md` line 70 says Node, wrangler and Claude Code are
+  installed and authenticated. Wrangler was not installed until 2026-10-23 and its
+  login is unchecked. Not edited; Martin to decide.
+- `docs\11-DEPLOY.md` status paragraph says none of its PowerShell has run on Windows.
+  Its local parts have now run on Windows under 5.1 and 7 (the key recipe, the
+  timestamp line, extract-without-overwrite). The Wrangler flags were checked
+  against 4.152.0 help text, which is the version now installed. Not edited.
+- `docs\spikes\preflight.md` says PowerShell 7 and Wrangler are not installed; true
+  when written, no longer true. It is a dated record and is left as written.
