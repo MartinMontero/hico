@@ -7,6 +7,8 @@ import { requestLog, securityHeaders } from './middleware/headers.ts';
 import { cookieResolver } from './middleware/staff-session.ts';
 import { publicTenant, requestHost, staffTenant, type AppEnv, type StaffResolver } from './middleware/tenant.ts';
 import { createStaffAuthRoutes } from './routes/staff-auth.ts';
+import { createStaffContentRoutes } from './routes/staff-content.ts';
+import { createStaffExportRoutes } from './routes/staff-export.ts';
 import { createStaffPeopleRoutes } from './routes/staff-people.ts';
 import { activities, events, hosts, offers, places, properties } from './repositories/index.ts';
 import {
@@ -93,6 +95,8 @@ export function createApp(options: AppOptions = {}): Hono<AppEnv> {
     return c.json({ role: s.role, property: row ? { slug: row.slug, name: { en: row.nameEn, fr: row.nameFr }, timezone: row.timezone } : null });
   });
   staffApi.route('/', createStaffPeopleRoutes(now));
+  staffApi.route('/', createStaffContentRoutes(now));
+  staffApi.route('/', createStaffExportRoutes(now));
   app.route('/api/staff/p/:slug', staffApi);
   app.all('/api/*', (c) => c.json({ error: 'not_found' }, 404));
 

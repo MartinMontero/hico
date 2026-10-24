@@ -42,6 +42,7 @@ export const en = {
   'category.drinks': 'Drinks',
   'stamp.checked': 'Checked by staff on {date}',
   'stamp.notChecked': 'Not checked yet. Ask at the desk.',
+  'stamp.stale': 'Last checked on {date}. Check at the desk.',
   'settings.title': 'Settings',
   'settings.language': 'Language',
   'settings.close': 'Close',

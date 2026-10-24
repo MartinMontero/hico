@@ -244,7 +244,16 @@ slices, each committed only when `npm run validate` passes. Plan: `docs\plans\20
   role matrix; the staff screens (sign-in, accept link, home, my account) as a lazily loaded chunk of 8 KB gzip
   that guests never download; `scripts\operator.ts` with `invite-first-admin` and `issue-recovery-link`
   (local only for now). SimpleWebAuthn 14 is now a root dependency (D-26).
-- **Slices 2 to 4 (content write API, console screens, operator scripts and finish): not started.**
+- **Slice 2 (content write API), done:** staff routes for activities (weekly and one-off, cancel a date, series
+  status, duplicate, re-verify, delete), places, offers, zones, QR labels (labelled links only, Stage 0) and
+  feature switches; the D-23 shared-activity rules (content editable from any offering property; zone, list
+  and delete owner only); verification stamps set by the server only; `version` conflicts return 409 with the
+  current record; every mutation audited; admin-only audit list and content export (no staff, no other
+  property). Guests now see "Checked by staff on <date>" with no name (point 1). Role matrix over every
+  `/api/staff/p/` route and an audit meta-test (`tests\worker\staff-matrix.test.ts`, `tests\node\staff-audit.test.ts`).
+  `npm run validate` passes (450 unit and isolation tests, 17 browser tests; raw output in
+  `docs\spikes\phase-1b-2-validate-slice2.txt`).
+- **Slices 3 and 4 (console screens and QR library D-29; operator scripts and finish): not started.**
 ## 5. Stale documents
 
 - `docs\05-ARCHITECTURE.md` §16 shows the proposed layout; the real one is above. §13 says

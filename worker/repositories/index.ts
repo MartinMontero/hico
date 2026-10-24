@@ -13,3 +13,6 @@ export * as credentials from './credentials.ts';
 export * as tokens from './tokens.ts';
 export * as challenges from './challenges.ts';
 export * as ratelimit from './ratelimit.ts';
+export * as zones from './zones.ts';
+export * as codes from './codes.ts';
+export * as features from './features.ts';

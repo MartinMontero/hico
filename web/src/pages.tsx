@@ -27,18 +27,17 @@ export function LoadState<T>({ loaded, children }: { loaded: Loaded<T>; children
   return <>{children(loaded.data)}</>;
 }
 
-function Stamp({ verifiedOn, verifiedBy, timeZone }: { verifiedOn: number | null; verifiedBy: string | null; timeZone: string }) {
+/**
+ * "Checked by staff on 12 October" (09 §2): the date only, never a name. Past the limit (7 days for the board,
+ * 90 for places) it says to check at the desk, so an old item never looks current.
+ */
+function Stamp({ verifiedOn, timeZone, maxAgeDays }: { verifiedOn: number | null; timeZone: string; maxAgeDays: number }) {
   const { t, lang } = useUi();
   if (verifiedOn === null) return <p class="stamp">{t('stamp.notChecked')}</p>;
   const date = formatDay(ymdInZone(new Date(verifiedOn * 1000), timeZone), lang, { day: 'numeric', month: 'long' });
-  return (
-    <p class="stamp">
-      {t('stamp.checked', { date })}
-      {verifiedBy ? ` (${verifiedBy})` : ''}
-    </p>
-  );
+  const stale = Date.now() / 1000 - verifiedOn > maxAgeDays * 24 * 3600;
+  return <p class="stamp">{t(stale ? 'stamp.stale' : 'stamp.checked', { date })}</p>;
 }
-
 export function FeatureOff({ comingLater }: { comingLater: boolean }) {
   const { t } = useUi();
   return <p class="state">{comingLater ? t('state.comingLater') : t('state.featureOff')}</p>;
@@ -92,7 +91,7 @@ export function WhatsOn({ property }: { property: PublicProperty }) {
                   {activity.description.en || activity.description.fr ? <p>{pick(activity.description, lang)}</p> : null}
                   {activity.zone ? <p class="muted">{t('whatson.meets', { place: pick(activity.zone, lang) })}</p> : null}
                   {activity.hostLabel ? <p class="muted">{t('whatson.host', { name: activity.hostLabel })}</p> : null}
-                  <Stamp verifiedOn={activity.verifiedOn} verifiedBy={activity.verifiedBy} timeZone={property.timezone} />
+                  <Stamp verifiedOn={activity.verifiedOn} timeZone={property.timezone} maxAgeDays={7} />
                 </li>
               ))}
             </ul>
@@ -144,7 +143,7 @@ export function Explore({ property }: { property: PublicProperty }) {
                   {place.walkTime.en || place.walkTime.fr ? <p class="muted">{t('explore.walk', { time: pick(place.walkTime, lang) })}</p> : null}
                   {place.hours.en || place.hours.fr ? <p class="muted">{t('explore.hours', { hours: pick(place.hours, lang) })}</p> : null}
                   {place.phone ? <p class="muted">{t('explore.phone', { phone: place.phone })}</p> : null}
-                  <Stamp verifiedOn={place.verifiedOn} verifiedBy={place.verifiedBy} timeZone={property.timezone} />
+                  <Stamp verifiedOn={place.verifiedOn} timeZone={property.timezone} maxAgeDays={90} />
                 </li>
               ))}
             </ul>

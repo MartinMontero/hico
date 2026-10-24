@@ -109,10 +109,11 @@ describe('database access', () => {
     }
   });
   it('every SQL statement in a tenant repository mentions property_id or the offered-at join', () => {
-    for (const f of ['activities.ts', 'places.ts', 'offers.ts', 'audit.ts', 'events.ts', 'properties.ts']) {
+    for (const f of ['activities.ts', 'places.ts', 'offers.ts', 'audit.ts', 'events.ts', 'properties.ts', 'zones.ts', 'codes.ts', 'features.ts']) {
       const text = readFileSync(`worker/repositories/${f}`, 'utf8');
       for (const m of text.matchAll(/\.prepare\(\s*`([\s\S]*?)`/g)) {
-        expect(m[1], `${f}: ${(m[1] ?? '').slice(0, 60)}`).toMatch(/property_id|\bp\.id = \?1/);
+        // ${VISIBLE} expands to the offered-at join, which carries o.property_id = ?3.
+        expect(m[1], `${f}: ${(m[1] ?? '').slice(0, 60)}`).toMatch(/property_id|\bp\.id = \?1|\$\{VISIBLE\}/);
       }
     }
   });

@@ -45,6 +45,7 @@ export const fr: Record<MessageKey, string> = {
   'category.drinks': 'Boissons',
   'stamp.checked': 'Vérifié par le personnel le {date}',
   'stamp.notChecked': 'Pas encore vérifié. Demandez à la réception.',
+  'stamp.stale': 'Dernière vérification le {date}. Vérifiez à la réception.',
   'settings.title': 'Paramètres',
   'settings.language': 'Langue',
   'settings.close': 'Fermer',

@@ -48,7 +48,6 @@ export function projectActivity({ row, cancelledDates }: ActivityWithDates): Pub
     status: row.status,
     cancelledDates,
     verifiedOn: row.verified_on,
-    verifiedBy: row.verified_by,
     isPlaceholder: row.is_placeholder === 1,
   };
 }
@@ -65,7 +64,6 @@ export function projectPlace(row: PlaceRow): PublicPlace {
     phone: row.phone,
     mapsAddress: row.maps_address,
     verifiedOn: row.verified_on,
-    verifiedBy: row.verified_by,
     isPlaceholder: row.is_placeholder === 1,
   };
 }
@@ -80,7 +78,6 @@ export function projectOffer(row: OfferRow): PublicOffer {
     requiresMembership: row.requires_membership === 1,
     howWeKnow: { en: row.how_we_know_en, fr: row.how_we_know_fr },
     verifiedOn: row.verified_on,
-    verifiedBy: row.verified_by,
     isPlaceholder: row.is_placeholder === 1,
   };
 }

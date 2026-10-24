@@ -41,7 +41,6 @@ export interface PublicActivity {
   status: 'active' | 'cancelled';
   cancelledDates: string[];
   verifiedOn: number | null;
-  verifiedBy: string | null;
   isPlaceholder: boolean;
 }
 
@@ -56,7 +55,6 @@ export interface PublicPlace {
   phone: string | null;
   mapsAddress: string;
   verifiedOn: number | null;
-  verifiedBy: string | null;
   isPlaceholder: boolean;
 }
 
@@ -69,7 +67,6 @@ export interface PublicOffer {
   requiresMembership: boolean;
   howWeKnow: Bilingual;
   verifiedOn: number | null;
-  verifiedBy: string | null;
   isPlaceholder: boolean;
 }
 
@@ -80,16 +77,118 @@ export const PUBLIC_FIELDS = {
   activity: [
     'id', 'title', 'description', 'category', 'zone', 'hostLabel', 'timezone', 'weekday',
     'startLocal', 'endLocal', 'startsAt', 'endsAt', 'capacity', 'status', 'cancelledDates',
-    'verifiedOn', 'verifiedBy', 'isPlaceholder',
+    'verifiedOn', 'isPlaceholder',
   ],
   place: [
     'id', 'category', 'name', 'staffPick', 'note', 'walkTime', 'hours', 'phone', 'mapsAddress',
-    'verifiedOn', 'verifiedBy', 'isPlaceholder',
+    'verifiedOn', 'isPlaceholder',
   ],
   offer: [
     'id', 'partnerName', 'terms', 'validFrom', 'validTo', 'requiresMembership', 'howWeKnow',
-    'verifiedOn', 'verifiedBy', 'isPlaceholder',
+    'verifiedOn', 'isPlaceholder',
   ],
   bilingual: ['en', 'fr'],
   features: ['common_room', 'connect'],
+} as const;
+
+// ---- What staff see (never sent to a guest). Field lists mirror worker/projections.ts exactly. ----
+
+export type Schedule =
+  | { kind: 'weekly'; weekday: number; startLocal: string; endLocal: string | null }
+  | { kind: 'one_off'; date: string; startLocal: string; endLocal: string | null };
+
+/** `check` is the 09 §2 rule: a stamp older than 7 days (board) or 90 days (places, offers), or none, is overdue. */
+export type CheckState = 'ok' | 'overdue';
+
+export interface StaffActivity {
+  id: string;
+  title: Bilingual;
+  description: Bilingual;
+  category: ActivityCategory;
+  zoneId: string | null;
+  zone: Bilingual | null;
+  hostLabel: string;
+  capacity: number | null;
+  status: 'active' | 'cancelled';
+  schedule: Schedule;
+  timezone: string;
+  cancelledDates: string[];
+  isOwner: boolean;
+  offeredAt: { slug: string; name: Bilingual }[];
+  canChangeList: boolean;
+  verifiedOn: number | null;
+  verifiedBy: string | null;
+  check: CheckState;
+  isPlaceholder: boolean;
+  version: number;
+}
+
+export interface StaffPlace {
+  id: string;
+  category: PlaceCategory;
+  name: string;
+  staffPick: boolean;
+  note: Bilingual;
+  walkTime: Bilingual;
+  hours: Bilingual;
+  phone: string | null;
+  mapsAddress: string;
+  verifiedOn: number | null;
+  verifiedBy: string | null;
+  check: CheckState;
+  isPlaceholder: boolean;
+  version: number;
+}
+
+export interface StaffOffer {
+  id: string;
+  partnerName: string;
+  terms: Bilingual;
+  validFrom: string | null;
+  validTo: string | null;
+  requiresMembership: boolean;
+  howWeKnow: Bilingual;
+  verifiedOn: number | null;
+  verifiedBy: string | null;
+  /** What guests see: shown, or hidden because it is expired, not started, or unchecked for 90 days. */
+  guestState: 'shown' | 'expired' | 'not_started' | 'unchecked';
+  isPlaceholder: boolean;
+  version: number;
+}
+
+export interface StaffZone {
+  id: string;
+  label: Bilingual;
+  ring: 'in_hostel' | 'short_walk' | 'further';
+  inUse: boolean;
+  version: number;
+}
+
+export interface StaffCode {
+  id: string;
+  label: string;
+  createdAt: number;
+  retiredAt: number | null;
+}
+
+export interface StaffAuditEntry {
+  id: string;
+  action: string;
+  targetType: string;
+  targetId: string | null;
+  actorName: string | null;
+  createdAt: number;
+}
+
+export const STAFF_FIELDS = {
+  activity: [
+    'id', 'title', 'description', 'category', 'zoneId', 'zone', 'hostLabel', 'capacity', 'status', 'schedule', 'timezone',
+    'cancelledDates', 'isOwner', 'offeredAt', 'canChangeList', 'verifiedOn', 'verifiedBy', 'check', 'isPlaceholder', 'version',
+  ],
+  place: ['id', 'category', 'name', 'staffPick', 'note', 'walkTime', 'hours', 'phone', 'mapsAddress', 'verifiedOn', 'verifiedBy', 'check', 'isPlaceholder', 'version'],
+  offer: ['id', 'partnerName', 'terms', 'validFrom', 'validTo', 'requiresMembership', 'howWeKnow', 'verifiedOn', 'verifiedBy', 'guestState', 'isPlaceholder', 'version'],
+  zone: ['id', 'label', 'ring', 'inUse', 'version'],
+  code: ['id', 'label', 'createdAt', 'retiredAt'],
+  audit: ['id', 'action', 'targetType', 'targetId', 'actorName', 'createdAt'],
+  nested: ['en', 'fr', 'kind', 'weekday', 'startLocal', 'endLocal', 'date', 'slug', 'name'],
 } as const;
