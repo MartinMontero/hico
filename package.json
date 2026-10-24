@@ -16,6 +16,8 @@
     "validate": "node scripts/validate.ts"
   },
   "dependencies": {
+    "@simplewebauthn/browser": "14.0.0",
+    "@simplewebauthn/server": "14.0.3",
     "hono": "4.13.13",
     "preact": "11.0.2",
     "valibot": "1.5.0"

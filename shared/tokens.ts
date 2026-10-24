@@ -54,6 +54,8 @@ export const PAIRS: Pair[] = [
   { text: 'sky', background: 'deep', kind: 'ui', use: 'focus ring against page' },
   { text: 'sky', background: 'ridge', kind: 'ui', use: 'focus ring against raised surfaces' },
   { text: 'stone', background: 'deep', kind: 'ui', use: 'borders and dividers' },
+  { text: 'stone', background: 'timber', kind: 'ui', use: 'form field borders on cards' },
+  { text: 'stone', background: 'ridge', kind: 'ui', use: 'form field borders on raised surfaces' },
 ];
 
 export const MIN_RATIO: Record<Pair['kind'], number> = { normal: 4.5, large: 3, ui: 3 };

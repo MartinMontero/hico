@@ -4,7 +4,10 @@ import { eventBodySchema } from '../shared/schemas.ts';
 import { previewGate } from './preview-gate/index.ts';
 import { readOnlySwitch, writeGuards } from './middleware/guards.ts';
 import { requestLog, securityHeaders } from './middleware/headers.ts';
+import { cookieResolver } from './middleware/staff-session.ts';
 import { publicTenant, requestHost, staffTenant, type AppEnv, type StaffResolver } from './middleware/tenant.ts';
+import { createStaffAuthRoutes } from './routes/staff-auth.ts';
+import { createStaffPeopleRoutes } from './routes/staff-people.ts';
 import { activities, events, hosts, offers, places, properties } from './repositories/index.ts';
 import {
   projectActivity,
@@ -15,7 +18,7 @@ import {
 } from './projections.ts';
 
 export interface AppOptions {
-  /** Phase 1b supplies the real staff sign-in; until then there is none and staff routes answer 401. */
+  /** Replaces the session-cookie sign-in. Tests inject one; production uses the cookie. */
   staffResolver?: StaffResolver;
   /** Test hook for the clock (epoch seconds). */
   now?: () => number;
@@ -78,12 +81,19 @@ export function createApp(options: AppOptions = {}): Hono<AppEnv> {
 
   app.route('/api/p/:slug', pub);
 
-  // Staff routes keep the 05 form /staff/p/<slug>/...; the role is checked on every request.
-  const staffRoutes = new Hono<AppEnv>();
-  staffRoutes.use('*', staffTenant(options.staffResolver));
-  staffRoutes.get('/me', (c) => c.json({ role: c.get('staff').role }));
-  app.route('/staff/p/:slug', staffRoutes);
+  // Staff (D-26). Person-level auth lives at /api/staff/auth; everything about one property is under
+  // /api/staff/p/<slug>/..., where the role is read from the database on every request (05 §4 rules 1 and 8).
+  app.route('/api/staff/auth', createStaffAuthRoutes(now));
 
+  const staffApi = new Hono<AppEnv>();
+  staffApi.use('*', staffTenant(options.staffResolver ?? cookieResolver(now)));
+  staffApi.get('/me', async (c) => {
+    const s = c.get('staff');
+    const row = await properties.getOwn(s.tenant);
+    return c.json({ role: s.role, property: row ? { slug: row.slug, name: { en: row.nameEn, fr: row.nameFr }, timezone: row.timezone } : null });
+  });
+  staffApi.route('/', createStaffPeopleRoutes(now));
+  app.route('/api/staff/p/:slug', staffApi);
   app.all('/api/*', (c) => c.json({ error: 'not_found' }, 404));
 
   // Everything else is the front end (SPA fallback is configured on the assets binding).

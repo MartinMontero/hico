@@ -38,3 +38,17 @@ export function pick(value: Bilingual, lang: Language): string {
 
 export const ALL_KEYS = Object.keys(en) as MessageKey[];
 export { en, fr };
+
+/**
+ * The same lookup rule (05 §13) for any pair of catalogs: the guest's language if the string exists, else
+ * English with a visible marker, never blank, never a raw key. The staff console has its own catalogs so
+ * guests never download them.
+ */
+export function makeTranslator<K extends string>(english: Record<K, string>, french: Record<K, string>) {
+  return (lang: Language, key: K, params?: Record<string, string>): string => {
+    const own = lang === 'fr' ? french[key] : english[key];
+    if (own !== undefined && own !== '') return fill(own, params);
+    const text = fill(english[key], params);
+    return lang === 'en' ? text : `${text} (${en['meta.englishOnly']})`;
+  };
+}

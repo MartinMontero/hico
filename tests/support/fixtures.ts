@@ -1,5 +1,6 @@
 // Test fixtures: raw SQL is allowed here (tests/support) and nowhere else outside repositories.
 import { newId } from '../../worker/ids.ts';
+import { randomToken, sha256Hex } from '../../worker/security.ts';
 
 export interface PropertyFixture {
   id: string;
@@ -114,5 +115,28 @@ export async function makeException(db: D1Database, activityId: string, ownerId:
   await db
     .prepare("INSERT INTO activity_exceptions (id, activity_id, property_id, on_date, kind) VALUES (?1, ?2, ?3, ?4, 'cancelled')")
     .bind(newId(), activityId, ownerId, date)
+    .run();
+}
+
+/** A live staff session for a person: returns the Cookie header value a browser would send. */
+export async function sessionCookieFor(db: D1Database, staffUserId: string, seconds = 3600): Promise<string> {
+  const token = randomToken();
+  const now = Math.floor(Date.now() / 1000);
+  await db
+    .prepare('INSERT INTO staff_sessions (id, staff_user_id, created_at, expires_at) VALUES (?1, ?2, ?3, ?4)')
+    .bind(await sha256Hex(token), staffUserId, now, now + seconds)
+    .run();
+  return `hc_staff=${token}`;
+}
+
+/** A staff person with a display name (makeStaff leaves it empty). */
+export async function nameStaff(db: D1Database, staffUserId: string, displayName: string): Promise<void> {
+  await db.prepare('UPDATE staff_users SET display_name = ?2 WHERE id = ?1').bind(staffUserId, displayName).run();
+}
+
+export async function addPasskey(db: D1Database, staffUserId: string, id: string, label = ''): Promise<void> {
+  await db
+    .prepare("INSERT INTO staff_credentials (id, staff_user_id, public_key, counter, transports, label, created_at) VALUES (?1, ?2, ?3, 0, '', ?4, 1)")
+    .bind(id, staffUserId, new Uint8Array([9, 9, 9]), label)
     .run();
 }

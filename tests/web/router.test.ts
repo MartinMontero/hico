@@ -12,9 +12,13 @@ describe('routes', () => {
   });
 
   it('treats anything else as unknown', () => {
-    for (const path of ['/x', '/p/', '/p/UPPER/explore', '/p/a/nope', '/p/a/explore/extra', '/staff/p/a/me']) {
+    for (const path of ['/x', '/p/', '/p/UPPER/explore', '/p/a/nope', '/p/a/explore/extra', '/stafff', '/api/staff/p/a/me']) {
       expect(parseRoute(path).name, path).toBe('unknown');
     }
+  });
+
+  it('sends every /staff path to the staff console chunk', () => {
+    for (const path of ['/staff', '/staff/', '/staff/accept', '/staff/account', '/staff/p/downtown/board']) expect(parseRoute(path).name, path).toBe('staff');
   });
 
   it('builds tab paths', () => {

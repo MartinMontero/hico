@@ -103,7 +103,8 @@ export function buildSeedSql(now: number): string {
   // Reset the tenant tables, children first. This script only ever runs against local D1 (seed/run.ts).
   for (const t of [
     'activity_exceptions', 'activity_offered_at', 'activities', 'places', 'offers', 'audit_log',
-    'event_counts', 'entry_codes', 'property_features', 'staff_memberships', 'staff_users',
+    'event_counts', 'entry_codes', 'property_features', 'staff_credentials', 'staff_sessions', 'staff_tokens',
+    'webauthn_challenges', 'rate_limits', 'staff_memberships', 'staff_users',
     'zones', 'property_hosts', 'properties',
   ]) out.push(`DELETE FROM ${t};`);
   out.push(`UPDATE platform_flags SET value = 'off' WHERE key = 'read_only';`);

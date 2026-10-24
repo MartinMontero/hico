@@ -64,7 +64,11 @@ describe('database access', () => {
   });
 
   it('the D1 binding is handed to repositories by exactly the files that must, and nowhere else', () => {
-    const mayTouchBinding = new Set(['worker/app.ts', 'worker/middleware/tenant.ts', 'worker/middleware/guards.ts', 'worker/tenant.ts', 'worker/repositories/index.ts']);
+    const mayTouchBinding = new Set([
+      'worker/app.ts', 'worker/middleware/tenant.ts', 'worker/middleware/guards.ts', 'worker/middleware/staff-session.ts',
+      'worker/tenant.ts', 'worker/ratelimit.ts', 'worker/routes/staff-auth.ts', 'worker/routes/staff-people.ts',
+      'worker/routes/staff-content.ts', 'worker/routes/staff-export.ts', 'worker/repositories/index.ts',
+    ]);
     const hits = source
       .map(rel)
       .filter((f) => f.startsWith('worker/') && !f.startsWith('worker/repositories/') && !mayTouchBinding.has(f))
@@ -89,17 +93,21 @@ describe('database access', () => {
     expect(hits).toEqual([]);
   });
 
-  it('every repository function takes the tenant context first (or is a documented lookup)', () => {
-    const lookups = new Set(['hosts.ts', 'flags.ts', 'staff.ts']);
+  it('every repository function takes the tenant context first, or the database (a documented lookup or person-level function)', () => {
+    // Property data: ctx only. Person-level modules (sessions, credentials, tokens, challenges, rate limits,
+    // host and staff lookups, the platform flag) take the database. audit and people have both kinds.
+    const ctxOnly = new Set(['activities.ts', 'places.ts', 'offers.ts', 'properties.ts', 'events.ts', 'zones.ts', 'codes.ts', 'features.ts', 'content-export.ts']);
+    const dbOnly = new Set(['hosts.ts', 'flags.ts', 'staff.ts', 'sessions.ts', 'credentials.ts', 'tokens.ts', 'challenges.ts', 'ratelimit.ts']);
     for (const f of readdirSync('worker/repositories').filter((x) => x.endsWith('.ts') && x !== 'index.ts')) {
       const text = readFileSync(`worker/repositories/${f}`, 'utf8');
       for (const m of text.matchAll(/export async function (\w+)\(\s*(\w+)/g)) {
-        if (lookups.has(f)) expect(m[2], `${f}:${m[1]}`).toBe('db');
-        else expect(m[2], `${f}:${m[1]}`).toBe('ctx');
+        const where = `${f}:${m[1]}`;
+        if (ctxOnly.has(f)) expect(m[2], where).toBe('ctx');
+        else if (dbOnly.has(f)) expect(m[2], where).toBe('db');
+        else expect(['ctx', 'db'], where).toContain(m[2]);
       }
     }
   });
-
   it('every SQL statement in a tenant repository mentions property_id or the offered-at join', () => {
     for (const f of ['activities.ts', 'places.ts', 'offers.ts', 'audit.ts', 'events.ts', 'properties.ts']) {
       const text = readFileSync(`worker/repositories/${f}`, 'utf8');
@@ -120,7 +128,8 @@ describe('spike code stays outside', () => {
   it('the repository root package.json does not depend on any spike package', () => {
     const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')) as { dependencies?: Record<string, string>; devDependencies?: Record<string, string> };
     const names = Object.keys({ ...pkg.dependencies, ...pkg.devDependencies });
-    for (const spikeOnly of ['better-auth', '@better-auth/passkey', '@simplewebauthn/server', '@simplewebauthn/browser', 'jose', 'kysely-d1']) {
+    // SimpleWebAuthn is not listed: D-26 adopted it for the real build. The routes that were not chosen stay out.
+    for (const spikeOnly of ['better-auth', '@better-auth/passkey', 'jose', 'kysely-d1']) {
       expect(names, spikeOnly).not.toContain(spikeOnly);
     }
   });
@@ -160,6 +169,23 @@ describe('no third-party hosts or scripts', () => {
     expect(css).not.toMatch(/googleapis|gstatic/);
   });
 
+  it('the guest entry bundle does not carry the staff console or the passkey library', () => {
+    const index = join(ROOT, 'dist', 'client', 'index.html');
+    try {
+      statSync(index);
+    } catch {
+      return; // not built yet
+    }
+    const html = readFileSync(index, 'utf8');
+    const entry = [...html.matchAll(/(?:src|href)="(\/assets\/[^"]+\.js)"/g)].map((m) => m[1] as string);
+    expect(entry.length).toBeGreaterThan(0);
+    for (const ref of entry) {
+      const code = readFileSync(join(ROOT, 'dist', 'client', ref), 'utf8');
+      expect(code, ref).not.toMatch(/navigator\.credentials|PublicKeyCredential|startRegistration|startAuthentication/);
+      expect(code, ref).not.toContain('/api/staff/');
+    }
+  });
+
   it('a built client, when present, contains no external host and no beacon string', () => {
     const dist = join(ROOT, 'dist', 'client');
     try {
@@ -172,8 +198,9 @@ describe('no third-party hosts or scripts', () => {
     for (const f of built) {
       const text = readFileSync(f, 'utf8');
       expect(text, rel(f)).not.toMatch(/googleapis|gstatic|cloudflareinsights|google-analytics|googletagmanager/i);
-      // Allow the W3C namespace strings that frameworks embed; nothing else.
-      const hosts = [...text.matchAll(/https?:\/\/([a-z0-9.-]+)/gi)].map((m) => m[1]).filter((h) => !/^(www\.w3\.org|localhost)$/.test(h ?? ''));
+      // Allowed: the W3C namespace strings frameworks embed, and simplewebauthn.dev, which appears only inside an error
+      // message of the passkey library (a documentation link in text; no request is made, and the browser tests fail on any external request).
+      const hosts = [...text.matchAll(/https?:\/\/([a-z0-9.-]+)/gi)].map((m) => m[1]).filter((h) => !/^(www\.w3\.org|localhost|simplewebauthn\.dev)$/.test(h ?? ''));
       expect(hosts, rel(f)).toEqual([]);
     }
   });

@@ -28,6 +28,9 @@ export const LIMITS = {
   hash: 64,
   localTime: 5,
   date: 10,
+  credentialId: 1400,
+  transports: 120,
+  challenge: 200,
 } as const;
 
 export type LimitName = keyof typeof LIMITS;
@@ -113,4 +116,21 @@ export const TEXT_COLUMN_LIMITS: Record<string, LimitName> = {
   'event_counts.property_id': 'id',
   'event_counts.day': 'date',
   'event_counts.event': 'eventName',
+  'staff_credentials.id': 'credentialId',
+  'staff_credentials.staff_user_id': 'id',
+  'staff_credentials.transports': 'transports',
+  'staff_credentials.label': 'name',
+  'staff_sessions.id': 'hash',
+  'staff_sessions.staff_user_id': 'id',
+  'staff_tokens.token_hash': 'hash',
+  'staff_tokens.email': 'email',
+  'staff_tokens.display_name': 'person',
+  'staff_tokens.property_id': 'id',
+  'staff_tokens.staff_user_id': 'id',
+  'staff_tokens.created_by': 'id',
+  'webauthn_challenges.id': 'id',
+  'webauthn_challenges.challenge': 'challenge',
+  'webauthn_challenges.staff_user_id': 'id',
+  'webauthn_challenges.token_hash': 'hash',
+  'rate_limits.key': 'hash',
 };

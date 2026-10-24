@@ -7,6 +7,7 @@ import { ToastRegion, UiProvider, useUi } from './context.tsx';
 import { Dialog } from './Dialog.tsx';
 import { useLoad } from './load.ts';
 import { Explore, FeatureOff, LoadState, WhatsOn } from './pages.tsx';
+import type { ComponentType } from 'preact';
 import { consumeNavigation, Link, navigate, parseRoute, tabPath, usePath, type Tab } from './router.tsx';
 
 const TAB_LABEL = {
@@ -172,6 +173,33 @@ function Header({ onSettings, slug }: { onSettings: (opener: HTMLElement) => voi
   );
 }
 
+/** The staff console is a separate chunk, fetched only when a staff path is opened. */
+function StaffLoader({ path }: { path: string }) {
+  const { t } = useUi();
+  const [Staff, setStaff] = useState<ComponentType<{ path: string }> | null>(null);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    import('./staff/StaffApp.tsx').then((m) => setStaff(() => m.default), () => setFailed(true));
+  }, []);
+  if (failed) {
+    return (
+      <main id="main">
+        <p class="error" role="alert">
+          {t('state.error')}
+        </p>
+      </main>
+    );
+  }
+  if (!Staff) {
+    return (
+      <main id="main">
+        <output class="muted">{t('state.loading')}</output>
+      </main>
+    );
+  }
+  return <Staff path={path} />;
+}
+
 function Content() {
   const path = usePath();
   const route = parseRoute(path);
@@ -196,6 +224,7 @@ function Content() {
         {route.name === 'root' ? <Picker /> : null}
         {route.name === 'tab' ? <PropertyRoute slug={route.slug} tab={route.tab} /> : null}
         {route.name === 'property' ? <PropertyRoute slug={route.slug} tab={null} /> : null}
+        {route.name === 'staff' ? <StaffLoader path={path} /> : null}
         {route.name === 'unknown' ? <NotFound /> : null}
       </div>
       <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} opener={settingsOpener.current} />

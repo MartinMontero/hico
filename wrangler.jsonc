@@ -12,7 +12,10 @@
     "not_found_handling": "single-page-application",
     "run_worker_first": true
   },
-  "vars": { "PREVIEW_GATE": "on" },
+  // RP_ID and ALLOWED_ORIGINS are the WebAuthn relying party for LOCAL use (vite dev 5173, vite preview 4173).
+  // A passkey is bound to its RP_ID: before a deploy these must be set to the real hostname (a GO), and the prod
+  // environment sets neither, so staff sign-in answers 503 there until they are set on purpose.
+  "vars": { "PREVIEW_GATE": "on", "RP_ID": "localhost", "ALLOWED_ORIGINS": "http://localhost:5173,http://localhost:4173" },
   "d1_databases": [
     {
       "binding": "DB",

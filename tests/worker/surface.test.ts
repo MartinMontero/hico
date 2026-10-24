@@ -16,8 +16,29 @@ const allow: Record<string, string[]> = {
   'GET /api/p/:slug/places': [...PUBLIC_FIELDS.place, ...bilingual],
   'GET /api/p/:slug/offers': [...PUBLIC_FIELDS.offer, ...bilingual],
   'POST /api/p/:slug/events': [],
-  'GET /staff/p/:slug/me': ['error'],
 };
+
+// Person-level staff routes, called with no cookie: the status and the only field names they may return.
+// Every route under /api/staff/p/ must answer 401 with just { error }: that rule needs no entry, so a new
+// property-scoped staff route is covered the moment it exists.
+const challengeKeys = ['challengeId', 'options', 'rpId', 'challenge', 'allowCredentials', 'timeout', 'userVerification', 'extensions'];
+const staffAuth: Record<string, { status: number; keys: string[] }> = {
+  'POST /api/staff/auth/login/options': { status: 200, keys: challengeKeys },
+  'POST /api/staff/auth/login/verify': { status: 401, keys: ['error'] },
+  'POST /api/staff/auth/link/inspect': { status: 400, keys: ['error'] },
+  'POST /api/staff/auth/link/accept': { status: 401, keys: ['error'] },
+  'POST /api/staff/auth/register/options': { status: 401, keys: ['error'] },
+  'POST /api/staff/auth/register/verify': { status: 400, keys: ['error'] },
+  'GET /api/staff/auth/me': { status: 401, keys: ['error'] },
+  'POST /api/staff/auth/logout': { status: 200, keys: ['ok'] },
+  'POST /api/staff/auth/logout-all': { status: 401, keys: ['error'] },
+  'GET /api/staff/auth/sessions': { status: 401, keys: ['error'] },
+  'POST /api/staff/auth/sessions/revoke': { status: 401, keys: ['error'] },
+  'GET /api/staff/auth/credentials': { status: 401, keys: ['error'] },
+  'POST /api/staff/auth/credentials/revoke': { status: 401, keys: ['error'] },
+  'POST /api/staff/auth/credentials/rename': { status: 401, keys: ['error'] },
+};
+const isStaffProperty = (key: string) => key.split(' ')[1]?.startsWith('/api/staff/p/') ?? false;
 
 function fieldNames(value: unknown, into = new Set<string>()): Set<string> {
   if (Array.isArray(value)) for (const v of value) fieldNames(v, into);
@@ -33,7 +54,9 @@ function fieldNames(value: unknown, into = new Set<string>()): Set<string> {
 describe('anonymous surface', () => {
   it('every registered route has an allow-list (a new route fails this test until one is written)', () => {
     const routes = createApp().routes.filter((r) => r.method !== 'ALL').map((r) => `${r.method} ${r.path}`);
-    expect(routes.sort()).toEqual(Object.keys(allow).sort());
+    const known = [...Object.keys(allow), ...Object.keys(staffAuth)];
+    expect(routes.filter((r) => !isStaffProperty(r)).sort()).toEqual(known.sort());
+    expect(routes.filter(isStaffProperty).length).toBeGreaterThan(0);
   });
 
   it('with no cookie, every route returns only allow-listed field names, and no id of a property', async () => {
@@ -65,7 +88,16 @@ describe('anonymous surface', () => {
       expect(res.status, key).toBe(200);
     }
     expect((await record('POST /api/p/:slug/events', await call('/api/p/surf-a/events', { host: 'surf.test', method: 'POST', body: { event: 'opened_whats_on' } }))).status).toBe(204);
-    expect((await record('GET /staff/p/:slug/me', await call('/staff/p/surf-a/me', { host: 'surf.test' }))).status).toBe(401);
+    // Staff routes with no cookie: person-level ones by their table, property-scoped ones all 401 { error }.
+    for (const route of createApp().routes.filter((r) => r.method !== 'ALL')) {
+      const key = ` `;
+      const path = route.path.replace(':slug', 'surf-a').replace(':id', 'a'.repeat(32));
+      if (!isStaffProperty(key) && !(key in staffAuth)) continue;
+      const res = await record(key, await call(path, { host: 'surf.test', method: route.method, body: route.method === 'POST' ? {} : undefined }));
+      const want = staffAuth[key] ?? { status: 401, keys: ['error'] };
+      expect(res.status, key).toBe(want.status);
+      allow[key] = want.keys;
+    }
 
     for (const [key, names] of Object.entries(seen)) {
       const extra = [...names].filter((n) => !(allow[key] ?? []).includes(n));
@@ -114,27 +146,27 @@ describe('security headers (05 §14)', () => {
   });
 });
 
-describe('staff routes (05 §4 rules 1 and 8), with an injected sign-in', () => {
+describe('staff property routes (05 §4 rules 1 and 8), with an injected sign-in', () => {
   it('naming a property gives no access; the role is read per request', async () => {
     const a = await makeProperty(env.DB, 'stf-a', { host: 'stf.test' });
     const b = await makeProperty(env.DB, 'stf-b', { host: 'stf.test' });
     const person = await makeStaff(env.DB, 'stf@x.test', [{ propertyId: a.id, role: 'editor' }]);
     const app = createApp({ staffResolver: async () => ({ staffUserId: person }) });
-    const own = await call('/staff/p/stf-a/me', { host: 'stf.test', app });
+    const own = await call('/api/staff/p/stf-a/me', { host: 'stf.test', app });
     expect(own.status).toBe(200);
-    expect(await own.json()).toEqual({ role: 'editor' });
-    const other = await call('/staff/p/stf-b/me', { host: 'stf.test', app });
+    expect(await own.json()).toMatchObject({ role: 'editor', property: { slug: 'stf-a' } });
+    const other = await call('/api/staff/p/stf-b/me', { host: 'stf.test', app });
     expect(other.status).toBe(404); // the person exists but has no role at B
     // Role changes take effect at once: no long-lived token.
     await env.DB.prepare("UPDATE staff_memberships SET role = 'admin' WHERE staff_user_id = ?1").bind(person).run();
-    expect(await (await call('/staff/p/stf-a/me', { host: 'stf.test', app })).json()).toEqual({ role: 'admin' });
+    expect(await (await call('/api/staff/p/stf-a/me', { host: 'stf.test', app })).json()).toMatchObject({ role: 'admin' });
     await env.DB.prepare('DELETE FROM staff_memberships WHERE staff_user_id = ?1').bind(person).run();
-    expect((await call('/staff/p/stf-a/me', { host: 'stf.test', app })).status).toBe(404);
+    expect((await call('/api/staff/p/stf-a/me', { host: 'stf.test', app })).status).toBe(404);
     expect(b.id).not.toBe(a.id);
   });
 
   it('no sign-in configured: 401 for everyone', async () => {
     const a = await makeProperty(env.DB, 'stf-none', { host: 'stf-none.test' });
-    expect((await call(`/staff/p/${a.slug}/me`, { host: a.host })).status).toBe(401);
+    expect((await call(`/api/staff/p/${a.slug}/me`, { host: a.host })).status).toBe(401);
   });
 });

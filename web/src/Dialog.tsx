@@ -1,5 +1,5 @@
 import type { ComponentChildren } from 'preact';
-import { useEffect, useId, useRef } from 'preact/hooks';
+import { useId, useLayoutEffect, useRef } from 'preact/hooks';
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -33,7 +33,9 @@ export function Dialog({ open, onClose, title, children, returnFocusTo }: Dialog
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
-  useEffect(() => {
+  // A layout effect, not a passive one: the Escape listener and the move of focus must exist the moment the dialog is on screen.
+  // A passive effect can run a frame later, and a key pressed in that gap would be lost.
+  useLayoutEffect(() => {
     if (!open) return undefined;
     opener.current = returnFocusTo ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
     document.body.classList.add('scroll-locked');

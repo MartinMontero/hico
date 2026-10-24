@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
@@ -21,6 +21,21 @@ if (rows.filter((r) => r.ref.endsWith('.js')).length === 0) {
 }
 if (js > BUDGET) {
   console.log('FAIL: over the budget');
+  process.exit(1);
+}
+// The staff console is a separate chunk that guests never load; it has its own budget (plan §4).
+const STAFF_BUDGET = 90 * 1024;
+const chunks = readdirSync(join(dir, 'assets')).filter((f) => /^Staff.*\.js$/.test(f));
+let staff = 0;
+for (const f of chunks) {
+  const raw = readFileSync(join(dir, 'assets', f));
+  const gz = gzipSync(raw, { level: 9 }).length;
+  staff += gz;
+  console.log(`${`/assets/${f}`.padEnd(40)} raw ${String(raw.length).padStart(7)}  gzip ${String(gz).padStart(6)}  (staff chunk, loaded only on /staff)`);
+}
+console.log(`staff chunk(s) ${staff} bytes gzip (budget ${STAFF_BUDGET})`);
+if (chunks.length === 0 || staff > STAFF_BUDGET) {
+  console.log(chunks.length === 0 ? 'FAIL: no staff chunk was built' : 'FAIL: staff chunk over its budget');
   process.exit(1);
 }
 console.log('within budget');

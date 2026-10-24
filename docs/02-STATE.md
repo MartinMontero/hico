@@ -236,9 +236,15 @@ Access passes 2 of 2 against a local stand-in. Cloudflare Access itself could no
 sent, no account or remote resource was created, and the report recommends a route without deciding.
 **Martin called O-02 on 2026-10-24: D-26, our own WebAuthn, passkey-first.** O-20 and O-21 were
 accepted as recommended (D-27, D-28). `npm run validate` still passes (153 tests, raw output in
-`docs\spikes\phase-1b-1-validate-output.txt`). The Phase 1b-2 plan is written
-(`docs\plans\2026-10-24-phase-1b-2-staff-console.md`) and **waits for Martin's GO**; nothing from it is built.
-It lists ten points for Martin to accept or change (§0).
+`docs\spikes\phase-1b-1-validate-output.txt`). Phase 1b-2 (staff authentication and console) is **in progress with Martin's GO of 2026-10-24**, built in four
+slices, each committed only when `npm run validate` passes. Plan: `docs\plans\2026-10-24-phase-1b-2-staff-console.md`.
+- **Slice 1 (auth and schema), done:** migration `0002` (passkeys, sessions, links, challenges, rate limits, a
+  `version` column for optimistic concurrency); staff sign-in, sessions, passkeys, admin-issued invite and
+  recovery links, person-level audit written per property (D-27), rate limits, the people routes with the
+  role matrix; the staff screens (sign-in, accept link, home, my account) as a lazily loaded chunk of 8 KB gzip
+  that guests never download; `scripts\operator.ts` with `invite-first-admin` and `issue-recovery-link`
+  (local only for now). SimpleWebAuthn 14 is now a root dependency (D-26).
+- **Slices 2 to 4 (content write API, console screens, operator scripts and finish): not started.**
 ## 5. Stale documents
 
 - `docs\05-ARCHITECTURE.md` §16 shows the proposed layout; the real one is above. §13 says

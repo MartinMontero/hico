@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { ALL_KEYS, en, fr, pick, translate } from '../../shared/i18n/index.ts';
 import type { MessageKey } from '../../shared/i18n/index.ts';
+import { makeTranslator } from '../../shared/i18n/index.ts';
+import { staffEn } from '../../shared/i18n/staff-en.ts';
+import { staffFr } from '../../shared/i18n/staff-fr.ts';
 
 const placeholders = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
 
@@ -56,5 +59,29 @@ describe('lookup rule (05 §13)', () => {
     expect(pick({ en: 'Hello', fr: '' }, 'fr')).toBe('Hello (English only)');
     expect(pick({ en: 'Hello', fr: '' }, 'en')).toBe('Hello');
     expect(pick({ en: '', fr: '' }, 'fr')).toBe('');
+  });
+});
+
+describe('staff console catalogs (kept apart so guests never download them)', () => {
+  const keys = Object.keys(staffEn) as (keyof typeof staffEn)[];
+  it('every English key has a non-empty French string', () => {
+    expect(keys.filter((k) => !staffFr[k] || staffFr[k].trim() === '')).toEqual([]);
+    expect(Object.keys(staffFr).filter((k) => !(k in staffEn))).toEqual([]);
+  });
+  it('placeholders match between languages', () => {
+    for (const k of keys) expect(placeholders(staffFr[k]), k).toEqual(placeholders(staffEn[k]));
+  });
+  it('no text names the product "HI" (D-21)', () => {
+    for (const k of keys) {
+      expect(staffEn[k], k).not.toMatch(/\bHI\b/);
+      expect(staffFr[k], k).not.toMatch(/\bHI\b/);
+    }
+  });
+  it('follows the same lookup rule: French, else English with the visible marker', () => {
+    const tr = makeTranslator<'a'>({ a: 'Hello {name}' }, { a: '' });
+    expect(tr('fr', 'a', { name: 'Eli' })).toBe('Hello Eli (English only)');
+    expect(tr('en', 'a', { name: 'Eli' })).toBe('Hello Eli');
+    const tr2 = makeTranslator<'a'>({ a: 'Hello' }, { a: 'Bonjour' });
+    expect(tr2('fr', 'a')).toBe('Bonjour');
   });
 });

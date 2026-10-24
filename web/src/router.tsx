@@ -19,6 +19,11 @@ export function consumeNavigation(): boolean {
   return was;
 }
 
+/** The next screen replaces the one the guest was on (for example after signing out): its heading takes focus. */
+export function markMoved(): void {
+  moved = true;
+}
+
 export function navigate(path: string, replace = false): void {
   if (path === currentPath()) return;
   if (replace) window.history.replaceState(null, '', path);
@@ -78,6 +83,7 @@ export type Route =
   | { name: 'root' }
   | { name: 'tab'; slug: string; tab: Tab }
   | { name: 'property'; slug: string }
+  | { name: 'staff' }
   | { name: 'unknown' };
 
 export const TABS = ['whats-on', 'explore', 'common-room', 'connect'] as const;
@@ -85,6 +91,8 @@ export type Tab = (typeof TABS)[number];
 
 export function parseRoute(path: string): Route {
   if (path === '/' || path === '') return { name: 'root' };
+  // The staff console is its own lazily loaded chunk: /staff, /staff/accept, /staff/account, /staff/p/<slug>/...
+  if (path === '/staff' || path.startsWith('/staff/')) return { name: 'staff' };
   const m = /^\/p\/([a-z0-9-]+)(?:\/([a-z-]+))?\/?$/.exec(path);
   if (!m || !m[1]) return { name: 'unknown' };
   if (!m[2]) return { name: 'property', slug: m[1] };

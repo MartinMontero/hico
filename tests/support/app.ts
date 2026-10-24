@@ -8,7 +8,8 @@ export const fakeAssets = {
 } as unknown as Fetcher;
 
 export function testEnv(overrides: Partial<Env> = {}): Env {
-  return { DB: env.DB, ASSETS: fakeAssets, PREVIEW_GATE: 'off', ...overrides } as Env;
+  // RP_ID and ALLOWED_ORIGINS match the https://localhost origin that call() uses by default.
+  return { DB: env.DB, ASSETS: fakeAssets, PREVIEW_GATE: 'off', RP_ID: 'localhost', ALLOWED_ORIGINS: 'https://localhost', RATE_LIMIT_SECRET: 'test-only-rate-limit-secret', ...overrides } as Env;
 }
 
 export interface CallOptions {

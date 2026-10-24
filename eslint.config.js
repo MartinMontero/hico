@@ -35,6 +35,13 @@ export default tseslint.config(
     },
   },
   {
+    // Files that hand the D1 binding to a repository (the same list as tests/node/static.test.ts).
+    files: ['worker/app.ts', 'worker/ratelimit.ts', 'worker/routes/*.ts', 'worker/middleware/*.ts'],
+    rules: {
+      'no-restricted-syntax': ['error', rawDb[0], rawDb[1], rawDb[3], rawDb[4]],
+    },
+  },
+  {
     // The only places allowed to touch the database directly.
     files: ['worker/repositories/**/*.ts', 'tests/support/**/*.ts', 'seed/**/*.ts', 'tests/worker/**/*.ts', 'tests/node/**/*.ts'],
     rules: {
