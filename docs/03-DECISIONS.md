@@ -39,10 +39,12 @@ that is not in this file has not been made.
 | D-23 | **An activity is one record owned by one property, with an "offered at" list** (O-17, Option A). Any property in the list can read it; staff with `editor` or `admin` at any listed property can edit its content; only the owner's `admin` changes the list or deletes it. D-02 is unchanged: each property is still a tenant. `05` §4 gains one paragraph stating this exception | Martin, 2026-10-23, "D-15: Option A". Option B (one tenant, two sites) would have changed D-02 and widened each hostel's staff rights | Martin | 2026-10-23 | M |
 | D-24 | **Public content is addressed as `/p/<slug>/...`, and the slug is accepted only if it is in the request hostname's own list in `property_hosts`** (O-18, Option 1). A host with one row serves that property only. `05` §4 rule 1 and the matching line in `CLAUDE.md` are amended accordingly. Staff and guest-session rules are unchanged | Martin, 2026-10-23, "D-21: Option 1 ... approve the change to 05 section 4 rule 1 and the matching CLAUDE.md line". Option 2 (one hostname per hostel) stays available later with no code change, only `property_hosts` rows | Martin | 2026-10-23 | Y |
 | D-25 | For the demo the app **shows no "HI" in hostel names** ("Vancouver Downtown", "Vancouver Jericho Beach", "Whistler"), the header is **the property name as text only** with no glyph, and **two extra placeholder properties (Downtown, Jericho Beach) are seeded** with shared sample activities so the hostel choice and D-15 can be shown | Martin, 2026-10-23, answering plan §0 items 4 to 6 | Martin | 2026-10-23 | Y |
-
 | D-13 | **The validation library is Valibot 1.5.0**, shared by browser and Worker from `shared\` (every length limit is declared once in `shared\limits.ts`) | Chosen by Claude Code in Phase 1, as the brief allowed. Modular, so the browser bundle carries only the validators used (initial JavaScript is 12.45 KB gzip against the 60 KB budget, `04` §7). Zod 4.6.7 was the alternative: a larger ecosystem, a bigger default bundle. A test checks that the migration's CHECK lengths equal `shared\limits.ts` | Claude Code | 2026-10-23 | Y |
+| D-26 | **Staff sign-in is our own WebAuthn, passkey-first: SimpleWebAuthn 14 with D1 sessions** (O-02, Route 3). A person has one or more passkeys, no password. Roles stay in `staff_memberships` and are read on every request. Route 1 (Cloudflare Access) and Route 2 (Better Auth) are not used | Martin, 2026-10-24, on `docs\spikes\staff-auth-report.md`: our own route passed 14 of 14 browser tests, needs no remote resource, and is the smallest (Worker 148 KiB gzip, sign-in page 9.8 KB, 26 packages). Strongest argument against, recorded: we own the sessions, tokens, recovery and rate limiting, and nobody independent has reviewed them; an outside review before production is `[U]` | Martin | 2026-10-24 | M |
+| D-27 | **Person-level audit events (sign-in, sign-out, recovery, session and passkey changes) are written one row per property the person holds a role in**, in the existing `audit_log`. A person with no role writes no row and cannot sign in (O-20 accepted as recommended). `06` §2 says so | Martin, 2026-10-24, "accept O-20 and O-21 as recommended" | Martin | 2026-10-24 | M |
+| D-28 | **Staff invite and recovery links are handed over by an admin: a one-time link or QR code shown once, no email** (O-21 accepted as recommended). Recovery is another admin of that property issuing a link, or the person's own second passkey. A property with one admin who loses their only device needs the operator (Martin) to issue a link, so staff should register two passkeys. Email stays a later add-on and needs its own decision | Martin, 2026-10-24. No sender, no new data flow, no DNS change | Martin | 2026-10-24 | Y |
 
-The next free number after D-25 is D-26.
+The next free number after D-28 is D-29.
 
 ## Open — decisions Martin owes
 
@@ -65,7 +67,7 @@ How does a guest get in, and what proves they are actually at the hostel?
 - Reversible: Y.
 
 ### O-02 Staff authentication
-**Staff sign-in is part of the demo (D-22). The method is still open: the Phase 1b-1 spike reports, then Martin calls it.**
+**Resolved by D-26: our own WebAuthn, passkey-first (the Phase 1b-1 spike, `docs\spikes\staff-auth-report.md`).**
 
 Three options, none verified to work on this stack yet (Phase 1 spike decides):
 1. **Cloudflare Access** in front of `/admin`: least code. `[U]` seat limit and
@@ -253,6 +255,8 @@ autumn change on 1 November. Toronto, Edmonton, Los Angeles and Paris still chan
 - Reversible: Y.
 
 ### O-20 Where person-level audit events go
+**Resolved by D-27.**
+
 Found in the staff sign-in spike (`docs\spikes\staff-auth-report.md` §7.1). `audit_log` has a required
 `property_id`, but a sign-in, sign-out or recovery belongs to a person who may hold roles in several properties.
 - **Recommended:** keep one `audit_log`, write one row per property the person holds a role in (as the spike did), and
@@ -261,6 +265,8 @@ Found in the staff sign-in spike (`docs\spikes\staff-auth-report.md` §7.1). `au
 - Reversible: M. Decide with O-02.
 
 ### O-21 How staff invite and recovery links are delivered
+**Resolved by D-28.**
+
 From the same report (§6). The demo has a handful of staff.
 - **Recommended for the demo:** the admin is shown a one-time link or QR code and hands it over in person; recovery is
   another admin issuing a link, or the person's second passkey. No email, no sender, no new data flow.

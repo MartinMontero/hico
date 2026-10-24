@@ -234,10 +234,11 @@ SimpleWebAuthn 14 passes 14 of 14 browser tests under Chromium's virtual authent
 1.7.12 with its passkey plugin passes 11 of 11 on workerd with local D1; the Worker half of Cloudflare
 Access passes 2 of 2 against a local stand-in. Cloudflare Access itself could not be tested. Nothing was
 sent, no account or remote resource was created, and the report recommends a route without deciding.
-**O-02 is still open: Martin calls it.** New open items: O-20 (person-level audit events) and O-21
-(how invite and recovery links are delivered). `npm run validate` still passes (153 tests, raw output in
-`docs\spikes\phase-1b-1-validate-output.txt`). The next step after O-02 is the Phase 1b-2 plan, which
-needs Martin's GO.
+**Martin called O-02 on 2026-10-24: D-26, our own WebAuthn, passkey-first.** O-20 and O-21 were
+accepted as recommended (D-27, D-28). `npm run validate` still passes (153 tests, raw output in
+`docs\spikes\phase-1b-1-validate-output.txt`). The Phase 1b-2 plan is written
+(`docs\plans\2026-10-24-phase-1b-2-staff-console.md`) and **waits for Martin's GO**; nothing from it is built.
+It lists ten points for Martin to accept or change (§0).
 ## 5. Stale documents
 
 - `docs\05-ARCHITECTURE.md` §16 shows the proposed layout; the real one is above. §13 says

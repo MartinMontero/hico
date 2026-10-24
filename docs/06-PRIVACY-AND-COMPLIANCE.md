@@ -52,7 +52,7 @@ at once.
 | Signals, responses | Connect | D1, plus the room object while live | Expiry plus 24 hours | Alarm and purge job |
 | Reports | Review | D1 | Resolved plus 90 days | Purge job |
 | Staff accounts | Staff login | D1 | While active, plus 30 days | Admin or operator removal |
-| Audit log | Accountability | D1 | One year | Purge job |
+| Audit log | Accountability. A person-level event (sign-in, sign-out, recovery, session or passkey change) is written once for each property the person holds a role in (D-27) | D1 | One year | Purge job |
 | Rate-limit counters | Abuse control | D1 or room object | 24 hours; keyed by a hash whose key is derived each day from `RATE_LIMIT_SECRET` and the UTC date, so counters cannot be linked across days | Expiry |
 | Aggregate counters | Measurement | D1 | Indefinite; contains no personal data | n/a |
 | Worker logs | Operations | Cloudflare | Cloudflare's retention `[U]` | n/a |
