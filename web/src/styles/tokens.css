@@ -1,0 +1,18 @@
+/* Generated from shared/tokens.ts by scripts/contrast.ts --write-css. Do not edit. */
+:root {
+  --c-deep: #121a21;
+  --c-timber: #1a2530;
+  --c-ridge: #243040;
+  --c-stone: #7a8e9e;
+  --c-cream: #e8e0d6;
+  --c-white: #f5f0ea;
+  --c-trail: #2ea872;
+  --c-trail-dk: #1e8a5a;
+  --c-ember: #e07a4f;
+  --c-ember-lt: #f0a878;
+  --c-sky: #5ba0d4;
+  --c-gold: #d4a83a;
+  --c-coral: #cc3d3d;
+  --c-stone-lt: #a9b8c4;
+  --c-coral-lt: #f08a8a;
+}

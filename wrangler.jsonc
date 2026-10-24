@@ -1,0 +1,43 @@
+{
+  // Top level is the PREVIEW Worker. The "prod" environment is hico-prod.
+  // Never use the names hico, mec-trails, lume or lume-city (live apps): tests/node/names.test.ts.
+  // database_id values are zero placeholders: only local D1 is used until a GO for `d1 create`.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "hico-preview",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-08-07",
+  "observability": { "enabled": true },
+  "assets": {
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": true
+  },
+  "vars": { "PREVIEW_GATE": "on" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "hico-preview",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "env": {
+    "prod": {
+      "name": "hico-prod",
+      "assets": {
+        "binding": "ASSETS",
+        "not_found_handling": "single-page-application",
+        "run_worker_first": true
+      },
+      "vars": { "PREVIEW_GATE": "off" },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "hico-prod",
+          "database_id": "00000000-0000-0000-0000-000000000000",
+          "migrations_dir": "migrations"
+        }
+      ]
+    }
+  }
+}

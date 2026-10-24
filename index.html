@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="color-scheme" content="dark" />
+    <title>Loading</title>
+    <!-- Stylesheets are linked, not imported from JS: the CSP is style-src 'self', which forbids the
+         inline style tags a JS import would inject in development. -->
+    <link rel="stylesheet" href="/web/src/styles/tokens.css" />
+    <link rel="stylesheet" href="/web/src/styles/fonts.css" />
+    <link rel="stylesheet" href="/web/src/styles/base.css" />
+    <link rel="preload" href="/fonts/dm-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/web/src/main.tsx"></script>
+  </body>
+</html>

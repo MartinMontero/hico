@@ -260,7 +260,7 @@ used; React is a measuring baseline only (D-12).
 | Build | Vite with the Cloudflare Vite plugin: front end and Worker in one project, with Durable Objects, D1 and static assets. v1.0 went GA on 2025-04-08, with Hono among the supported frameworks | `[V]` Cloudflare blog; current version to be checked in Phase 1 |
 | API | Hono on the Worker | `[I]`; check current version and Workers support in Phase 1 |
 | Validation | One schema library shared by browser and Worker, with every length limit declared once | `[A]`; chosen in Phase 1 and recorded |
-| Tests | Vitest for units and API tests against local D1; Playwright for end-to-end and axe | `[I]`; Phase 1 confirms they run on Windows (Phase 0.2 was waived, D-12) |
+| Tests | Vitest for units and API tests against local D1; Playwright for end-to-end and axe | `[V]` 2026-10-23: they run on this Windows machine (Vitest 4.1.12 in workerd, Playwright 1.64.1 with Chromium); see `02` §4 |
 | PWA | Web app manifest plus a service worker | `[A]`; see §12 |
 | Fonts | DM Sans, self-hosted. No Google Fonts request in production | `[A]`; the prototype loads it from Google |
 
@@ -295,13 +295,23 @@ proved by test.
    role in that property on every request; naming a property gives no access by itself.
    For a public content read with no session, the property is looked up server-side
    from the request's hostname (`property_hosts`); that is safe because the content is
-   public by design and nothing private is returned. In every other case the property
-   is never read from the body, the query string, a client-set header or a
-   client-supplied id.
+   public by design and nothing private is returned. Public content is addressed as
+   `/p/<slug>/...` (D-24): the slug is accepted only if it names a property in that
+   hostname's own list in `property_hosts`. A host with one row serves that property
+   only, and a slug that is unknown or not on the host's list gets the same flat 404.
+   In every other case the property is never read from the body, the query string, a
+   client-set header or a client-supplied id.
 2. **Every query carries `property_id`.** All data access is in `worker\repositories\`.
    A repository function takes a context object that already holds the property; it
    cannot be called without one. Raw `env.DB.prepare` outside that folder is a lint
    error.
+   **The one shared row type (D-23).** An activity belongs to an owner property
+   (`activities.property_id`) and is readable by every property listed in
+   `activity_offered_at`. Reads for property P require a row for P in that table. Staff
+   with `editor` or `admin` at any listed property may edit its content; only the
+   owner's `admin` may change the list or delete it. Guards `canEditActivity` and
+   `canChangeOfferedAt` are the only way a write function may decide this. No other
+   table is shared between properties.
 3. **Composite foreign keys.** Every parent table has `UNIQUE (id, property_id)` and
    every child references `(parent_id, property_id)`. A child row cannot point at
    another property's parent even if code is wrong. `[I]` D1 enforces foreign keys;
@@ -510,25 +520,25 @@ as HTML.
 - A global `read_only` flag in `platform_flags` and the per-property feature switches
   let Martin stop writes, or one feature, without a deploy `[A]`.
 
-## 16. Repository layout `[A]`
+## 16. Repository layout
+
+As built in Phase 1 (2026-10-23, `[V]`). The full tree, with what each part does, is in
+`02-STATE.md` §4. In short:
 
 ```text
 hico\
-  CLAUDE.md
+  CLAUDE.md  package.json  wrangler.jsonc  vite.config.ts  vitest.config.ts  playwright.config.ts
   docs\                 the numbered documents; plans\; spikes\; external\ (answers from
-                        HI Canada that Martin adds); content-templates\
+                        HI Canada that Martin adds)
   reference\            hi-co-prototype.jsx (never edited)
-  content\              property content files, for example content\downtown\
-  spike\                throwaway measurements (framework, auth, Wallet)
-  worker\               API, tenant middleware, repositories, projections
-  web\                  front end
-  shared\               schemas, types, i18n keys
+  worker\               API (Hono), tenant middleware, repositories\, projections, preview-gate\
+  web\src\              Preact front end; index.html is at the repository root
+  shared\               limits, Valibot schemas, types, design tokens, contrast, i18n catalogs
   migrations\           D1 migrations
-  seed\                 demo-whistler placeholder data
-  scripts\              PowerShell operator scripts
-  tests\                isolation, anonymous-surface, end-to-end
-  wrangler.jsonc
+  seed\                 demo seed (local D1 only)
+  scripts\              validate and its parts
+  public\fonts\         DM Sans (self-hosted) and its licence
+  tests\                worker\ (workerd + D1), node\, web\ (jsdom), e2e\ (Playwright)
 ```
 
-Claude Code may adjust this in Phase 1. It records the final layout in
-`02-STATE.md`.
+`content\` and `spike\` from the proposal do not exist yet; `content\` arrives with Phase 3.

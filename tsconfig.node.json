@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "types": ["node", "@cloudflare/workers-types"],
+    "tsBuildInfoFile": "./node_modules/.cache/tsc-node.tsbuildinfo"
+  },
+  "include": [
+    "scripts/**/*.ts",
+    "seed/**/*.ts",
+    "tests/node/**/*.ts",
+    "tests/e2e/**/*.ts",
+    "shared/**/*.ts",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "playwright.config.ts"
+  ]
+}

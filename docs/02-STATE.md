@@ -119,40 +119,125 @@ prototype dataset as placeholder for any property other than HI Whistler, and
 re-verify it before HI Whistler goes live. The café at HI Whistler is **Cheaky's Cafe**
 (D-14, stated by Martin, 2026-10-23; the prototype spells it Cheekye's).
 
+
 ## 4. In flight
 
-The repository exists at `C:\Users\User\dev\hico`. The documents are in `docs\`,
-`CLAUDE.md` is at the root, and the prototype is in `reference\hi-co-prototype.jsx`.
-No application code exists, no project dependency is installed and nothing is
-deployed. The Windows preflight has run `[V]` on 2026-10-23, four times (the fourth,
-`docs\spikes\preflight-rerun.md`, repeats everything under both shells and gives the
-same results and the same desktop-app conclusion):
+### The application (Phase 1, built 2026-10-23)
 
-- `docs\spikes\preflight.md`: first run, Windows PowerShell 5.1 only (no `pwsh`, no
-  Wrangler at that time). No step failed.
-- `docs\spikes\preflight-desktop.md`: second run under 5.1. The process chain shows the
-  session was launched by the Claude desktop application (bundled Claude Code
-  2.1.308); `claude --version` on the PATH is 2.1.310, a different binary `[V]`.
-- `docs\spikes\preflight-pwsh7.md`: third run, under PowerShell 7.6.8, after two
-  installs approved by Martin on 2026-10-23 (D-16): PowerShell 7.6.8 (`winget`,
-  `Microsoft.PowerShell`, `pwsh.exe` in `%LOCALAPPDATA%\Microsoft\WindowsApps`) and
-  Wrangler 4.152.0 (`npm install -g`, no `package.json` created). Wrangler was only run
-  with `--version`; it was not logged in or pointed at Cloudflare, so its
-  authentication is `[U]`. Steps 2a–2e gave the same results under 5.1 and 7, apart
-  from newer cmdlet versions under 7.
+`[V]` by `npm run validate`, raw output in `docs\spikes\phase-1-validate-output.txt`: it
+passes. This is the multi-tenant foundation only (D-22 Phase 1): no guest features, no
+staff sign-in (Phase 1b), nothing deployed, no remote resource, no secret, and no Wrangler
+command that contacts Cloudflare was run. Decisions called at GO: D-23 (activity ownership
+and the offered-at list), D-24 (`/p/<slug>` checked against the host's own list), D-25
+(no "HI" in displayed names, text-only header, two extra seeded hostels). D-13 (Valibot) was
+chosen in the build and recorded.
 
-Gate G0 is closed by waiver: D-12 chose Preact 11 on the sandbox benchmark, and
-`docs\spikes\G0-framework-report.md` says what that did and did not measure. Decisions
-D-12 and D-17 to D-22 were called on 2026-10-23. The demo path is Phases 1, 1b-1, 1b-2, 2
-and 3 of `10-BUILD-PLAN.md` (D-22). The Phase 1 plan is written
-(`docs\plans\2026-10-23-phase-1-foundation.md`) and **waits for Martin's GO**; nothing
-from it is built. It asks Martin to call two decisions (O-17, the D-15 data shape, and
-O-18, how one domain serves two hostels), approve the downloads, and answer four small
-points. Package versions it relies on were read from the npm registry on 2026-10-23
-`[V]`: Vitest must stay on 4.x (the Workers test pool needs it) and TypeScript on 6.0.x
-(typescript-eslint needs `<6.1`), although 5.0.5 and 7.0.2 are the latest.
+Layout as built (replaces the proposal in `05` §16):
+
+```text
+hico\
+  package.json  package-lock.json  tsconfig*.json  eslint.config.js  vite.config.ts
+  vitest.config.ts  playwright.config.ts  wrangler.jsonc  env.d.ts  index.html
+  .dev.vars.example (copy to .dev.vars, gitignored)  .claude\launch.json (dev server)
+  worker\            index.ts, app.ts (Hono), tenant.ts, ids.ts, projections.ts,
+                     middleware\ (tenant, guards, headers), preview-gate\, repositories\
+  web\src\           App.tsx, router.tsx, pages.tsx, Dialog.tsx, context.tsx, api.ts, time.ts,
+                     load.ts, styles\ (tokens.css is generated from shared\tokens.ts)
+  shared\            limits.ts, schemas.ts (Valibot), types.ts, tokens.ts, contrast.ts, i18n\
+  migrations\        0001_foundation.sql (15 tables)
+  seed\              data.ts, run.ts (local D1 only), guard.ts
+  scripts\           validate.ts, typecheck.ts, lint.ts, contrast.ts, bundle-size.ts,
+                     check-names.ts, names.ts
+  public\fonts\      DM Sans 400/500/700 woff2 and the OFL licence text
+  tests\             worker\ (workerd + local D1), node\, web\ (jsdom), e2e\ (Playwright)
+```
+
+What it does `[V]`:
+
+- **Stack on this machine.** The Cloudflare Vite plugin 1.65.0 runs the Hono Worker, the
+  static assets (SPA fallback, Worker first) and a local D1 binding with Preact 11.0.2 on
+  Vite 8.3.5, in `vite dev`, `vite build` and `vite preview`. Vitest 4.1.12 runs in
+  workerd against a real local D1. Playwright 1.64.1 runs Chromium (headless shell 156)
+  on Windows. Nothing failed in a way that points at Preact. Two version facts: Vitest must
+  stay on 4.x or 5.x for the Workers test plugin, and the plugin is now
+  `@cloudflare/vitest-plugin` (the old `@cloudflare/vitest-pool-workers` is deprecated and
+  was not used); TypeScript is pinned to 6.0.3 for typescript-eslint.
+- **D1 enforces what the design relies on** (`tests\worker\d1-enforcement.test.ts`):
+  composite foreign keys (including the offered-at owner link and exception rows),
+  length and enumeration CHECKs, id format, missing parents.
+- **Tenancy.** The property comes from the hostname list plus the `/p/<slug>` rule, or
+  from a per-request staff role lookup; never from the body, query, a client header or an
+  id. Repository functions take the request context first; static tests forbid raw
+  database access, `SELECT *`, building a context, and third-party hosts outside the
+  allowed files. 151 tests; the isolation suite covers every exported repository
+  function and a meta-test fails otherwise. Three deliberate mutations (a dropped
+  property filter, a dropped offered-at join, a skipped host-list check) each failed
+  tests, then were reverted.
+- **Surface.** Every route is called with no cookie and its field names compared to an
+  allow-list; forbidden names never appear. Exact CSP and companion headers on every
+  response. Preview gate copied from Serendipty into `worker\preview-gate\`, covering
+  `/api/*`, with the key never in a body, header or log line. Global read-only switch (503,
+  guest's language, 5-second cache).
+- **Front end.** Four tabs with routing, property name as text, "Sample content" band,
+  accessible Dialog and Toast, English and French (French strings are first drafts, D-19),
+  DM Sans self-hosted, 21 contrast pairs all above their minimum (table in the validate
+  output). Initial JavaScript 12.45 KB gzip against the 60 KB budget.
+- **Seed.** `npm run db:seed` writes the local D1: Whistler (10 activities, 24 places),
+  Vancouver Downtown and Jericho Beach with 3 shared sample activities. Ratings, guest
+  names, dorm names and unverified claims are left out; every row is a placeholder.
+- **Browser checks** at 360 px: axe-core finds no serious or critical violation on any
+  tab, the dialog, the French shell or the not-found page; no sideways scroll, also at
+  200% text size; a keyboard-only walk through the skip link, tabs, heading focus, the
+  Settings dialog (focus in, Tab trapped, Escape closes, focus returns). Axe found one
+  real fault (day buttons whose accessible name did not contain their visible text) and
+  the keyboard test found one (focus was not returned to the Settings button because the
+  page behind is made inert in the same render that opens the dialog); both are fixed.
+
+What is not done or not verified `[U]`:
+
+- Staff sign-in (O-02, Phase 1b); the staff routes exist and answer 401 until a resolver is
+  supplied. No activity, place or offer write functions exist yet, so "update and delete
+  another property's rows" is covered by the edit guards and the meta-test, not by
+  attacks on write functions.
+- A real phone, Lighthouse, a screen reader, and the French wording.
+- `npm audit`: 0 vulnerabilities in the production dependencies (hono, preact, valibot);
+  6 (3 moderate, 3 high) in the Cloudflare tooling that is installed for development only
+  (wrangler, miniflare, undici, sharp, zod inside them). The advisories name the tools, not
+  the deployed Worker; `npm audit fix --force` would downgrade the Workers test plugin, so
+  it was not run.
+- `wrangler login` and every remote command: none run, Wrangler's login is still unchecked.
+- A built `dist\hico_preview\` contains a copy of `.dev.vars` (the plugin copies it).
+  Locally it holds only `PREVIEW_GATE=off`, but it must never hold a key, and `.dev.vars`
+  must be absent or gate-on before any deploy of that folder.
+- The workers.dev address of the preview is unknown until the first deploy, so
+  `property_hosts` has only `localhost` and `127.0.0.1`; the deploy phase adds the real host.
+
+Time-zone fact found while testing `[V]` on this machine: the runtime's time-zone data
+(Node ICU, tzdata 2026b) has America/Vancouver on UTC-7 all year after 8 March 2026, with
+no autumn change on 1 November, while Toronto, Edmonton, Los Angeles and Paris still fall
+back. The code uses the IANA zone and never an assumed offset, so it follows whichever data
+the device has; phones with older data may disagree for part of the year. See O-19.
+
+The Windows preflight has run four times (`docs\spikes\preflight.md`,
+`preflight-desktop.md`, `preflight-pwsh7.md`, `preflight-rerun.md`): Windows PowerShell 5.1,
+then PowerShell 7.6.8 and Wrangler 4.152.0 installed with Martin's approval (D-16).
+Wrangler has only been run with `--version`.
+
+Gate G0 is closed by waiver (D-12); the open measures in `docs\spikes\G0-framework-report.md`
+§4 are exercised here: the plugin works with Preact (measure 6) and axe finds no serious or
+critical violation on the shell (measure 3).
+
+The next step is Phase 1b-1 (the staff sign-in spike) in `10-BUILD-PLAN.md`, which needs a
+plan and Martin's GO.
 
 ## 5. Stale documents
 
-- `docs\spikes\preflight.md` says PowerShell 7 and Wrangler are not installed; true
-  when written, no longer true. It is a dated record and is left as written.
+- `docs\05-ARCHITECTURE.md` §16 shows the proposed layout; the real one is above. §13 says
+  tests cover both daylight-saving changes; in this runtime BC has only the spring one
+  (O-19).
+- `docs\09-CONTENT-AND-ONBOARDING.md` §1 now carries the activity edit rule.
+- `docs\10-BUILD-PLAN.md` Phase 1 lists tasks that are now done.
+- `docs\01-project-instructions.md` line 70 and `docs\11-DEPLOY.md`'s status paragraph still
+  describe the shell tools as they were before D-16 and the preflight runs.
+- `docs\spikes\preflight.md` says PowerShell 7 and Wrangler are not installed; true when
+  written, no longer true. It is a dated record and is left as written.

@@ -1,0 +1,4 @@
+# Copy to .dev.vars (gitignored). Local only.
+# PREVIEW_GATE=off serves the app with no gate. To try the gate locally set PREVIEW_GATE=on and
+# choose a made-up ACCESS_KEY here; never put the real preview key in any file.
+PREVIEW_GATE=off

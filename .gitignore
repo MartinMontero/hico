@@ -10,3 +10,6 @@ _package
 *.p12
 *.key
 *.cer
+playwright-report
+test-results
+.vite

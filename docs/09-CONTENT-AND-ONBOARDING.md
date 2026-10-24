@@ -19,6 +19,12 @@ Staff are the authors. Every text field exists in English and French.
 An activity can be offered at more than one property (D-15). It is one record with one set of
 verification stamps. The zone or place it meets at belongs to one property.
 
+Who may edit it (D-23): the activity has an owner property. Staff with `editor` or `admin` at any
+property that offers it may edit its content (text, time, status, cancelled dates, verification
+stamps), acting under that property in the path. Only an `admin` of the owner changes the
+offered-at list or deletes it. Cancelling a date cancels it for every property that offers it.
+Removing a property from the list removes the activity from that property at once.
+
 Images are not part of Stage 0. Uploaded images need storage, review and
 moderation; they come only if a property asks and staff have the time (`[A]`).
 

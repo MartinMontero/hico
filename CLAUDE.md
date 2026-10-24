@@ -36,7 +36,7 @@ steps.
 - Copy, never move. Never edit `reference\hi-co-prototype.jsx`.
 - The original prototype and the shared gate live in `C:\Users\User\dev\Serendipty`.
   Read them if needed. Do not modify that repository.
-- Git is local. No remote and no push unless I say so.
+- Git has one private remote, `origin` (github.com/MartinMontero/hico). No push unless I say so.
 - Secrets never go in tracked files. `.dev.vars` is gitignored.
 
 ## Deploying
@@ -55,8 +55,10 @@ the current session, announced in advance. Procedures are in `docs\11-DEPLOY.md`
   request names the property in its path and the server checks that staff member's
   role in that property on every request; naming a property gives no access by
   itself. Public content reads, before any session exists, take the property from the
-  server-side hostname lookup, which is safe because that content is public. The
-  property never comes from the request body, the query string, a client-set header
+  server-side hostname lookup, which is safe because that content is public; the path
+  `/p/<slug>/...` narrows it, and the slug counts only if it is in that hostname's own
+  list in `property_hosts` (D-24). An activity may be offered by more than one property
+  through its offered-at list (D-23). Otherwise the property never comes from the request body, the query string, a client-set header
   or any other client-supplied id. Data access goes through the repository layer
   only; raw `env.DB.prepare` outside it fails the lint rule and the review.
 - Secrets are read with whitespace trimmed. A secret piped in from PowerShell can

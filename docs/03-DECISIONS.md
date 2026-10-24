@@ -36,8 +36,13 @@ that is not in this file has not been made.
 | D-20 | **Fawzie owns content updates and the report queue** for HI Vancouver Downtown and HI Vancouver Jericho Beach (O-09) | Martin's call. Fawzie runs programs for HI Jericho, Downtown and Whistler `[R]`. His own agreement and whether this fits the "a few minutes a day" budget `[A]` are not recorded `[U]`. Martin says events change monthly, not daily `[R]` | Martin | 2026-10-23 | Y |
 | D-21 | **For the demo only,** the app's domain is **hico.builderworkshop.ca** and it shows **no HI logo**. The production hostname, who owns the domain, and whether HI marks may be used stay open (O-03) | Martin, 2026-10-23. Whether builderworkshop.ca is on the Cloudflare account Wrangler will use is not checked `[U]`. How the two hostels are told apart (one host with the property carried in the link, or a subdomain each) is for the Phase 1 plan | Martin | 2026-10-23 | Y |
 | D-22 | **Demo scope.** The demo is for HI Canada's head office: Rhian, General Manager of both Vancouver hostels, asked for it so she can present it to the head of programs `[R]`. It is Phases 1, 1b-1, 1b-2, 2 and 3 of `10-BUILD-PLAN.md`, with Phase 3 covering both HI Vancouver Downtown and HI Vancouver Jericho Beach (D-15). Staff sign-in (O-02) is part of the demo; its method is chosen by the Phase 1b-1 spike and then called by Martin. Phase 0.2 is waived (D-12). Phase 3b onward (production, savings, membership verification, shared counts, wallet pass, a second tenant) is not part of the demo. Nothing is deployed without Martin's GO in advance | Martin, 2026-10-23: "you are overcomplicating this MVP build for the demo to senior management" and "staff sign-in (O-02) is part of the demo". HI Canada head office's agreement is not recorded `[U]` | Martin | 2026-10-23 | Y |
+| D-23 | **An activity is one record owned by one property, with an "offered at" list** (O-17, Option A). Any property in the list can read it; staff with `editor` or `admin` at any listed property can edit its content; only the owner's `admin` changes the list or deletes it. D-02 is unchanged: each property is still a tenant. `05` §4 gains one paragraph stating this exception | Martin, 2026-10-23, "D-15: Option A". Option B (one tenant, two sites) would have changed D-02 and widened each hostel's staff rights | Martin | 2026-10-23 | M |
+| D-24 | **Public content is addressed as `/p/<slug>/...`, and the slug is accepted only if it is in the request hostname's own list in `property_hosts`** (O-18, Option 1). A host with one row serves that property only. `05` §4 rule 1 and the matching line in `CLAUDE.md` are amended accordingly. Staff and guest-session rules are unchanged | Martin, 2026-10-23, "D-21: Option 1 ... approve the change to 05 section 4 rule 1 and the matching CLAUDE.md line". Option 2 (one hostname per hostel) stays available later with no code change, only `property_hosts` rows | Martin | 2026-10-23 | Y |
+| D-25 | For the demo the app **shows no "HI" in hostel names** ("Vancouver Downtown", "Vancouver Jericho Beach", "Whistler"), the header is **the property name as text only** with no glyph, and **two extra placeholder properties (Downtown, Jericho Beach) are seeded** with shared sample activities so the hostel choice and D-15 can be shown | Martin, 2026-10-23, answering plan §0 items 4 to 6 | Martin | 2026-10-23 | Y |
 
-D-13 (the validation library) is reserved. It is added in Phase 1, so the number the build plan uses stays valid. The next free number after D-22 is D-23.
+| D-13 | **The validation library is Valibot 1.5.0**, shared by browser and Worker from `shared\` (every length limit is declared once in `shared\limits.ts`) | Chosen by Claude Code in Phase 1, as the brief allowed. Modular, so the browser bundle carries only the validators used (initial JavaScript is 12.45 KB gzip against the 60 KB budget, `04` §7). Zod 4.6.7 was the alternative: a larger ecosystem, a bigger default bundle. A test checks that the migration's CHECK lengths equal `shared\limits.ts` | Claude Code | 2026-10-23 | Y |
+
+The next free number after D-25 is D-26.
 
 ## Open — decisions Martin owes
 
@@ -212,6 +217,8 @@ and do not decide this for you.
 - Reversible: Y.
 
 ### O-17 Data shape for an activity offered by one or two properties
+**Resolved by D-23.**
+
 Settles the open part of D-15. Full options, costs and tests: `docs\plans\2026-10-23-phase-1-foundation.md` §1.
 - **Recommended: Option A.** One activity record owned by one property, with an
   "offered at" list of the properties that show it. Any property in the list can edit
@@ -220,6 +227,8 @@ Settles the open part of D-15. Full options, costs and tests: `docs\plans\2026-1
 - Reversible: M.
 
 ### O-18 How one domain serves two hostels
+**Resolved by D-24.**
+
 Settles the open part of D-21. Options, costs and tests: plan §2.
 - **Recommended: Option 1.** The property is chosen by a path segment (`/p/<slug>`), accepted only if
   it is in that host's own list in `property_hosts`. This changes `05` §4 rule 1 and the
@@ -227,6 +236,21 @@ Settles the open part of D-21. Options, costs and tests: plan §2.
 - Alternative 2: one hostname per hostel (rule 1 unchanged; needs more DNS, certificate
   and route changes, and preview on `workers.dev` can serve only one hostel).
 - Reversible: Y for the demo.
+
+### O-19 British Columbia clock changes
+Found while writing the daylight-saving tests. On this machine the runtime's time-zone data
+(Node ICU, tzdata 2026b) has America/Vancouver on UTC-7 permanently after 8 March 2026: no
+autumn change on 1 November. Toronto, Edmonton, Los Angeles and Paris still change `[V]`
+(`02` §4). `05` §13 assumed both changes happen.
+- Does BC (and so Whistler and both Vancouver hostels) now stay on daylight time all year? I
+  did not check an official source; the data on one machine is the only evidence `[U]`.
+- What the code does either way: dates are stored in UTC, shown with the IANA zone, so it
+  follows the device's data. A phone with older data would show times an hour off for part of
+  the year. The weekly board stores wall-clock times with the zone, so the posted time stays
+  right wherever the data is current.
+- **Recommended:** confirm the BC rule with someone at the hostel or an official source before
+  the demo, and add a launch-check line that a phone on an older OS shows the right times.
+- Reversible: Y.
 
 ## Gates
 

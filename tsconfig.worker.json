@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "types": ["@cloudflare/workers-types", "@cloudflare/vitest-plugin/types"],
+    "tsBuildInfoFile": "./node_modules/.cache/tsc-worker.tsbuildinfo"
+  },
+  "include": ["worker/**/*.ts", "shared/**/*.ts", "tests/worker/**/*.ts", "tests/support/**/*.ts", "env.d.ts"]
+}
