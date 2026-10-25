@@ -512,8 +512,13 @@ the audit log, no shared logins.
   language if the string exists, else English with a visible "English only" marker.
   Never a blank and never a raw key. A build test fails if any shipped key has no
   French (`09` §6).
-- Dates are stored in UTC and shown in the property's timezone. Tests cover both
-  daylight-saving changes.
+- Dates are stored in UTC and shown in the property's timezone. British Columbia no longer changes
+  clocks: the last change was on 8 March 2026, there is none on 1 November 2026, and the permanent time is
+  called Pacific time (PCT), UTC-7 (BC government page, read 2026-10-24; O-19). So the tests cover the
+  spring change on America/Vancouver (8 March 2026, which really happened) and the autumn change on
+  America/Toronto (1 November 2026, which still happens), and use Pacific/Auckland as a device far from the
+  property. The demo hostels in BC can no longer show a clock-change bug; a phone with old time-zone data
+  still can (O-19).
 
 ## 14. Security headers and CSP
 

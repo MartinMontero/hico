@@ -4,7 +4,8 @@ import type { PublicActivity } from '../../shared/types.ts';
 import { addDays, occurrencesOn, weekFrom, weekdayOf, ymdInZone } from '../../web/src/time.ts';
 
 // Dates are stored in UTC and shown in the PROPERTY's zone, never the device's (CLAUDE.md).
-// 05 §13: tests cover both daylight-saving changes (2026: 8 March and 1 November in BC).
+// 05 §13: BC no longer changes clocks (the last change was 8 March 2026; none on 1 November 2026, O-19), so the autumn
+// change is tested on America/Toronto, and the spring change on America/Vancouver. A device far from the property is Pacific/Auckland.
 
 const VAN = 'America/Vancouver';
 const originalTz = process.env.TZ;

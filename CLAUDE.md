@@ -36,7 +36,7 @@ steps.
 - Copy, never move. Never edit `reference\hi-co-prototype.jsx`.
 - The original prototype and the shared gate live in `C:\Users\User\dev\Serendipty`.
   Read them if needed. Do not modify that repository.
-- Git has one private remote, `origin` (github.com/MartinMontero/hico). No push unless I say so.
+- Git has one remote, `origin` (github.com/MartinMontero/hico), which is public (D-32). No push unless I say so.
 - Secrets never go in tracked files. `.dev.vars` is gitignored.
 
 ## Deploying
@@ -77,6 +77,11 @@ the current session, announced in advance. Procedures are in `docs\11-DEPLOY.md`
   large text); touch targets at least 44 CSS px.
 - Dates and times are stored in UTC and displayed in the **property's** timezone,
   never the device's.
+- A number that decides what a guest or staff member sees or can do (a time limit, a
+  length, a count) comes from me, from a standard, or from a measurement. If it does
+  not, it is labelled assumed where it is declared, declared once in `shared\`, and
+  listed in the assumptions item in `docs\03-DECISIONS.md`. Never present an assumed
+  number as settled.
 
 ## Definition of done for any change
 

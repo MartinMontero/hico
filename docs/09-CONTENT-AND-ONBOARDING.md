@@ -13,7 +13,7 @@ Staff are the authors. Every text field exists in English and French.
 | Zones | Label EN/FR, ring | The named places in the hostel (Common Room, Deck, Kitchen, Lobby) plus "Out and about". Each belongs to one ring: in the hostel, a short walk away, or further out. "Out and about" is further out |
 | Activity | Title, description, category, offered at (one or more properties, D-15), zone or place, host label, start and end or weekly recurrence with local time, capacity (optional), status (active or cancelled), verified-on, verified-by | Cancelling one date does not delete the series |
 | Place | Name, category, staff pick, staff note, walk time as text, hours text, phone (optional), "open in maps" address, verified-on, verified-by | No rating |
-| Offer | Partner name, terms in plain words, valid from and to, requires-membership flag, how we know, verified-on, verified-by | Hidden from guests if expired or unchecked for 90 days `[A]` |
+| Offer | Partner name, terms in plain words, valid from and to, requires-membership flag, how we know, verified-on, verified-by | Hidden from guests if expired or past the check limit (D-33) |
 | QR code | Location label, created, retired | In Stage 0 a code is a labelled link (`/p/<slug>#l=<label>`) the console draws as a QR code and prints; no token exists. Rotating a code and ending its sessions arrive in Stage 2 (Phase 1b-2 point 3). The entry token, shown once with only its hash kept, comes with guest sessions |
 
 An activity can be offered at more than one property (D-15). It is one record with one set of
@@ -38,7 +38,7 @@ moderation; they come only if a property asks and staff have the time (`[A]`).
    expiry in rule 3, and shows an offer as hidden from guests once it is past it.
 2. The guest screen shows the stamp in words ("Checked by staff on 12 October"). It never
    shows the staff member's name; the name is for staff and the audit log.
-3. Past the expiry (`[A]` 90 days for places and offers, 7 days for the board) the
+3. Past the check limit for its kind (demo values, declared once in `shared\check-limits.ts`, D-33) the
    item says "Check at the desk" or is hidden, as `04` specifies. It never looks
    current when it is not.
 4. Placeholder rows have `is_placeholder = true`. Placeholders render with a visible
@@ -82,7 +82,7 @@ Facts, with their status. Re-verify with the property before any is shown to a g
 | Free wifi, coworking space, shared kitchen, games room with billiards, patio, library | `[V]` same listing (the listing says "sunny patio") |
 | No hostel-run activities listed on the listing | `[V]` same listing |
 | 232 pillows; reopened June 2023 after a three-year closure; 24-hour front desk; free continental breakfast 7 to 9; rooftop patio; TV lounge | `[I]` from an earlier research note (30 May). Not on the listing page read today. Treat as unverified |
-| The General Manager of both Vancouver hostels is Rhian | `[R]` Martin, 2026-10-23, who confirmed the spelling. The surname in the earlier note is `[I]` and is not confirmed; do not use it |
+| The General Manager of both Vancouver hostels is Rhian | `[R]` Martin, 2026-10-23, who confirmed the spelling. An earlier research note gave a surname; it is `[I]` unconfirmed and is not used in this repository |
 
 Downtown has **no content yet** for the app. Its first board, places and offers come
 from the property, not from the prototype's Whistler content (`02` §3).

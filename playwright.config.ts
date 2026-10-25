@@ -19,7 +19,9 @@ export default defineConfig({
   projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
   webServer: {
     command: 'npx vite preview --port 4173 --strictPort',
-    url: 'http://localhost:4173/api/hosts/properties',
+    // Not an API route: those read the database, which tests/e2e/global-setup.ts creates only after this server
+    // starts. The home page needs no database, so a fresh clone (no .wrangler state yet) becomes ready too.
+    url: 'http://localhost:4173/',
     reuseExistingServer: false,
     timeout: 120_000,
     env: { CLOUDFLARE_INCLUDE_PROCESS_ENV: 'true', PREVIEW_GATE: 'off', WRANGLER_SEND_METRICS: 'false' },

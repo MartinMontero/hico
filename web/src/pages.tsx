@@ -1,6 +1,7 @@
 import type { ComponentChildren } from 'preact';
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import type { PublicActivity, PublicPlace, PublicProperty, PlaceCategory } from '../../shared/types.ts';
+import { pastCheckLimit, type CheckKind } from '../../shared/check-limits.ts';
 import { pick } from '../../shared/i18n/index.ts';
 import { api } from './api.ts';
 import { useUi } from './context.tsx';
@@ -28,14 +29,14 @@ export function LoadState<T>({ loaded, children }: { loaded: Loaded<T>; children
 }
 
 /**
- * "Checked by staff on 12 October" (09 §2): the date only, never a name. Past the limit (7 days for the board,
- * 90 for places) it says to check at the desk, so an old item never looks current.
+ * "Checked by staff on 12 October" (09 §2): the date only, never a name. Past the limit for its kind (shared\check-limits.ts,
+ * D-33) it says to check at the desk, so an old item never looks current. "now" is epoch seconds, for tests.
  */
-function Stamp({ verifiedOn, timeZone, maxAgeDays }: { verifiedOn: number | null; timeZone: string; maxAgeDays: number }) {
+export function Stamp({ verifiedOn, timeZone, kind, now = Date.now() / 1000 }: { verifiedOn: number | null; timeZone: string; kind: CheckKind; now?: number }) {
   const { t, lang } = useUi();
   if (verifiedOn === null) return <p class="stamp">{t('stamp.notChecked')}</p>;
   const date = formatDay(ymdInZone(new Date(verifiedOn * 1000), timeZone), lang, { day: 'numeric', month: 'long' });
-  const stale = Date.now() / 1000 - verifiedOn > maxAgeDays * 24 * 3600;
+  const stale = pastCheckLimit(verifiedOn, now, kind);
   return <p class="stamp">{t(stale ? 'stamp.stale' : 'stamp.checked', { date })}</p>;
 }
 export function FeatureOff({ comingLater }: { comingLater: boolean }) {
@@ -91,7 +92,7 @@ export function WhatsOn({ property }: { property: PublicProperty }) {
                   {activity.description.en || activity.description.fr ? <p>{pick(activity.description, lang)}</p> : null}
                   {activity.zone ? <p class="muted">{t('whatson.meets', { place: pick(activity.zone, lang) })}</p> : null}
                   {activity.hostLabel ? <p class="muted">{t('whatson.host', { name: activity.hostLabel })}</p> : null}
-                  <Stamp verifiedOn={activity.verifiedOn} timeZone={property.timezone} maxAgeDays={7} />
+                  <Stamp verifiedOn={activity.verifiedOn} timeZone={property.timezone} kind="board" />
                 </li>
               ))}
             </ul>
@@ -143,7 +144,7 @@ export function Explore({ property }: { property: PublicProperty }) {
                   {place.walkTime.en || place.walkTime.fr ? <p class="muted">{t('explore.walk', { time: pick(place.walkTime, lang) })}</p> : null}
                   {place.hours.en || place.hours.fr ? <p class="muted">{t('explore.hours', { hours: pick(place.hours, lang) })}</p> : null}
                   {place.phone ? <p class="muted">{t('explore.phone', { phone: place.phone })}</p> : null}
-                  <Stamp verifiedOn={place.verifiedOn} timeZone={property.timezone} maxAgeDays={90} />
+                  <Stamp verifiedOn={place.verifiedOn} timeZone={property.timezone} kind="places" />
                 </li>
               ))}
             </ul>

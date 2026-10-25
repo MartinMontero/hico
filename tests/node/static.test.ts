@@ -76,6 +76,14 @@ describe('database access', () => {
     expect(hits).toEqual([]);
   });
 
+  it('no check limit is written as a number outside shared/check-limits.ts (D-33)', () => {
+    const hits = source
+      .map(rel)
+      .filter((f) => /^(worker|web|shared)\//.test(f) && f !== 'shared/check-limits.ts')
+      .filter((f) => /(?<![\d.])(7|90)\s*\*\s*(DAY|24)|\b90 days\b|\b90 jours\b|\bNINETY|maxAgeDays=\{\d|(BOARD|CHECK)_MAX_AGE\s*=\s*\d/i.test(readFileSync(join(ROOT, f), 'utf8')));
+    expect(hits).toEqual([]);
+  });
+
   it('web code never reaches the database or the Worker internals', () => {
     const hits = source
       .map(rel)

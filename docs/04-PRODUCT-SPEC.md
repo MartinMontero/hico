@@ -58,8 +58,10 @@ or changes another property's data, including operators acting through the app.
   changes. Staff can cancel a single date.
 - "I'm In" saves the activity to the guest's own plan on their device (O-14). It
   shows nothing to anyone else and needs no session.
-- Every screen shows when staff last updated it. Content older than `[A]` 7 days
-  shows "Last updated 9 days ago — check at the desk" instead of looking current.
+- Every item shows when staff last checked it. Past the limit for its kind (board, places,
+  offers: demo values, declared once in `shared\check-limits.ts`, D-33) it shows "Last checked on
+  <date>. Check at the desk." (the exact English text of `stamp.stale`) instead of looking
+  current; offers are hidden instead, and staff see "Check overdue".
 - The screen opens from cache with no network, and says it is offline.
 
 Acceptance: switching days and filters takes under `[A]` 100 ms on a mid-range phone
@@ -81,9 +83,9 @@ zone and the year under test. It does not hard-code them.
 - "Open in Maps" is a plain link the guest taps. Nothing loads from a map provider
   until they do.
 - Offers (a discount at a partner, a membership benefit) appear with the terms in
-  plain words, the dates they are valid, and who confirmed them and when. An offer
-  that is past its end date, or has not been checked within `[A]` 90 days, is hidden
-  from guests and shown to staff with a "needs checking" flag.
+  plain words, the dates they are valid, and the date staff last checked them (no name,
+  D-30). An offer that is past its end date, or whose check is past the limit (D-33), is
+  hidden from guests and shown to staff with a flag.
 - Search covers place and activity text in the guest's language.
 
 Acceptance: no place shows a rating; nothing time-sensitive shows without a

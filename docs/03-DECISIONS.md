@@ -44,12 +44,13 @@ that is not in this file has not been made.
 | D-27 | **Person-level audit events (sign-in, sign-out, recovery, session and passkey changes) are written one row per property the person holds a role in**, in the existing `audit_log`. A person with no role writes no row and cannot sign in (O-20 accepted as recommended). `06` §2 says so | Martin, 2026-10-24, "accept O-20 and O-21 as recommended" | Martin | 2026-10-24 | M |
 | D-28 | **Staff invite and recovery links are handed over by an admin: a one-time link or QR code shown once, no email** (O-21 accepted as recommended). Recovery is another admin of that property issuing a link, or the person's own second passkey. A property with one admin who loses their only device needs the operator (Martin) to issue a link, so staff should register two passkeys. Email stays a later add-on and needs its own decision | Martin, 2026-10-24. No sender, no new data flow, no DNS change | Martin | 2026-10-24 | Y |
 | D-29 | **The QR library is lean-qr 2.7.4** (MIT, no dependencies), used only in the staff chunk, pinned to the exact version. It draws a code as an SVG image with a text alternative; invite and recovery links and the labelled links of a property are drawn with it | Chosen by Claude Code in Phase 1b-2 under Martin's approval of one QR package (2026-10-24, "approve the npm install of one QR library, chosen in the build"). Candidates: uqr 0.1.3 (MIT, no dependencies, pre-1.0), qrcode-generator 2.0.4 (MIT, 555 KB unpacked), lean-qr 2.7.4 (MIT, 69 KB unpacked, 2.x, updated September 2026). lean-qr was the smallest stable-major one. The whole staff chunk, console and library together, is 29 KB gzip against its 90 KB budget; the guest bundle is unchanged (15.6 KB of 60 KB). The `npm audit` findings (undici, zod) are in the existing tooling, not in this package. A code was checked to render as a decoded image, but **not scanned with a reader**: that check is `[U]` on a phone | Claude Code | 2026-10-24 | Y |
-
 | D-30 | **Phase 1b-2 rules, ten points accepted as recommended** (plan §0): (1) guests see only "Checked by staff on <date>", never a staff name; (2) an owner admin may add to a shared activity's offered-at list only a property where they also hold a role; (3) QR codes in Stage 0 are labelled links, and "rotate" and "revoke sessions" wait for Stage 2; (4) the audit log is admin only; (5) a staff session lasts 12 hours with no sliding window; (6) staff tokens are stored as plain SHA-256; (7) sign-in, invite and recovery endpoints are rate limited in D1; (8) one npm QR library, chosen in the build (D-29); (9) staff pages are at `/staff/p/<slug>/...` and the API at `/api/staff/p/<slug>/...`; (10) the phase is built in four slices | Martin, 2026-10-24, "GO for Phase 1b-2, accept the recommendations on all ten points in section 0". Reasoning is in `docs\plans\2026-10-24-phase-1b-2-staff-console.md` §0 | Martin | 2026-10-24 | M |
-
 | D-31 | **The staff console's navigation is one "Menu: <current screen>" button that opens the list of screens** (O-22 accepted as recommended). Same links, same order; Escape closes it and returns focus to the button; choosing a screen closes it | Martin, 2026-10-24, "Accept O-22 as recommended". Alternative rejected: the wrapped buttons, which pushed the first card down about 330 px at 360 px | Martin | 2026-10-24 | Y |
+| D-32 | **The GitHub repository github.com/MartinMontero/hico is public.** Martin changed it from private by hand on 2026-10-24 and told Claude Code to push to it. Anything pushed is readable by anyone and stays in the history of any clone | Martin, 2026-10-24. This settles the remote half of O-12, whose recommendation was a private remote. CI that runs `npm run validate` is not set up and stays open | Martin | 2026-10-24 | M |
+| D-33 | **The "check at the desk" limit is 90 days for the board, for places and for offers, as demo values, each declared once in `shared\`.** The 7 days that `04` §4.1 and `09` §2 gave for the board was an assumption (`[A]`) written by Claude Code, never set by Martin, and is withdrawn. The board's 90 is Claude Code's reading of Martin's words, not a figure Martin gave | Martin, 2026-10-24: events change monthly; about half of them are active for about six months; "as long as it works for the hostel and the guest"; for places and offers "the 90 is fine for the demo. I will get a more official number later." Official figures are owed (the assumptions item, O-23) | Martin | 2026-10-24 | Y |
+| D-34 | **The git history of `main` is rewritten to remove an unconfirmed personal surname from every commit, and `origin/main` is replaced by the rewritten history with one force-push** | Martin, 2026-10-24, "this is brand new repo I am the only who who used it. Delete it from the 1st commit". Limits: every commit ID changes; clones and forks made before the push keep the old history; GitHub may keep serving old commits by their ID for a time; only deleting and recreating the repository removes them for certain, and only Martin can do that | Martin | 2026-10-24 | M |
 
-The next free number after D-31 is D-32.
+The next free number after D-34 is D-35.
 
 ## Open — decisions Martin owes
 
@@ -176,6 +177,8 @@ The Serendipty rule is local git, no remote. A production product wants backup,
 review history and CI. Recommendation: a private remote repository and CI that runs
 `npm run validate`. Reversible: Y.
 
+Remote half resolved by D-32 (the remote is public). CI is still open.
+
 ### O-13 Place ratings
 **Resolved by D-17.**
 
@@ -258,6 +261,11 @@ autumn change on 1 November. Toronto, Edmonton, Los Angeles and Paris still chan
 - **Recommended:** confirm the BC rule with someone at the hostel or an official source before
   the demo, and add a launch-check line that a phone on an older OS shows the right times.
 - Reversible: Y.
+- **Source, 2026-10-24 `[V]`:** the BC government page
+  https://www2.gov.bc.ca/gov/content/governments/celebrating-british-columbia/daylight-saving-time (read 2026-10-24) says
+  the change took effect on 8 March 2026, clocks do not turn back on 1 November 2026, and the permanent time is called
+  Pacific time (PCT), UTC-7. East Kootenay differs (UTC-6) and is not a demo property. That answers the first question
+  above. **O-19 stays open:** the launch-check item about phones with older time-zone data is still owed.
 
 ### O-20 Where person-level audit events go
 **Resolved by D-27.**
@@ -287,6 +295,44 @@ rows and push the first card down by about 330 px. It meets the 44 px target rul
   near the top. Same links, same keyboard order, one extra control.
 - Alternative: keep the wrapped buttons. Nothing to build; staff on phones scroll past it every time.
 - Reversible: Y.
+### O-23 Numbers Claude chose that Martin has not set
+Added 2026-10-24 after the board's 7-day limit turned out to be an assumption written by Claude Code (see D-33). The
+rule is in `CLAUDE.md`: a number that decides what a guest or staff member sees or can do comes from Martin, from a
+standard, or from a measurement; otherwise it is labelled assumed, declared once in `shared\`, and listed here. Nothing
+below is settled. Not listed, because Martin accepted them: the 12-hour staff session (D-30 point 5) and the 30-minute
+invite and recovery links (D-28).
+
+| What | Current value | Declared in | A guest or staff member sees its effect? | Who supplies the official figure |
+| --- | --- | --- | --- | --- |
+| Check limits for the board, places and offers | 90 days each, demo values (D-33) | `shared\check-limits.ts` | Yes: guests see "Check at the desk" (offers hidden); staff see "Check overdue" | Martin or HI Canada |
+| Text length limits | Title 120, description 600, note 300, terms 400, hours text 200, name and label 80, short text 120, address 200, phone 30, and the rest of `shared\limits.ts`. Also: activity capacity at most 1000 (`shared\staff-content-schemas.ts`) and at most 50 zones in a zones file (`scripts\operator-lib.ts`) | `shared\limits.ts`; the migrations carry matching `CHECK`s | Yes: staff cannot enter more, guests see text cut to what was allowed | Martin, after a staff trial with what Fawzie actually writes |
+| Staff sign-in rate limits | Sign-in: 40 requests per 15 minutes per caller (the address, hashed with a daily key) per endpoint group; link inspect, register and accept: 30 per 15 minutes; passkey challenge valid 5 minutes. Creating an invite or recovery link as an admin is not rate limited | `worker\routes\staff-auth.ts` (`WINDOW`, `CHALLENGE_SECONDS`, the `limited(...)` calls) | Staff: "Too many tries" after the count. D-30 point 7 accepted "rate limited in D1", not these numbers | Martin, or a security review |
+| Bundle budgets | Guest initial JavaScript 60 KB gzip; staff chunk 90 KB gzip | `scripts\bundle-size.ts`; `04` §7 and the 1b-2 plan, both `[A]` | No; a build fails if exceeded | Martin |
+| Interaction target | 100 ms | `04` §4.1 `[A]` (not yet measured against it) | Indirectly | Martin |
+| Preview gate cookie lifetime | 30 days (preview only) | `worker\preview-gate\index.ts` (`COOKIE_MAX_AGE`) | The people Martin gives the preview key to | Martin |
+| Numbers labelled `[A]` in `04` and `06` for features not built | Guest session 14 days; post and description lengths; capacities; per-session limits; signal expiry; retention periods; audit retention one year | `04`, `06` | Not yet (outside the demo, D-22) | Martin, before each feature is built |
+
+**Untraced content** (trace pass of 2026-10-24: every number, time, price, distance or statement of fact about a real
+hostel or place that a guest or staff member is shown, checked against Martin's words, a standard, a measurement under
+`docs\spikes\`, or `12-EVIDENCE-REGISTER.md`). Nothing was changed for these.
+- **Whistler board (10 activities).** Weekdays, start times, hosts ("Staff", "Guest leader", "The Point Artists") and the
+  claims in the text: "Mats provided", "free drink" for the pool winner, "Happy hour" at Cheaky's Cafe, "easy one-hour
+  return hike", "3 km, easy, about two hours", "9 km one way, moderate to hard", "Sign up at the front desk". Source: the
+  prototype, which Martin supplied; the register records facts about the file (E-01 to E-05), not these claims.
+- **Whistler places (24).** Distances and times ("1 km, about 30 min", "3 km loop, about 2 h", "6 km return, about 3 h",
+  "18 km return, 6 to 7 h", "10 km return, about 4 h", "26 km return, 8 to 10 h", "about 10 min on foot"), "a 70-metre
+  waterfall", which places are "Staff pick", and the notes about named businesses ("known for its nachos", "live music some
+  nights", "permanent collection spanning the 18th century to today"). Same source. Only the café's spelling is in the
+  register (E-07).
+- **Vancouver shared activities (3).** Titles, weekdays and times came from the Jericho board transcription named in a
+  code comment in `seed\data.ts`; it is not in the register. Their text says "Sample entry: confirm details at the desk".
+- **Zones.** The labels and rings (Lobby, Common room, Deck, Out and about) are demo labels, not claims about real rooms.
+  Zones have no placeholder flag, so they show no Sample band.
+- **Traced:** the café's name (E-07); the three hostels' time zone, America/Vancouver (O-19, BC government page of
+  2026-10-24); the French strings are drafts marked as needing review (D-19) and carry no facts.
+- **Sample band.** Every seeded activity and place has `is_placeholder = 1` and shows the Sample band; no offers are
+  seeded. None is missing.
+
 ## Gates
 
 **G0 — framework gate. Closed by waiver on 2026-10-23 (D-12).** Phase 0.2 was not run. The evidence is the sandbox benchmark, summarised in `docs\spikes\G0-framework-report.md`, which says what was and was not measured. Phase 1 adds D-13 (the validation library).

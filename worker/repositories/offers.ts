@@ -1,4 +1,5 @@
 import type { TenantContext } from '../tenant.ts';
+import { checkLimitSeconds } from '../../shared/check-limits.ts';
 import { newId } from '../ids.ts';
 import type { Stamp } from './activities.ts';
 
@@ -20,8 +21,8 @@ export interface OfferRow {
 const COLUMNS = `id, partner_name, terms_en, terms_fr, valid_from, valid_to, requires_membership,
   how_we_know_en, how_we_know_fr, verified_on, verified_by, is_placeholder`;
 
-/** 09 §2: an offer is hidden if it is expired or has not been checked for 90 days. */
-const NINETY_DAYS = 90 * 24 * 60 * 60;
+/** 09 §2: an offer is hidden if it is expired or its check is past the limit (shared\check-limits.ts, D-33). */
+const CHECK_LIMIT = checkLimitSeconds('offers');
 
 export async function listShown(ctx: TenantContext, now: number): Promise<OfferRow[]> {
   const { results } = await ctx.db
@@ -33,7 +34,7 @@ export async function listShown(ctx: TenantContext, now: number): Promise<OfferR
          AND (valid_from IS NULL OR valid_from <= ?3)
        ORDER BY partner_name`,
     )
-    .bind(ctx.propertyId, now - NINETY_DAYS, now)
+    .bind(ctx.propertyId, now - CHECK_LIMIT, now)
     .all<OfferRow>();
   return results;
 }
@@ -46,7 +47,7 @@ export async function getShown(ctx: TenantContext, id: string, now: number): Pro
          AND verified_on IS NOT NULL AND verified_on >= ?3
          AND (valid_to IS NULL OR valid_to >= ?4)`,
     )
-    .bind(ctx.propertyId, id, now - NINETY_DAYS, now)
+    .bind(ctx.propertyId, id, now - CHECK_LIMIT, now)
     .first<OfferRow>();
 }
 

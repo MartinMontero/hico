@@ -97,7 +97,7 @@ export type Schedule =
   | { kind: 'weekly'; weekday: number; startLocal: string; endLocal: string | null }
   | { kind: 'one_off'; date: string; startLocal: string; endLocal: string | null };
 
-/** `check` is the 09 §2 rule: a stamp older than 7 days (board) or 90 days (places, offers), or none, is overdue. */
+/** `check` is the 09 §2 rule: a stamp past the limit in shared\check-limits.ts, or none, is overdue. */
 export type CheckState = 'ok' | 'overdue';
 
 export interface StaffActivity {
@@ -150,7 +150,7 @@ export interface StaffOffer {
   howWeKnow: Bilingual;
   verifiedOn: number | null;
   verifiedBy: string | null;
-  /** What guests see: shown, or hidden because it is expired, not started, or unchecked for 90 days. */
+  /** What guests see: shown, or hidden because it is expired, not started, or unchecked past the limit. */
   guestState: 'shown' | 'expired' | 'not_started' | 'unchecked';
   isPlaceholder: boolean;
   version: number;

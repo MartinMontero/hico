@@ -117,7 +117,7 @@ proposal; **U** unknown.
 | E-82 | A one-night stay earns a free two-year HI Canada membership | U | Reported by the adoption strategy `[R]`; not found on the About page or the Life Member perks page, 2026-10-23 |
 | E-83 | Life Member perks: two 50%-off vouchers (up to $100 per reservation), a $50 referral voucher, 15% off food and drink at the cafés at HI Lake Louise, HI Whistler and HI Banff, a legacy pin | V | hihostels.ca/en/faq/life-member-perks, 2026-10-23 |
 | E-84 | HI Vancouver Downtown: 1114 Burnaby St, V6E 1P1; West End; 4-bed dorms and private rooms; wifi, coworking, kitchen, games room with billiards, patio, library; no hostel-run activities listed | V | hihostels.com listing, 2026-10-23 |
-| E-85 | Downtown: 232 pillows, reopened June 2023, 24-hour desk, free breakfast 7–9, rooftop, TV lounge, GM Rhian | I | Earlier research note (30 May); not on the listing page |
+| E-85 | Downtown: 232 pillows, reopened June 2023, 24-hour desk, free breakfast 7–9, rooftop, TV lounge, GM Rhian | I | Earlier research note (30 May); not on the listing page. The general manager's surname was removed on 2026-10-24 at Martin's instruction; it is unconfirmed |
 | E-86 | Membership card is issued via the Audience platform; owner chain ends at Cobber (formerly ResPax); no public API found | R | Guest Adoption Strategy |
 | E-87 | Hostelworld: 3 million members; FY2025 net revenue €93.8m | R | Guest Adoption Strategy |
 | E-88 | iOS is 60.31% of Canadian mobile (StatCounter 2026) | R | Guest Adoption Strategy |

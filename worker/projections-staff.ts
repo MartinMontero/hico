@@ -1,4 +1,5 @@
 import type { StaffActivity, StaffAuditEntry, StaffCode, StaffOffer, StaffPlace, StaffZone } from '../shared/types.ts';
+import { pastCheckLimit, type CheckKind } from '../shared/check-limits.ts';
 import { epochToLocal } from '../shared/time.ts';
 import type { StaffActivityFull } from './repositories/activities.ts';
 import type { AuditRow } from './repositories/audit.ts';
@@ -10,12 +11,8 @@ import type { ZoneRow } from './repositories/zones.ts';
 // Named staff projections: exactly the fields staff may see, listed one by one. Never sent to a guest, and
 // never built from another property's rows (the repositories only return this property's).
 
-const DAY = 24 * 3600;
-export const BOARD_MAX_AGE = 7 * DAY;
-export const CHECK_MAX_AGE = 90 * DAY;
-
-const overdue = (verifiedOn: number | null, now: number, maxAge: number): 'ok' | 'overdue' =>
-  verifiedOn === null || now - verifiedOn > maxAge ? 'overdue' : 'ok';
+// The limits are declared once, in shared\check-limits.ts (assumed demo values, D-33).
+const overdue = (verifiedOn: number | null, now: number, kind: CheckKind): 'ok' | 'overdue' => (pastCheckLimit(verifiedOn, now, kind) ? 'overdue' : 'ok');
 
 export function projectStaffActivity(full: StaffActivityFull, who: { propertyId: string; role: 'editor' | 'admin' }, now: number): StaffActivity {
   const r = full.row;
@@ -45,7 +42,7 @@ export function projectStaffActivity(full: StaffActivityFull, who: { propertyId:
     canChangeList: isOwner && who.role === 'admin',
     verifiedOn: r.verified_on,
     verifiedBy: r.verified_by,
-    check: overdue(r.verified_on, now, BOARD_MAX_AGE),
+    check: overdue(r.verified_on, now, 'board'),
     isPlaceholder: r.is_placeholder === 1,
     version: r.version,
   };
@@ -64,7 +61,7 @@ export function projectStaffPlace(r: StaffPlaceRow, now: number): StaffPlace {
     mapsAddress: r.maps_address,
     verifiedOn: r.verified_on,
     verifiedBy: r.verified_by,
-    check: overdue(r.verified_on, now, CHECK_MAX_AGE),
+    check: overdue(r.verified_on, now, 'places'),
     isPlaceholder: r.is_placeholder === 1,
     version: r.version,
   };
@@ -72,7 +69,7 @@ export function projectStaffPlace(r: StaffPlaceRow, now: number): StaffPlace {
 
 export function projectStaffOffer(r: StaffOfferRow, timezone: string, now: number): StaffOffer {
   const guestState: StaffOffer['guestState'] =
-    r.valid_to !== null && r.valid_to < now ? 'expired' : r.valid_from !== null && r.valid_from > now ? 'not_started' : overdue(r.verified_on, now, CHECK_MAX_AGE) === 'overdue' ? 'unchecked' : 'shown';
+    r.valid_to !== null && r.valid_to < now ? 'expired' : r.valid_from !== null && r.valid_from > now ? 'not_started' : overdue(r.verified_on, now, 'offers') === 'overdue' ? 'unchecked' : 'shown';
   return {
     id: r.id,
     partnerName: r.partner_name,

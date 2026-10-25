@@ -1,5 +1,6 @@
 import type { ComponentChildren } from 'preact';
 import { useState } from 'preact/hooks';
+import { CHECK_LIMIT_DAYS } from '../../../shared/check-limits.ts';
 import { LIMITS } from '../../../shared/limits.ts';
 import { pick } from '../../../shared/i18n/index.ts';
 import { ACTIVITY_CATEGORIES, PLACE_CATEGORIES } from '../../../shared/staff-content-schemas.ts';
@@ -538,7 +539,7 @@ export function Offers({ api, ctx }: Props) {
           {t('offers.add')}
         </button>
       </p>
-      <p class="muted">{t('offers.rule')}</p>
+      <p class="muted">{t('offers.rule', { days: String(CHECK_LIMIT_DAYS.offers) })}</p>
       {message ? <p class="error" role="alert">{message}</p> : null}
       <Gate state={list.state} reload={list.reload}>
         {(items) =>
@@ -554,7 +555,7 @@ export function Offers({ api, ctx }: Props) {
                     {o.validFrom || o.validTo ? t('offers.valid', { from: o.validFrom ?? '…', to: o.validTo ?? '…' }) : t('offers.noDates')}
                   </p>
                   <p class="card-meta">
-                    <strong class={`chip${o.guestState === 'shown' ? '' : ' chip-warn'}`}>{t(`guest.${o.guestState}`)}</strong>
+                    <strong class={`chip${o.guestState === 'shown' ? '' : ' chip-warn'}`}>{t(`guest.${o.guestState}`, { days: String(CHECK_LIMIT_DAYS.offers) })}</strong>
                   </p>
                   <CheckedLine on={o.verifiedOn} by={o.verifiedBy} overdue={false} placeholder={o.isPlaceholder} tz={ctx.timezone} />
                   <p class="actions">

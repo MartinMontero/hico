@@ -212,11 +212,12 @@ What is not done or not verified `[U]`:
 - The workers.dev address of the preview is unknown until the first deploy, so
   `property_hosts` has only `localhost` and `127.0.0.1`; the deploy phase adds the real host.
 
-Time-zone fact found while testing `[V]` on this machine: the runtime's time-zone data
-(Node ICU, tzdata 2026b) has America/Vancouver on UTC-7 all year after 8 March 2026, with
-no autumn change on 1 November, while Toronto, Edmonton, Los Angeles and Paris still fall
-back. The code uses the IANA zone and never an assumed offset, so it follows whichever data
-the device has; phones with older data may disagree for part of the year. See O-19.
+Time zone, confirmed `[V]` 2026-10-24 on the BC government page: BC's last clock change was on 8 March 2026, clocks do
+not change on 1 November 2026, and the time is called Pacific time (PCT), UTC-7. The runtime's data (Node ICU,
+tzdata 2026b) agrees; Toronto, Edmonton, Los Angeles and Paris still fall back. The tests therefore cover the spring
+change on America/Vancouver and the autumn change on America/Toronto. The code uses the IANA zone and never an assumed
+offset, so it follows whichever data the device has; phones with older data may disagree for part of the year (O-19
+stays open for that).
 
 The Windows preflight has run four times (`docs\spikes\preflight.md`,
 `preflight-desktop.md`, `preflight-pwsh7.md`, `preflight-rerun.md`): Windows PowerShell 5.1,
@@ -267,6 +268,12 @@ slices, each committed only when `npm run validate` passed. Plan: `docs\plans\20
   Tests run the commands and the wrappers against a throwaway local database (`tests\node\operator.test.ts`).
   Walkthrough with ten screenshots: `docs\walkthrough-phase-1b-2.md`. Documents updated: 05 (§4, §11, §16), 06 (§2),
   09 (§1, §2), 10 (status), 03 (D-29).
+- **Corrections of 2026-10-24 (D-32 to D-34, O-23):** the repository is public (D-32). The 7-day board limit was an
+  assumption of Claude Code's and is withdrawn; the board, places and offers each use 90 days, as demo values declared
+  once in `shared\check-limits.ts` (D-33), with tests at 89 and 91 days. `O-23` lists every number Claude chose that
+  Martin has not set, and the content that could not be traced to a source. The browser tests no longer need a database
+  before the server starts, so they pass on a fresh clone. BC's clock facts were confirmed on the BC government page.
+  The history of `main` is rewritten to remove an unconfirmed surname (D-34).
 - **After the walkthrough (D-31):** the console navigation is a single "Menu" button; screenshots 01 to 10 predate it.
 - **Phase 1b-2 final state:** `npm run validate` passes (462 unit and isolation tests in 23 files, 29 browser tests,
   24 contrast pairs; raw output in `docs\spikes\phase-1b-2-validate-final.txt`). Guest JavaScript 15.6 KB gzip (budget
@@ -275,14 +282,11 @@ slices, each committed only when `npm run validate` passed. Plan: `docs\plans\20
   `hico-preview` and `hico-prod` until `RP_ID`, `ALLOWED_ORIGINS` and `RATE_LIMIT_SECRET` are set (O-03).
 ## 5. Stale documents
 
-- `docs\05-ARCHITECTURE.md` §13 says tests cover both daylight-saving changes; in this runtime BC has only the
-  spring one (O-19). (§4, §11 and §16 were brought up to date in Phase 1b-2.)
+- `docs\05-ARCHITECTURE.md` §4, §11, §13 and §16 are up to date (Phase 1b-2 and 2026-10-24).
 - `docs\09-CONTENT-AND-ONBOARDING.md` §1 now carries the activity edit rule.
 - `docs\10-BUILD-PLAN.md` Phase 1 lists tasks that are now done (Phase 1b-2 carries a status note).
 - `docs\04-PRODUCT-SPEC.md` §4.8 (the console screens) was not re-read against what was built: Translations is a
   missing-French list, QR rotate and revoke are Stage 2. `docs\11-DEPLOY.md` was not re-read for the staff-sign-in
   variables and secret (see above).
-- `docs\01-project-instructions.md` line 70 and `docs\11-DEPLOY.md`'s status paragraph still
-  describe the shell tools as they were before D-16 and the preflight runs.
 - `docs\spikes\preflight.md` says PowerShell 7 and Wrangler are not installed; true when
   written, no longer true. It is a dated record and is left as written.

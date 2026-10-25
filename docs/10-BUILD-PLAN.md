@@ -40,8 +40,9 @@ phase. Every prompt below is whole and ready to paste. Labels as in `00-README.m
 
 **The demo path (D-22) is Phases 1, 1b-1, 1b-2, 2 and 3,** with Phase 3 covering both
 Vancouver hostels. Phase 0 is done and Phase 0.2 is waived. Phase 3b onward is not part
-of the demo. Every phase waits for your GO. O-12 (a private remote repository and CI)
-blocks nothing; local git works until you decide.
+of the demo. Every phase waits for your GO. O-12 (source control and CI) blocks nothing:
+the remote is a public GitHub repository (D-32), and CI that runs `npm run validate` is
+not set up yet.
 
 ## What only HI Canada can supply
 
@@ -469,42 +470,48 @@ and which documents are now stale.
 
 ## Phase 2 — Guest app, Stage 0
 
-Claude Code prompt (start after O-13 and O-14 are decided, or after you have accepted
-the recommendations in `docs\03-DECISIONS.md`):
+Claude Code prompt (D-17 and D-18 are recorded):
 
 ```text
-Objective: build the Stage 0 guest app: What's On, Explore, Settings and privacy,
-labelled QR links, French, offline, and the accessibility and performance work the
-prototype lacks. No guest data is stored on the server in this stage. Use the
-decisions recorded for O-13 and O-14 in docs\03-DECISIONS.md. If either is missing,
-stop and tell me.
-
-Read first: docs\04-PRODUCT-SPEC.md (all), docs\05-ARCHITECTURE.md sections 4, 7, 12,
-13 and 14, docs\06-PRIVACY-AND-COMPLIANCE.md sections 1, 2 and 5, docs\09 section 2,
-and reference\hi-co-prototype.jsx for the look and the interactions to keep.
+Objective: build the Stage 0 guest app for the demo (D-22): What's On, Explore,
+Settings and privacy, labelled QR links, French, offline, and the accessibility and
+performance work the prototype lacks, for Whistler and both Vancouver hostels. No guest
+data is stored on the server in this stage. D-17 (no numeric ratings) and D-18 ("I'm In"
+saves the activity to the guest's own plan on their device and shows no count) apply. If
+either is missing from docs\03-DECISIONS.md, stop and tell me.
 
 First write the plan to docs\plans\<today>-phase-2-guest-stage-0.md and stop for my GO.
+In the plan, say which parts already exist from Phase 1 and Phase 1b-2, and mark each
+numbered item below "seen in a demo" or "not seen in a demo" with a rough size, so I can
+decide what to defer.
 Then build:
 
 1. What's On per 04 section 4.1: seven-day strip from today in the property's
    timezone, category filter, activity cards, cancelled and changed states, recurring
-   activities across daylight-saving changes, "Last updated" with the staleness
-   message, "I'm In" per the O-14 decision.
-2. Explore per 04 section 4.2: grouped places, staff pick as a label, staff note,
-   verification stamp in words, "Open in Maps" as a plain link that loads nothing until
+   activities across daylight-saving changes, the "last checked" stamp with its "Check
+   at the desk" message, "I'm In" per D-18. An activity shared by two hostels (D-23)
+   shows at both and reads the same; the app carries no transport information (D-15).
+   British Columbia no longer changes clocks (O-19), so keep the daylight-saving tests
+   on time zones that still do. Use the shared check limits from Step A item 3; write
+   no limit as a number anywhere else.
+2. Explore per 04 section 4.2: grouped places, "Staff pick" as a label, staff note,
+   verification stamp in words ("Checked by staff on <date>", no staff name, D-30), no
+   numeric rating (D-17), "Open in Maps" as a plain link that loads nothing until
    tapped, offers with terms and dates, hidden when expired or unchecked past the
    limit, search in the guest's language.
 3. QR links per 04 section 3 and 05 section 7 (Stage 0): a labelled link whose
    fragment carries the location label; the page adds one to the aggregate count for
    that label (only labels the property has created count), removes the fragment, sets
-   no cookie and stores nothing about the guest. No guest sessions exist in this phase;
-   they arrive in Phase 5. Social routes answer "Not turned on for this property".
+   no cookie and stores nothing about the guest. The staff console already creates the
+   labels (D-30 point 3); use them. No guest sessions exist in this phase; they arrive
+   in Phase 5. Social routes answer "Not turned on for this property".
 4. Settings and privacy per 04 section 4.3 and the matrix in 06 section 1: every
-   feature listed, every switch off, the property's privacy contact, the consent screen pattern in 06
-   section 5 built
-   as a reusable component (consent rows are written once sessions exist, in Phase 5),
-   "Delete my data" that clears everything this site stored on the device. In Stage 0
-   every switch is disabled with "Not available at this property yet".
+   feature listed, every switch off, the property's privacy contact, the consent screen
+   pattern in 06 section 5 built as a reusable component (consent rows are written once
+   sessions exist, in Phase 5), "Delete my data" that clears everything this site stored
+   on the device. In Stage 0 every switch is disabled with "Not available at this
+   property yet". Where a property's privacy contact is empty, show a visible
+   placeholder and list it in the missing-items list; never invent a contact.
 5. The retention purge job (a scheduled Worker per 06 section 2) with a fake-clock
    test for every row type that exists so far.
 6. Aggregate counters per 05 section 10, with a test proving the counter table can hold
@@ -512,7 +519,7 @@ Then build:
 7. PWA per 05 section 12: manifest, service worker, network-first content with timeout
    then cache, offline state, no caching of any response carrying a session cookie.
 8. Complete French for every interface string, drafted by you and flagged "needs
-   review" in the catalog. Do not mark any French as reviewed.
+   review" in the catalog (D-19). Do not mark any French as reviewed.
 9. Accessibility per 04 section 6, including a dialog for every sheet, emoji with text
    alternatives, reduced motion with no decorative particles, 200% text zoom with no
    horizontal scroll, and live regions. axe runs in CI through Playwright at 360 px for
@@ -526,13 +533,15 @@ Then build:
     recorded and nothing is stored about the guest), language switch, offline reload,
     delete my data.
 
-Do not: deploy, create remote resources, add a third-party script or font request,
-invent content (use the demo-whistler placeholders, which carry the Sample band), or
-mark French as reviewed.
+Do not: deploy, create remote resources, push, add a third-party script or font request,
+put an HI logo or any HI mark in the app (D-21, D-25), invent content (use the seeded
+placeholders for Whistler and the two Vancouver hostels, which carry the Sample band),
+write a number that decides what a guest or staff member sees without the label and the
+register entry the new CLAUDE.md rule requires, or mark French as reviewed.
 
-Done when: npm run validate passes with raw output pasted; axe is clean; Lighthouse
-numbers are printed; you have run the app and described each screen at 360 px and with
-keyboard only; docs\02-STATE.md is current.
+Done when: npm run validate passes with raw output pasted; the fresh-clone check from
+Step A passes; axe is clean; Lighthouse numbers are printed; you have run the app and
+described each screen at 360 px and with keyboard only; docs\02-STATE.md is current.
 
 Stop and ask if: a requirement here conflicts with a document; any decision I have not
 made is needed.
