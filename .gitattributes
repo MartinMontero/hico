@@ -1,0 +1,7 @@
+# Text files are checked out with LF on every machine. On Windows with core.autocrlf=true a fresh clone otherwise gets
+# CRLF, and tests that read source and migration files with line-based patterns fail (found by the fresh-clone check).
+* text=auto eol=lf
+*.png binary
+*.woff2 binary
+*.ico binary
+*.bundle binary
