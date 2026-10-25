@@ -1,0 +1,33 @@
+# NOT ACTIVE. This file is an example and lives outside .github/workflows on purpose: GitHub runs a workflow the moment
+# one is pushed there, and CI is still open (03 O-12, D-32). To turn it on, Martin says so, and the file is copied to
+# .github/workflows/validate.yml in a commit of its own. It has not been run `[U]`: nobody has tried it on GitHub.
+#
+# What it does: the same `npm run validate` that runs on Martin's machine, on a clean Linux machine from a fresh checkout.
+# It needs no secret, writes nothing to GitHub, deploys nothing, and touches no Cloudflare account.
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CI: 'true'
+      WRANGLER_SEND_METRICS: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # The browser tests and Lighthouse use Playwright's Chromium.
+      - run: npx playwright install --with-deps chromium
+      - run: npm run validate

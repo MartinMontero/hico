@@ -205,7 +205,7 @@ describe('the commands, against a throwaway database', { timeout: 180_000 }, () 
 describe('the PowerShell wrappers', () => {
   const pwsh = spawnSync('pwsh', ['-NoProfile', '-Command', '$PSVersionTable.PSVersion.Major'], { encoding: 'utf8' });
   const have = pwsh.status === 0;
-  const run = (script: string, ...args: string[]) => spawnSync('pwsh', ['-NoProfile', '-File', `scripts\\${script}`, ...args, '-StateDir', state.stateDir], { encoding: 'utf8', env, input: '' });
+  const run = (script: string, ...args: string[]) => spawnSync('pwsh', ['-NoProfile', '-File', join('scripts', script), ...args, '-StateDir', state.stateDir], { encoding: 'utf8', env, input: '' });
 
   it.skipIf(!have)('create-property.ps1 and add-hostname.ps1 reach the same commands', () => {
     const a = run('create-property.ps1', '-Slug', 'ps-north', '-NameEn', 'North', '-Timezone', 'America/Toronto');

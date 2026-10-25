@@ -32,10 +32,21 @@ if (seeded.status !== 0) throw new Error('Seeding the local database failed');
 const server: ChildProcess = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort'], {
   shell: true,
   stdio: 'ignore',
+  // Its own process group on Linux and macOS, so the whole tree can be stopped; Windows has taskkill for that.
+  detached: process.platform !== 'win32',
   env: { ...process.env, CLOUDFLARE_INCLUDE_PROCESS_ENV: 'true', PREVIEW_GATE: 'off', WRANGLER_SEND_METRICS: 'false', FORCE_COLOR: '0' },
 });
 const stopServer = () => {
-  if (server.pid) spawnSync('taskkill', ['/pid', String(server.pid), '/T', '/F'], { stdio: 'ignore' });
+  if (!server.pid) return;
+  if (process.platform === 'win32') {
+    spawnSync('taskkill', ['/pid', String(server.pid), '/T', '/F'], { stdio: 'ignore' });
+    return;
+  }
+  try {
+    process.kill(-server.pid, 'SIGTERM'); // the group started above: npx, vite and the Worker runtime
+  } catch {
+    server.kill('SIGTERM');
+  }
 };
 
 let failed = false;

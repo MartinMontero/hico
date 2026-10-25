@@ -300,6 +300,7 @@ slices, each committed only when `npm run validate` passed. Plan: `docs\plans\20
     were not checking anything and now do.
   - **Not done:** a way to set the privacy contact (O-25), a native French review
     (D-19), a real phone, VoiceOver or TalkBack, installing the app to a home screen, anything on Cloudflare.
+- **Cloud-build preparation (2026-10-25):** the repository was checked for a Linux build (no case-sensitive import problems; two Windows-only bits fixed; `engines` and `.nvmrc` say Node 24) and `docs\14-CLOUD-BUILD.md` says what was and was not checked. **No run on Linux has happened [U].** A GitHub Actions example is at `docs\ci\github-actions-validate.yml.example` and is not active (CI is O-12's open half). Pushed to GitHub on 2026-10-25.
 - **After the walkthrough (D-31):** the console navigation is a single "Menu" button; screenshots 01 to 10 predate it.
 - **Phase 1b-2 final state:** `npm run validate` passes (462 unit and isolation tests in 23 files, 29 browser tests,
   24 contrast pairs; raw output in `docs\spikes\phase-1b-2-validate-final.txt`). Guest JavaScript 15.6 KB gzip (budget
