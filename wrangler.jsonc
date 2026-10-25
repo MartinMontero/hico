@@ -7,6 +7,8 @@
   "main": "worker/index.ts",
   "compatibility_date": "2026-08-07",
   "observability": { "enabled": true },
+  // The daily retention purge (06 §2), 03:17 UTC. Declared for each environment: triggers are not inherited.
+  "triggers": { "crons": ["17 3 * * *"] },
   "assets": {
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
@@ -27,6 +29,7 @@
   "env": {
     "prod": {
       "name": "hico-prod",
+      "triggers": { "crons": ["17 3 * * *"] },
       "assets": {
         "binding": "ASSETS",
         "not_found_handling": "single-page-application",

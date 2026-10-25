@@ -16,6 +16,7 @@ const allow: Record<string, string[]> = {
   'GET /api/p/:slug/places': [...PUBLIC_FIELDS.place, ...bilingual],
   'GET /api/p/:slug/offers': [...PUBLIC_FIELDS.offer, ...bilingual],
   'POST /api/p/:slug/events': [],
+  'POST /api/p/:slug/qr': [],
 };
 
 // Person-level staff routes, called with no cookie: the status and the only field names they may return.
@@ -88,6 +89,7 @@ describe('anonymous surface', () => {
       expect(res.status, key).toBe(200);
     }
     expect((await record('POST /api/p/:slug/events', await call('/api/p/surf-a/events', { host: 'surf.test', method: 'POST', body: { event: 'opened_whats_on' } }))).status).toBe(204);
+    expect((await record('POST /api/p/:slug/qr', await call('/api/p/surf-a/qr', { host: 'surf.test', method: 'POST', body: { label: 'desk' } }))).status).toBe(204);
     // Staff routes with no cookie: person-level ones by their table, property-scoped ones all 401 { error }.
     for (const route of createApp().routes.filter((r) => r.method !== 'ALL')) {
       const key = ` `;

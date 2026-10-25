@@ -29,6 +29,14 @@ export const api = {
   activities: (slug: string) => getJson<PublicActivity[]>(`/api/p/${slug}/activities`),
   places: (slug: string) => getJson<PublicPlace[]>(`/api/p/${slug}/places`),
   offers: (slug: string) => getJson<PublicOffer[]>(`/api/p/${slug}/offers`),
+  /** One scan of a labelled QR link: an anonymous count for (property, day, label). Failure is ignored on purpose. */
+  async scan(slug: string, label: string): Promise<void> {
+    try {
+      await fetch(`/api/p/${slug}/qr`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ label }) });
+    } catch {
+      /* offline or read-only: the count is simply not made */
+    }
+  },
   /** Aggregate count only. Failure (offline, read-only) is ignored on purpose. */
   async event(slug: string, event: EventName): Promise<void> {
     try {

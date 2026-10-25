@@ -22,6 +22,7 @@ export const EVENT_NAMES = [
   'opened_whats_on',
   'opened_explore',
   'opened_common_room',
+  'opened_settings',
   'opened_connect',
   'offer_shown',
 ] as const;
@@ -36,3 +37,6 @@ export function parseLanguage(value: string | null | undefined): Language | null
   const first = value.split(',')[0]?.trim().toLowerCase().slice(0, 2);
   return first === 'fr' ? 'fr' : first === 'en' ? 'en' : null;
 }
+
+/** A QR label as the staff console writes it: lower-case letters, digits and hyphens (shared/staff-content-schemas.ts). */
+export const qrBodySchema = v.strictObject({ label: v.pipe(v.string(), v.maxLength(40), v.regex(/^[a-z0-9-]+$/)) });

@@ -71,7 +71,7 @@ describe('database access', () => {
   it('the D1 binding is handed to repositories by exactly the files that must, and nowhere else', () => {
     const mayTouchBinding = new Set([
       'worker/app.ts', 'worker/middleware/tenant.ts', 'worker/middleware/guards.ts', 'worker/middleware/staff-session.ts',
-      'worker/tenant.ts', 'worker/ratelimit.ts', 'worker/routes/staff-auth.ts', 'worker/routes/staff-people.ts',
+      'worker/tenant.ts', 'worker/ratelimit.ts', 'worker/purge.ts', 'worker/routes/staff-auth.ts', 'worker/routes/staff-people.ts',
       'worker/routes/staff-content.ts', 'worker/routes/staff-export.ts', 'worker/repositories/index.ts',
     ]);
     const hits = source
@@ -110,7 +110,7 @@ describe('database access', () => {
     // Property data: ctx only. Person-level modules (sessions, credentials, tokens, challenges, rate limits,
     // host and staff lookups, the platform flag) take the database. audit and people have both kinds.
     const ctxOnly = new Set(['activities.ts', 'places.ts', 'offers.ts', 'properties.ts', 'events.ts', 'zones.ts', 'codes.ts', 'features.ts', 'content-export.ts']);
-    const dbOnly = new Set(['hosts.ts', 'flags.ts', 'staff.ts', 'sessions.ts', 'credentials.ts', 'tokens.ts', 'challenges.ts', 'ratelimit.ts']);
+    const dbOnly = new Set(['hosts.ts', 'flags.ts', 'staff.ts', 'sessions.ts', 'credentials.ts', 'tokens.ts', 'challenges.ts', 'ratelimit.ts', 'purge.ts']);
     for (const f of readdirSync('worker/repositories').filter((x) => x.endsWith('.ts') && x !== 'index.ts')) {
       const text = readFileSync(`worker/repositories/${f}`, 'utf8');
       for (const m of text.matchAll(/export async function (\w+)\(\s*(\w+)/g)) {

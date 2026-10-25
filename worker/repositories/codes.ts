@@ -18,6 +18,15 @@ export async function list(ctx: TenantContext): Promise<CodeRow[]> {
   return results.map((r) => ({ id: r.id, label: r.label, createdAt: r.created_at, retiredAt: r.revoked_at }));
 }
 
+/** A label this property created and has not retired: the only kind a scan may count (05 §7). */
+export async function isActiveLabel(ctx: TenantContext, label: string): Promise<boolean> {
+  const row = await ctx.db
+    .prepare('SELECT 1 AS found FROM entry_codes WHERE property_id = ?1 AND label = ?2 AND revoked_at IS NULL')
+    .bind(ctx.propertyId, label)
+    .first<{ found: number }>();
+  return row !== null;
+}
+
 export async function insert(ctx: TenantContext, label: string, now: number): Promise<{ id: string } | 'exists'> {
   const id = newId();
   try {

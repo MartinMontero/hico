@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import * as v from 'valibot';
-import { eventBodySchema } from '../shared/schemas.ts';
+import { eventBodySchema, qrBodySchema } from '../shared/schemas.ts';
 import { previewGate } from './preview-gate/index.ts';
 import { readOnlySwitch, writeGuards } from './middleware/guards.ts';
 import { requestLog, securityHeaders } from './middleware/headers.ts';
@@ -10,7 +10,7 @@ import { createStaffAuthRoutes } from './routes/staff-auth.ts';
 import { createStaffContentRoutes } from './routes/staff-content.ts';
 import { createStaffExportRoutes } from './routes/staff-export.ts';
 import { createStaffPeopleRoutes } from './routes/staff-people.ts';
-import { activities, events, hosts, offers, places, properties } from './repositories/index.ts';
+import { activities, codes, events, hosts, offers, places, properties } from './repositories/index.ts';
 import {
   projectActivity,
   projectOffer,
@@ -78,6 +78,19 @@ export function createApp(options: AppOptions = {}): Hono<AppEnv> {
     if (!parsed.success) return c.json({ error: 'bad_request' }, 400);
     const day = new Date(now() * 1000).toISOString().slice(0, 10);
     await events.increment(c.get('tenant'), day, parsed.output.event);
+    return c.body(null, 204);
+  });
+
+  // A scan of a labelled QR link (Stage 0, 05 §7): one more for (property, day, qr:<label>), only for a label this property
+  // created and has not retired. Nothing about the guest is read or stored, no cookie is set, and the answer is the same
+  // 204 whether or not the label exists, so the route confirms nothing.
+  pub.post('/qr', async (c) => {
+    const parsed = v.safeParse(qrBodySchema, await c.req.json().catch(() => null));
+    if (!parsed.success) return c.json({ error: 'bad_request' }, 400);
+    const tenant = c.get('tenant');
+    if (await codes.isActiveLabel(tenant, parsed.output.label)) {
+      await events.increment(tenant, new Date(now() * 1000).toISOString().slice(0, 10), `qr:${parsed.output.label}`);
+    }
     return c.body(null, 204);
   });
 

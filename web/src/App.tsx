@@ -9,6 +9,7 @@ import { useLoad } from './load.ts';
 import { Explore, FeatureOff, LoadState, WhatsOn } from './pages.tsx';
 import type { ComponentType } from 'preact';
 import { consumeNavigation, Link, navigate, parseRoute, tabPath, usePath, type Tab } from './router.tsx';
+import { takeScanLabel } from './scan.ts';
 
 const TAB_LABEL = {
   'whats-on': 'nav.whatsOn',
@@ -150,6 +151,11 @@ function PropertyRoute({ slug, tab }: { slug: string; tab: Tab | null }) {
   useEffect(() => {
     if (tab === null) navigate(tabPath(slug, 'whats-on'), true);
   }, [tab, slug]);
+  // A labelled QR link was opened: count it once for this property (the label is already out of the address bar).
+  useEffect(() => {
+    const label = takeScanLabel();
+    if (label) void api.scan(slug, label);
+  }, [slug]);
   if (loaded.status === 'error' && loaded.notFound) return <NotFound />;
   return (
     <LoadState loaded={loaded}>
