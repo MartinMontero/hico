@@ -274,6 +274,8 @@ slices, each committed only when `npm run validate` passed. Plan: `docs\plans\20
   Martin has not set, and the content that could not be traced to a source. The browser tests no longer need a database
   before the server starts, so they pass on a fresh clone. BC's clock facts were confirmed on the BC government page.
   The history of `main` is rewritten to remove an unconfirmed surname (D-34).
+- **Phase 2 plan written, awaiting Martin's GO:** `docs\plans\2026-10-25-phase-2-guest-stage-0.md`. Nothing of Phase 2
+  is built. Seven points for Martin are in its §0.
 - **After the walkthrough (D-31):** the console navigation is a single "Menu" button; screenshots 01 to 10 predate it.
 - **Phase 1b-2 final state:** `npm run validate` passes (462 unit and isolation tests in 23 files, 29 browser tests,
   24 contrast pairs; raw output in `docs\spikes\phase-1b-2-validate-final.txt`). Guest JavaScript 15.6 KB gzip (budget
