@@ -137,8 +137,8 @@ Untracked files:
 
 nothing added to commit but untracked files present (use "git add" to track)
 $ git log --oneline
-cba93df Add Windows preflight results
-edbfc51 Bootstrap: project documents and reference prototype
+117fb3a Add Windows preflight results
+ef0ee63 Bootstrap: project documents and reference prototype
 $ git fsck --full
 (exit code 0)
 $ git config --local --list
@@ -173,5 +173,5 @@ numbers of the task (1, 2a–2e, 4). Matching is by content.
 | 2d. Zip / extract | Same outcome | 14 files, second extract errors, edited file untouched. Differences: the edited file here is `CLAUDE.md` (the first record used `00-README.md`), so the hash differs (8D65F8DA… vs A4A3D914…); and this record notes that the stop depends on `-ErrorAction Stop`, which the first record does not mention. |
 | 2e. Cmdlets | Same | Set-Clipboard 3.1.0.0, Expand-Archive 1.0.1.0, Get-FileHash 3.1.0.0, same sources. |
 | 2 under PowerShell 7 | Same | Not run in either; `pwsh` is not installed. |
-| 4 / first record §3. Git checks | Different (one line) | `git log --oneline` now also lists `cba93df Add Windows preflight results`, the commit made from the first record. `git status`, `git fsck --full` (clean) and `git config --local --list` are identical; no dubious-ownership message. |
+| 4 / first record §3. Git checks | Different (one line) | `git log --oneline` now also lists `117fb3a Add Windows preflight results`, the commit made from the first record. `git status`, `git fsck --full` (clean) and `git config --local --list` are identical; no dubious-ownership message. |
 | First record §4 (stale lock/tmp cleanup) | Not repeated | Not part of this task. |

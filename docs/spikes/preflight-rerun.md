@@ -155,10 +155,10 @@ Changes not staged for commit:
 Untracked files:
 	docs/external/
 
-6c8bf47 Add PowerShell 7 preflight record
-41fb71a Add second Windows preflight record
-cba93df Add Windows preflight results
-edbfc51 Bootstrap: project documents and reference prototype
+030e897 Add PowerShell 7 preflight record
+30d75f3 Add second Windows preflight record
+117fb3a Add Windows preflight results
+ef0ee63 Bootstrap: project documents and reference prototype
 (git fsck --full: no output, exit 0)
 core.repositoryformatversion=0
 core.filemode=false
@@ -188,7 +188,7 @@ Against `preflight-desktop.md` (second record, PowerShell 5.1) and
 | 2a under 7 | Same | Identical to the third record. |
 | 2b, 2c, 2e under 5.1 and 7 | Same | Key results identical; folder created and removed; same cmdlets and versions. Only the timestamp values differ. |
 | 2d under 5.1 and 7 | Same outcome | 14 files; second extract errors; edited file untouched. The hash differs (6F85DCA0… vs 8D65F8DA…) because `CLAUDE.md` content changed. |
-| 4. Git | Different | Log now ends with `6c8bf47`; the working tree now shows modified tracked files (listed above), not only `docs/external/`. `git fsck --full` clean; config unchanged. |
+| 4. Git | Different | Log now ends with `030e897`; the working tree now shows modified tracked files (listed above), not only `docs/external/`. `git fsck --full` clean; config unchanged. |
 | 5.1 vs 7 in this run | Same outcomes, different cmdlet versions | Presence and results match; Set-Clipboard/Get-FileHash/Expand-Archive are 3.1.0.0/3.1.0.0/1.0.1.0 under 5.1 and 7.0.0.0/7.0.0.0/1.2.6 under 7. |
 
 Not verified: Wrangler's behaviour (only `--version` was run in the third record, and

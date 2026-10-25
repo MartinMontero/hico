@@ -104,7 +104,7 @@ Untracked files:
 nothing added to commit but untracked files present (use "git add" to track)
 
 $ git log --oneline
-edbfc51 Bootstrap: project documents and reference prototype
+ef0ee63 Bootstrap: project documents and reference prototype
 
 $ git fsck --full
 (no output — clean)
