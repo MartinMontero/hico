@@ -7,7 +7,7 @@ not. Written 2026-10-25 by Claude Code. Labels as in `00-README.md`. **Nothing h
 
 | Meaning | What changes | Status |
 | --- | --- | --- |
-| **Claude Code cloud sessions** (work continues in a Linux session started from the GitHub repository) | The shell is bash on Linux, not Windows PowerShell; the browsers and Node must be installed in the session | Repository checked for Linux problems (below). `CLAUDE.md`'s shell rule needs a note: Martin's decision |
+| **Claude Code cloud sessions** (work continues in a Linux session started from the GitHub repository) | The shell is bash on Linux, not Windows PowerShell; the browsers and Node must be installed in the session | Repository checked for Linux problems (below). `CLAUDE.md` has the cloud-session note (D-40). Needs the environment and a brief from Martin (last section) |
 | **CI on GitHub Actions** (`npm run validate` on every push) | A workflow file in `.github/workflows` | Example written, **not active** (`docs\ci\github-actions-validate.yml.example`). Turning it on is O-12's CI half: Martin's call |
 | **Builds on Cloudflare** (Workers Builds deploying from GitHub) | It would deploy | **Not prepared.** Deploying needs Martin's GO each time (`CLAUDE.md`); this file does not change that |
 
@@ -47,10 +47,39 @@ database command is `--local`.
 - **The Cloudflare local runtime on Linux** (`workerd` is published for Linux x64 and the tests use it; not run here).
 - **Timing.** Lighthouse numbers on a shared cloud machine will differ from Martin's; they are printed, not enforced.
 
-## Rules that differ in a cloud session (for Martin to decide)
+## Rules in a cloud session (decided: D-40, 2026-10-25)
 
-`CLAUDE.md` says: Windows, PowerShell only, no bash, no forward-slash paths. That is right for Martin's machine and wrong for a
-Linux session, where PowerShell may not exist and Windows paths do not work. Suggested addition, not made: "In a cloud session
-(Linux) use bash and forward-slash paths; every other rule applies unchanged: never deploy, create remote resources, push, or
-store a secret without my GO." The rule about never running `wrangler deploy`, `d1 create`, `secret put`, a remote migration or
-a DNS change without GO does not depend on the shell.
+`CLAUDE.md` now says: in a cloud session (Linux) use bash and forward-slash paths; the PowerShell rules are for Martin's machine;
+every other rule applies unchanged (never deploy, create remote resources, push, or store a secret without Martin's GO); a cloud
+session sees only what is on GitHub. The rule about `wrangler deploy`, `d1 create`, `secret put`, a remote migration or a DNS
+change does not depend on the shell.
+
+## What a cloud session needs from Martin to start
+
+What Claude Code can see of the cloud setup (`list_start_targets`, read-only, 2026-10-25): cloud sessions are available; the
+repository `MartinMontero/hico` is on GitHub; two cloud environments exist, both hosted by Anthropic, neither marked as unable to
+run this repository. One is the default, and its name is `CLAUDE_CODE_GIT_BASH_PATH`, which looks like an environment-variable
+name typed into the name field by mistake `[I]`; the other is called `Default`. **What each environment contains (setup script,
+network access, variables) is not visible to Claude Code.** So the list below is what the repository needs; whether an environment
+already provides it is Martin's to check.
+
+1. **Pick the environment**, and say which in the request ("use Default"). The default one, with the odd name, is what a request
+   without a choice would use.
+2. **Node 24 or later.** `.nvmrc` and `package.json` say 24. If the environment's Node is older, `npm ci` may warn and the scripts
+   (`node file.ts`) will fail.
+3. **A setup step** that runs `npm ci` and `npx playwright install --with-deps chromium` before the session works. Without the
+   second, the browser tests and Lighthouse cannot run (the other eight validate steps can).
+4. **Network access** from the environment to the npm registry (to install), to Playwright's browser download host, and to
+   GitHub. Nothing else is needed: the build calls no other service.
+5. **No secrets and no Cloudflare credentials.** None is needed to build and test, and none should be put in the environment: a
+   cloud session must not be able to deploy even by accident.
+6. **Say what the session may push, in the request.** `CLAUDE.md` says no push without Martin's GO, and a cloud session delivers
+   its work by pushing. Suggested: "push only to a branch named `cloud/<task>`, never to `main`", so Martin reviews before
+   anything reaches `main`. That is a rule Martin has not stated; it is a suggestion.
+7. **Anything the session needs that is not on GitHub must be put there first.** `docs\external\` (HI Canada's answers) is
+   untracked and stays on Martin's machine, so a task that depends on it cannot run in the cloud as things stand.
+8. **A brief, because the session starts cold.** It does not have this conversation. A request names the files, what "done"
+   looks like, and which documents to read (`CLAUDE.md`, `docs\02-STATE.md`, `docs\03-DECISIONS.md`).
+
+The first run on Linux should be a small, harmless one: `npm ci` then `npm run validate`, nothing changed, so that anything
+Windows-only that this audit missed shows up before real work depends on it.

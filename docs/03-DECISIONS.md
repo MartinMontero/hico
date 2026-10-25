@@ -57,7 +57,9 @@ that is not in this file has not been made.
 
 | D-39 | **An activity can carry a short staff note saying what has changed, at most 120 characters, in English and French** (O-24 accepted as recommended). Guests see a "Changed" label and the note on the card; clearing the note clears it; it is searchable. Staff set it in the activity form, any property that offers a shared activity may set it (D-23), a copy of an activity starts without one, and re-checking keeps it. Stored in two new columns by migration `0003_activity_change_note.sql` (additive: existing rows get the empty note; applied to the local database only, no remote database exists) | Martin, 2026-10-25, "Accept O-24 as recommended: a staff note of at most 120 characters on an activity. Announce the migration before you make it." The migration was announced before it was written. The 120 is Martin's (accepted), declared once as `changeNote` in `shared\limits.ts` and as a CHECK in the migration | Martin | 2026-10-25 | M |
 
-The next free number after D-39 is D-40.
+| D-40 | **In a cloud session (Linux) Claude Code uses bash and forward-slash paths; the PowerShell rules in `CLAUDE.md` are for Martin's machine. Every other rule applies unchanged:** never deploy, create remote resources, push, or store a secret without Martin's GO. A cloud session sees only what is on GitHub (`docs\external\` and anything untracked is not there) | Martin, 2026-10-25, "I mean Claude Code cloud sessions. Add the cloud-session note to CLAUDE.md as you suggested". The wording is the one proposed in `docs\14-CLOUD-BUILD.md`, plus the last sentence, which is a fact about what a cloud session can see. Nothing in a Linux run has been tried yet `[U]` | Martin | 2026-10-25 | Y |
+
+The next free number after D-40 is D-41.
 
 ## Open — decisions Martin owes
 

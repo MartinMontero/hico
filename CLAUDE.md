@@ -31,6 +31,13 @@ winget) were installed on 2026-10-23 (D-16, `docs\spikes\preflight-pwsh7.md`); w
 Wrangler is logged in to Cloudflare has not been checked. Never write install or login
 steps.
 
+In a cloud session (Linux, D-40) use bash and forward-slash paths; the PowerShell rules
+above are for my machine. Every other rule applies unchanged: never deploy, create
+remote resources, push, or store a secret without my GO. A cloud session sees only what
+is on GitHub: `docs\external\` and anything else untracked on my machine is not there.
+Setup is `npm ci` and `npx playwright install --with-deps chromium`
+(`docs\14-CLOUD-BUILD.md`).
+
 ## Files
 
 - Copy, never move. Never edit `reference\hi-co-prototype.jsx`.
