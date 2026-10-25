@@ -83,7 +83,7 @@ test('the week of activities is shown and no rating or guest name appears', asyn
   }
   expect(seen.size).toBeGreaterThanOrEqual(8); // 10 weekly activities across seven weekdays
   await page.goto('/p/demo-whistler/explore');
-  await expect(page.locator('.card')).toHaveCount(24);
+  await expect(page.locator('main ul.cards').first().locator('li.card')).toHaveCount(24); // the places; offers are a second list
   const text = await page.locator('main').innerText();
   expect(text).not.toMatch(/★|rating|Lisa K|Marco P|dorm/i);
   expect(text).toContain('Staff pick');

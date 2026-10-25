@@ -53,7 +53,9 @@ that is not in this file has not been made.
 | D-36 | **Lighthouse 13.5.0 is a dev dependency, pinned to the exact version** (Apache-2.0). It runs against the built app in `npm run validate` to print LCP, TBT and CLS for mobile; it never ships to guests | Martin approved the package on 2026-10-25 (D-35 point 1); the version was chosen in the build: 13.5.0 is the latest stable, released 2026-09-18 (13.4.1 on 2026-07-20 before it). It needs Node 22.19 or later (this machine has 24.16.0). Its `npm audit` findings, if any, are in dev tooling | Claude Code | 2026-10-25 | Y |
 | D-37 | **"Open in Maps" is a plain link to Google Maps' search URL** (`https://www.google.com/maps/search/?api=1&query=<the staff address>`), opened in a new tab with `noopener noreferrer`. Nothing is requested from Google until the guest taps | Chosen in the build because `04` §4.2 says "a plain link" and names no provider. It works on Android and iOS without an app choice. The cost: the address the guest taps goes to Google at that moment, by their own action; and the link's host is the one third-party host the guest app's code names, allowed by name in two tests. Alternative: Apple Maps, which opens a web page on Android | Claude Code | 2026-10-25 | Y |
 
-The next free number after D-37 is D-38.
+| D-38 | **The installed app is named "Hostel · Auberge" with a plain icon of Claude Code's own drawing** (a green mountain and a gold sun on the dark page colour, `public\icon.svg` and two PNGs from it). The web app manifest is one static file, so it cannot be English for some and French for others; it carries both words and no HI mark (D-21, D-25) | Chosen in the build. The product is called HI CO in the documents, but a name on a guest's home screen that includes "HI" would be an HI mark, which D-21 and D-25 keep out of the app. Martin may supply a name and an icon; both are one file each | Claude Code | 2026-10-25 | Y |
+
+The next free number after D-38 is D-39.
 
 ## Open — decisions Martin owes
 
@@ -313,6 +315,9 @@ invite and recovery links (D-28).
 | Bundle budgets | Guest initial JavaScript 60 KB gzip; staff chunk 90 KB gzip | `scripts\bundle-size.ts`; `04` §7 and the 1b-2 plan, both `[A]` | No; a build fails if exceeded | Martin |
 | Interaction target | 100 ms | `04` §4.1 `[A]` (not yet measured against it) | Indirectly | Martin |
 | Preview gate cookie lifetime | 30 days (preview only) | `worker\preview-gate\index.ts` (`COOKIE_MAX_AGE`) | The people Martin gives the preview key to | Martin |
+| Service worker network timeout | 3000 ms: how long the app waits for the network before showing the last copy it kept | `shared\offline.ts` (`NETWORK_TIMEOUT_MS`) | Yes: a guest on slow wifi sees the kept copy after this long | Martin, after a test on a real phone and network |
+| Retention periods for the purge job | Audit rows 365 days; retired QR labels 30; revoked passkeys 30; ended staff sessions 7, ended invite and recovery links 7, ended sign-in challenges 1, rate-limit counters 1 | `shared\retention.ts`; `06` §2 gives some of them as `[A]` | Staff only (nothing a guest sees) | HI Canada's privacy officer (`06` §7), Martin |
+| Lighthouse reading | LCP 2.5 s, TBT 200 ms, CLS 0.1 are the "good" Core Web Vitals thresholds `[I]` printed beside the measured numbers; nothing fails on them | `04` §7; `scripts\lighthouse.ts` prints only | No; the build prints | Martin |
 | Numbers labelled `[A]` in `04` and `06` for features not built | Guest session 14 days; post and description lengths; capacities; per-session limits; signal expiry; retention periods; audit retention one year | `04`, `06` | Not yet (outside the demo, D-22) | Martin, before each feature is built |
 
 **Untraced content** (trace pass of 2026-10-24: every number, time, price, distance or statement of fact about a real
@@ -329,12 +334,37 @@ hostel or place that a guest or staff member is shown, checked against Martin's 
   register (E-07).
 - **Vancouver shared activities (3).** Titles, weekdays and times came from the Jericho board transcription named in a
   code comment in `seed\data.ts`; it is not in the register. Their text says "Sample entry: confirm details at the desk".
+- **Added in Phase 2 (2026-10-25).** The nine privacy-screen feature texts in `shared\i18n\en.ts` (`feature.*`) restate the
+  `06` §1.1 matrix in plain words, and name Cloudflare as the host (`06` §5); none is shown as available, and none has a number
+  in it. The "Add to home screen" help names what a browser's menu is called ("menu or share button", "Add to home screen"):
+  a statement about other companies' software, untraced and not tested on a phone. The installed app's name and icon are
+  Claude Code's own (D-38). "Open in Maps" goes to Google's search address (D-37).
 - **Zones.** The labels and rings (Lobby, Common room, Deck, Out and about) are demo labels, not claims about real rooms.
   Zones have no placeholder flag, so they show no Sample band.
 - **Traced:** the café's name (E-07); the three hostels' time zone, America/Vancouver (O-19, BC government page of
   2026-10-24); the French strings are drafts marked as needing review (D-19) and carry no facts.
 - **Sample band.** Every seeded activity and place has `is_placeholder = 1` and shows the Sample band; no offers are
   seeded. None is missing.
+
+### O-24 A "changed" state on the board
+`04` §4.1 says an activity shows "a cancelled or changed state when staff set one". Staff can cancel a series or one date, and
+the guest app shows "Cancelled"; there is no way for staff to mark an activity "changed" (a new time, a new place), so the guest
+app has no such state. Found while building Phase 2.
+- **Recommended:** a short staff note on an activity ("Moved to 8 pm"), at most 120 characters, shown on the card in both
+  languages and cleared when staff clear it. It is a schema change (one column, a migration, a length limit), announced before it
+  is made.
+- Alternative: drop "changed" from `04` and let staff edit the time and the description, which the guest then simply sees.
+- Reversible: Y before it is built; M after.
+
+### O-25 Where a property's privacy contact is set
+Settings and privacy shows the property's privacy contact, and for all three demo properties it is empty, so the app shows a
+visible placeholder and `docs\13-MISSING-ITEMS.md` lists it. Nothing lets staff or the operator set it: there is no console field
+and no operator script option.
+- **Recommended:** an admin-only field pair (title, address) on a "Property" screen in the staff console, with the same length
+  limits as the columns (80 and 120), audited like every other change.
+- Alternative: an operator script option (`-PrivacyTitle`, `-PrivacyAddress`) and nothing in the console. Smaller, but the property
+  cannot fix its own contact.
+- Reversible: Y.
 
 ## Gates
 

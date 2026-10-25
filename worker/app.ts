@@ -33,6 +33,11 @@ export function createApp(options: AppOptions = {}): Hono<AppEnv> {
   app.use('*', requestLog);
   app.use('*', securityHeaders);
   app.use('*', previewGate); // first real gate: covers /api/* and assets alike
+  // Nothing under /api/staff may ever be kept by a browser cache or the service worker.
+  app.use('/api/staff/*', async (c, next) => {
+    await next();
+    if (!c.res.headers.has('Cache-Control')) c.res.headers.set('Cache-Control', 'no-store');
+  });
   app.use('/api/*', readOnlySwitch);
   app.use('/api/*', writeGuards);
 
@@ -114,7 +119,17 @@ export function createApp(options: AppOptions = {}): Hono<AppEnv> {
   app.all('/api/*', (c) => c.json({ error: 'not_found' }, 404));
 
   // Everything else is the front end (SPA fallback is configured on the assets binding).
-  app.all('*', (c) => c.env.ASSETS.fetch(c.req.raw));
+  app.all('*', async (c) => {
+    const res = await c.env.ASSETS.fetch(c.req.raw);
+    // The service worker script and its off switch must always be re-checked, or an old worker could never be replaced or stopped.
+    const path = new URL(c.req.url).pathname;
+    if (path === '/sw.js' || path === '/sw-status.json') {
+      const headers = new Headers(res.headers);
+      headers.set('Cache-Control', path === '/sw.js' ? 'no-cache' : 'no-store');
+      return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+    }
+    return res;
+  });
 
   return app;
 }

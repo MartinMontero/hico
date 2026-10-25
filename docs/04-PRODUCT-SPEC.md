@@ -56,8 +56,9 @@ or changes another property's data, including operators acting through the app.
   description, and a cancelled or changed state when staff set one.
 - Recurring activities repeat weekly at the same local time across daylight-saving
   changes. Staff can cancel a single date.
-- "I'm In" saves the activity to the guest's own plan on their device (O-14). It
-  shows nothing to anyone else and needs no session.
+- "I'm In" saves the activity to the guest's own plan on their device (D-18). It
+  shows nothing to anyone else, shows no count, and needs no session. A "Show only my plan"
+  toggle on this screen shows just the saved activities (D-35 point 4).
 - Every item shows when staff last checked it. Past the limit for its kind (board, places,
   offers: demo values, declared once in `shared\check-limits.ts`, D-33) it shows "Last checked on
   <date>. Check at the desk." (the exact English text of `stamp.stale`) instead of looking

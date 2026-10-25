@@ -12,6 +12,7 @@
     "tests/e2e/**/*.ts",
     "shared/**/*.ts",
     "vite.config.ts",
+    "vite.sw.config.ts",
     "vitest.config.ts",
     "playwright.config.ts"
   ]

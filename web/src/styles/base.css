@@ -115,11 +115,18 @@ a {
 }
 
 .tabs ul {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  /* A word is never cut in half (French has long ones: Rencontres, programme). Four in a row when they fit; at large text
+     sizes they wrap to two rows instead of overflowing sideways. */
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.25rem;
 }
+.tabs li {
+  flex: 1 1 4.5rem;
+  min-width: min-content;
+}
 .tabs a {
+  overflow-wrap: normal;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -495,4 +502,8 @@ dt {
 }
 dd {
   margin: 0 0 0.5rem;
+}
+
+output > .band {
+  display: block;
 }

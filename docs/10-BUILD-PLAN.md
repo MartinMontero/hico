@@ -470,6 +470,13 @@ and which documents are now stale.
 
 ## Phase 2 — Guest app, Stage 0
 
+
+**Status, 2026-10-25: built** in four slices (plan: `docs\plans\2026-10-25-phase-2-guest-stage-0.md`; raw validate output per
+slice in `docs\spikes\phase-2-validate-slice*.txt`; walkthrough in `docs\walkthrough-phase-2.md`). Items 1 to 12 below are done
+except these: **1** has no "changed" state (staff can only cancel; O-24); **7** is checked in Chromium only, not installed on a
+phone; **10** prints Lighthouse numbers and fails only if Lighthouse cannot run, because the limits are not Martin's (O-23);
+**4** shows a placeholder for every property's privacy contact, which nothing yet lets staff set (O-25). Also new: `lighthouse`
+13.5.0 (D-36), the Maps link (D-37), the manifest name (D-38).
 Claude Code prompt (D-17 and D-18 are recorded):
 
 ```text

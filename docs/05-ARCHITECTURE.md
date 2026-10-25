@@ -456,6 +456,10 @@ therefore stores no guest data at all.
 - First-party aggregate counters only: a count per property, per day, per event name
   ("opened What's On", "offer shown"). No session id, no user agent, no IP in the
   counter table.
+  *As built (Phase 2):* `event_counts` has exactly four columns (property, UTC day, event, count), and a test sends a
+  user agent, a cookie and addresses with a count and finds none of them in the database. A page may report only the
+  listed screen events (`shared\schemas.ts`); a scan of a labelled QR link goes to its own route, which counts
+  `qr:<label>` only for a label the property created and has not retired.
 - No Cloudflare Web Analytics auto-injection. After every deploy, a script fetches
   the live HTML and fails if it contains any beacon or third-party host.
 - Worker logs: request id, route, status, duration. No cookies, no tokens, no
@@ -506,6 +510,21 @@ the audit log, no shared logins.
 - The "Add to home screen" prompt is manual, shown on request in settings, not a
   pop-up.
 
+*As built (Phase 2, `[V]` in Chromium; not on a real phone `[U]`):*
+- `web\sw\` is built on its own into `/sw.js` (`npm run build` runs `vite build` and then `vite build --config
+  vite.sw.config.ts`). Its logic is plain functions tested without a browser (`tests\web\sw.test.ts`).
+- It handles only: public reads (`/api/hosts/properties` and `/api/p/<slug>/config|activities|places|offers`), built files
+  under `/assets/` and `/fonts/`, the manifest and icon, and page navigations (one kept shell for every page). It never
+  handles `/staff`, `/api/staff`, a POST, or another site. A Set-Cookie header is not visible to a service worker, so the
+  guarantee is the allow-list: a test calls every kept route with and without a cookie and checks that none sets one, and a
+  browser test lists what was kept after a visit to the staff pages and finds nothing from them. Every `/api/staff` response
+  is also `Cache-Control: no-store`.
+- Content is network-first with `NETWORK_TIMEOUT_MS` (3000, assumed, `shared\offline.ts`, O-23), then the kept copy marked
+  `X-From-Cache`, which the page ignores when it reads the server's `Date` header as "now" (`web\src\clock.ts`).
+- `/sw.js` is `Cache-Control: no-cache` and `/sw-status.json` is `no-store`; setting `{"enabled": false}` in the second
+  makes every installed service worker delete its caches and unregister itself.
+- The app says "You are offline. Showing what was loaded last." when the browser reports no network.
+
 ## 13. Language and time
 
 - English and French strings live in catalogs. The lookup rule is: the guest's
@@ -530,6 +549,14 @@ plus the site's `wss:` address, `manifest-src 'self'`, `frame-ancestors 'none'`,
 `Referrer-Policy: no-referrer`, and a restrictive `Permissions-Policy` that allows
 geolocation only for the site's own origin. User content is rendered as text, never
 as HTML.
+
+*As built:* `worker\middleware\headers.ts` sets exactly `default-src 'none'; script-src 'self'; style-src 'self'; img-src
+'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action
+'self'` (no `wss:` yet: no socket exists), `nosniff`, `Referrer-Policy: no-referrer` and `Permissions-Policy: geolocation=(self),
+camera=(), microphone=(), payment=()`. `tests\worker\surface.test.ts` compares the exact values on the page, API, service worker,
+manifest, QR route and staff responses. `tests\node\static.test.ts` fails if any built file (HTML, script, style, manifest,
+icon) names a host other than this site, the W3C namespace string, one string inside a passkey library's error text, and the
+Google Maps search address that "Open in Maps" links to (D-37), which is requested only when a guest taps it.
 
 ## 15. Backup and recovery
 

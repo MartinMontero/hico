@@ -4,12 +4,14 @@ import type { PublicProperty } from '../../shared/types.ts';
 import { pick, translate } from '../../shared/i18n/index.ts';
 import { api } from './api.ts';
 import { ToastRegion, UiProvider, useUi } from './context.tsx';
+import { deleteDeviceData } from './deleteData.ts';
 import { Dialog } from './Dialog.tsx';
 import { useLoad } from './load.ts';
 import { Explore, FeatureOff, LoadState, WhatsOn } from './pages.tsx';
 import { Privacy } from './Privacy.tsx';
 import type { ComponentType } from 'preact';
 import { consumeNavigation, Link, navigate, parseRoute, tabPath, usePath, type Tab } from './router.tsx';
+import { useOnline } from './pwa.ts';
 import { takeScanLabel } from './scan.ts';
 
 const TAB_LABEL = {
@@ -52,30 +54,44 @@ function SettingsBody({ slug }: { slug: string | null }) {
   );
 }
 
+
 function SettingsDialog({ open, onClose, opener, slug }: { open: boolean; onClose: () => void; opener: HTMLElement | null; slug: string | null }) {
-  const { t, toast, resetDevice } = useUi();
-  const [confirming, setConfirming] = useState(false);
+  const { t } = useUi();
+  const [step, setStep] = useState<'settings' | 'confirm' | 'done'>('settings');
   useEffect(() => {
-    if (!open) setConfirming(false);
+    if (!open) setStep('settings');
   }, [open]);
 
-  if (confirming) {
+  if (step === 'done') {
+    // The page reloads when this closes: the service worker that was serving it is gone, so nothing refills the caches.
+    const finish = () => window.location.reload();
     return (
-      <Dialog key="delete" open={open} onClose={() => setConfirming(false)} title={t('delete.title')} returnFocusTo={opener}>
+      <Dialog key="done" open={open} onClose={finish} title={t('delete.title')} returnFocusTo={opener}>
+        <output>{t('delete.done')}</output>
+        <p class="actions">
+          <button type="button" class="btn btn-primary" onClick={finish}>
+            {t('settings.close')}
+          </button>
+        </p>
+      </Dialog>
+    );
+  }
+  if (step === 'confirm') {
+    return (
+      <Dialog key="delete" open={open} onClose={() => setStep('settings')} title={t('delete.title')} returnFocusTo={opener}>
         <p>{t('delete.confirm')}</p>
         <p class="actions">
           <button
             type="button"
             class="btn btn-primary"
             onClick={async () => {
-              const next = await resetDevice();
-              onClose();
-              toast(translate(next, 'delete.done'));
+              await deleteDeviceData();
+              setStep('done');
             }}
           >
             {t('delete.yes')}
           </button>
-          <button type="button" class="btn" onClick={() => setConfirming(false)}>
+          <button type="button" class="btn" onClick={() => setStep('settings')}>
             {t('delete.cancel')}
           </button>
         </p>
@@ -86,7 +102,7 @@ function SettingsDialog({ open, onClose, opener, slug }: { open: boolean; onClos
     <Dialog key="settings" open={open} onClose={onClose} title={t('settings.title')} returnFocusTo={opener}>
       <SettingsBody slug={slug} />
       <p>
-        <button type="button" class="btn" onClick={() => setConfirming(true)}>
+        <button type="button" class="btn" onClick={() => setStep('confirm')}>
           {t('delete.title')}
         </button>
       </p>
@@ -96,6 +112,18 @@ function SettingsDialog({ open, onClose, opener, slug }: { open: boolean; onClos
     </Dialog>
   );
 }
+
+function OfflineBand() {
+  const { t } = useUi();
+  const online = useOnline();
+  // Always in the page so a screen reader announces it when it appears.
+  return (
+    <output>
+      {online ? null : <span class="band">{t('state.offline')}</span>}
+    </output>
+  );
+}
+
 function Shell({ slug, tab, property }: { slug: string; tab: Tab; property: PublicProperty }) {
   const { t, lang } = useUi();
   const main = useRef<HTMLElement>(null);
@@ -124,6 +152,7 @@ function Shell({ slug, tab, property }: { slug: string; tab: Tab; property: Publ
           ))}
         </ul>
       </nav>
+      <OfflineBand />
       {property.hasPlaceholders ? (
         <p class="band" role="note">
           {t('sample.band')}
@@ -260,14 +289,14 @@ function StaffLoader({ path }: { path: string }) {
 function Content() {
   const path = usePath();
   const route = parseRoute(path);
-  const { t, toastMessage, epoch } = useUi();
+  const { t, toastMessage } = useUi();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const settingsOpener = useRef<HTMLElement | null>(null);
   const slug = route.name === 'tab' || route.name === 'property' ? route.slug : null;
 
   return (
     <>
-      <div class="app-content" inert={settingsOpen} key={epoch}>
+      <div class="app-content" inert={settingsOpen}>
         <a class="skip" href="#main">
           {t('skip.main')}
         </a>

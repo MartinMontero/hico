@@ -1,8 +1,7 @@
 import { createContext, type ComponentChildren } from 'preact';
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { useCallback, useContext, useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { parseLanguage, type Language } from '../../shared/schemas.ts';
 import { translate, type MessageKey } from '../../shared/i18n/index.ts';
-import { deleteDeviceData } from './deleteData.ts';
 
 const LANG_KEY = 'hc_lang';
 
@@ -28,10 +27,6 @@ export interface Ui {
   t: (key: MessageKey, params?: Record<string, string>) => string;
   toast: (message: string) => void;
   toastMessage: string;
-  /** Changes when the guest deletes their data: screens keyed on it start again from nothing. */
-  epoch: number;
-  /** Clears everything this site stored on the device and starts the app again from nothing (04 §4.3). */
-  resetDevice: () => Promise<Language>;
 }
 
 const UiContext = createContext<Ui | null>(null);
@@ -39,10 +34,10 @@ const UiContext = createContext<Ui | null>(null);
 export function UiProvider({ children }: { children: ComponentChildren }) {
   const [lang, setLangState] = useState<Language>(() => readStoredLanguage() ?? parseLanguage(navigator.language) ?? 'en');
   const [toastMessage, setToastMessage] = useState('');
-  const [epoch, setEpoch] = useState(0);
   const timer = useRef<number | undefined>(undefined);
 
-  useEffect(() => {
+  // A layout effect: the page's language is set in the same frame as the text, so a screen reader never reads French in English.
+  useLayoutEffect(() => {
     document.documentElement.lang = lang;
   }, [lang]);
 
@@ -57,18 +52,9 @@ export function UiProvider({ children }: { children: ComponentChildren }) {
     setLangState(next);
   }, []);
 
-  // The language goes back to the browser's, without being stored again: deleting must leave nothing behind.
-  const resetDevice = useCallback(async () => {
-    await deleteDeviceData();
-    const next = parseLanguage(navigator.language) ?? 'en';
-    setLangState(next);
-    setEpoch((n) => n + 1);
-    return next;
-  }, []);
-
   const ui = useMemo<Ui>(
-    () => ({ lang, setLang, toast, toastMessage, epoch, resetDevice, t: (key, params) => translate(lang, key, params) }),
-    [lang, setLang, toast, toastMessage, epoch, resetDevice],
+    () => ({ lang, setLang, toast, toastMessage, t: (key, params) => translate(lang, key, params) }),
+    [lang, setLang, toast, toastMessage],
   );
   return <UiContext.Provider value={ui}>{children}</UiContext.Provider>;
 }

@@ -136,11 +136,15 @@ describe('security headers (05 §14)', () => {
       await call('/api/hosts/properties', { host: a.host }),
       await call('/api/nope', { host: a.host }),
       await call(`/api/p/${a.slug}/config`, { host: a.host }),
+      await call('/sw.js', { host: a.host }),
+      await call('/manifest.webmanifest', { host: a.host }),
+      await call(`/api/p/${a.slug}/qr`, { host: a.host, method: 'POST', body: { label: 'x' } }),
+      await call('/api/staff/auth/me', { host: a.host }),
     ]) {
       expect(res.headers.get('Content-Security-Policy')).toBe(CSP);
       expect(res.headers.get('X-Content-Type-Options')).toBe('nosniff');
       expect(res.headers.get('Referrer-Policy')).toBe('no-referrer');
-      expect(res.headers.get('Permissions-Policy')).toContain('geolocation=(self)');
+      expect(res.headers.get('Permissions-Policy')).toBe('geolocation=(self), camera=(), microphone=(), payment=()');
     }
     expect(CSP).toBe(
       "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",

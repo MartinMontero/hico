@@ -14,11 +14,12 @@ const steps: Step[] = [
   { name: 'lint', cmd: 'node', args: ['scripts/lint.ts'] },
   { name: 'unit and isolation tests', cmd: 'npx', args: ['vitest', 'run'] },
   { name: 'contrast table', cmd: 'node', args: ['scripts/contrast.ts'] },
-  { name: 'build', cmd: 'npx', args: ['vite', 'build'] },
+  { name: 'build', cmd: 'npm', args: ['run', 'build'] },
   { name: 'worker names', cmd: 'node', args: ['scripts/check-names.ts'], needs: 'build' },
   { name: 'bundle size', cmd: 'node', args: ['scripts/bundle-size.ts'], needs: 'build' },
   { name: 'built output checks', cmd: 'npx', args: ['vitest', 'run', 'tests/node/static.test.ts'], needs: 'build' },
   { name: 'browser tests (axe, 360 px, keyboard)', cmd: 'npx', args: ['playwright', 'test'], needs: 'build' },
+  { name: 'lighthouse mobile (LCP, TBT, CLS printed)', cmd: 'node', args: ['scripts/lighthouse.ts'], needs: 'build' },
 ];
 
 const results = new Map<string, boolean>();

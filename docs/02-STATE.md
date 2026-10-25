@@ -274,8 +274,27 @@ slices, each committed only when `npm run validate` passed. Plan: `docs\plans\20
   Martin has not set, and the content that could not be traced to a source. The browser tests no longer need a database
   before the server starts, so they pass on a fresh clone. BC's clock facts were confirmed on the BC government page.
   The history of `main` is rewritten to remove an unconfirmed surname (D-34).
-- **Phase 2 plan written, awaiting Martin's GO:** `docs\plans\2026-10-25-phase-2-guest-stage-0.md`. Nothing of Phase 2
-  is built. Seven points for Martin are in its §0.
+- **Phase 2 (the Stage 0 guest app) is built on Martin's GO of 2026-10-25 (D-35)**, in four slices, each committed when
+  `npm run validate` passed (plan `docs\plans\2026-10-25-phase-2-guest-stage-0.md`; raw output `docs\spikes\phase-2-validate-slice*.txt`;
+  walkthrough with screenshots `docs\walkthrough-phase-2.md`). What exists now, beyond Phase 1 and 1b-2:
+  - **What's On:** category filter, search in the guest's language (case and accents ignored), "I'm In" (kept on the device,
+    no count) with "Show only my plan", the stamp against the server's clock.
+  - **Explore:** search, offers (terms, dates, a membership label, how we know), "Open in Maps" as a plain link (D-37).
+  - **Labelled QR links:** `POST /api/p/<slug>/qr` counts `qr:<label>` per property and day for a label the property created
+    and has not retired; the page removes the fragment, sets no cookie, stores nothing.
+  - **Settings and privacy:** nine features listed, every switch off and disabled; the privacy contact or a visible
+    placeholder (all three demo properties have none: `docs\13-MISSING-ITEMS.md`); a reusable consent component (not
+    wired); "Delete my data" (storage, caches, service worker, then a reload); "Add to home screen" help.
+  - **Offline:** a service worker (`/sw.js`, `web\sw\`), a manifest and icons; network-first content, built files from the
+    copy; nothing from the staff area; an offline band; an operator off switch (`public\sw-status.json`).
+  - **Purge job:** a daily scheduled Worker deleting expired staff sessions, links, challenges, rate-limit counters,
+    retired QR labels, revoked passkeys and old audit rows (`shared\retention.ts`, assumed periods, O-23).
+  - **French:** every string present; none marked reviewed (`shared\i18n\review.ts`); French tab labels no longer cut.
+  - **Quality:** guest JavaScript 22.0 KB gzip (budget 60 KB), 550 unit and isolation tests in 34 files and 43 browser tests; Lighthouse mobile in `validate`
+    (What's On LCP about 2.0 s, Explore about 2.2 s, TBT 0, CLS 0 and 0.035; printed, not enforced); axe on every screen and
+    state; a fresh-clone check.
+  - **Not done:** a "changed" state on the board (O-24), a way to set the privacy contact (O-25), a native French review
+    (D-19), a real phone, VoiceOver or TalkBack, installing the app to a home screen, anything on Cloudflare.
 - **After the walkthrough (D-31):** the console navigation is a single "Menu" button; screenshots 01 to 10 predate it.
 - **Phase 1b-2 final state:** `npm run validate` passes (462 unit and isolation tests in 23 files, 29 browser tests,
   24 contrast pairs; raw output in `docs\spikes\phase-1b-2-validate-final.txt`). Guest JavaScript 15.6 KB gzip (budget

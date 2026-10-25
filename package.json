@@ -6,13 +6,14 @@
   "description": "HI CO: multi-tenant hostel companion (Phase 1 foundation)",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && vite build --config vite.sw.config.ts",
     "typecheck": "node scripts/typecheck.ts",
     "lint": "node scripts/lint.ts",
     "test": "vitest run",
     "contrast": "node scripts/contrast.ts",
     "db:seed": "node seed/run.ts --local",
     "test:e2e": "playwright test",
+    "lighthouse": "node scripts/lighthouse.ts",
     "validate": "node scripts/validate.ts"
   },
   "dependencies": {

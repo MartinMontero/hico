@@ -207,7 +207,7 @@ describe('no third-party hosts or scripts', () => {
     } catch {
       return; // not built yet; scripts/validate.ts builds first and runs this file again
     }
-    const built = files(dist, ['.html', '.js', '.css']);
+    const built = files(dist, ['.html', '.js', '.css', '.json', '.webmanifest', '.svg']);
     expect(built.length).toBeGreaterThan(0);
     for (const f of built) {
       const text = withoutMapsLink(readFileSync(f, 'utf8'));

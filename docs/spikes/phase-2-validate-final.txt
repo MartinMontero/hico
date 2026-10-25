@@ -1,0 +1,253 @@
+
+> hico@0.1.0 validate
+> node scripts/validate.ts
+
+
+===== typecheck =====
+> tsc -p tsconfig.worker.json
+> tsc -p tsconfig.web.json
+> tsc -p tsconfig.sw.json
+> tsc -p tsconfig.node.json
+
+===== lint =====
+> oxlint
+> eslint
+
+===== unit and isolation tests =====
+
+ RUN  v4.1.12 C:/Users/User/dev/hico
+
+(node:2124) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+ Test Files  34 passed (34)
+      Tests  550 passed (550)
+   Start at  00:42:27
+   Duration  107.88s (transform 17.98s, setup 1.26s, import 58.50s, tests 116.22s, environment 11.93s)
+
+
+===== contrast table =====
+text      on       kind    ratio   min  result  use
+cream     deep     normal  13.44   4.5  pass    body text on page
+cream     timber   normal  11.89   4.5  pass    body text on cards
+cream     ridge    normal  10.22   4.5  pass    body text on raised surfaces
+white     deep     normal  15.50   4.5  pass    headings on page
+white     ridge    normal  11.79   4.5  pass    headings on raised surfaces
+stoneLt   deep     normal  8.65    4.5  pass    secondary text on page
+stoneLt   timber   normal  7.65    4.5  pass    secondary text on cards
+stoneLt   ridge    normal  6.58    4.5  pass    secondary text on raised surfaces
+deep      trail    normal  5.82    4.5  pass    primary button label
+deep      ember    normal  5.91    4.5  pass    accent button label
+deep      gold     normal  7.91    4.5  pass    staff-pick badge
+trail     deep     normal  5.82    4.5  pass    accent text on page
+trail     timber   normal  5.15    4.5  pass    accent text on cards
+emberLt   timber   normal  7.83    4.5  pass    highlight text on cards
+sky       deep     normal  6.21    4.5  pass    links on page
+sky       timber   normal  5.49    4.5  pass    links on cards
+coralLt   deep     normal  7.28    4.5  pass    error text on page
+coralLt   timber   normal  6.44    4.5  pass    error text on cards
+sky       deep     ui      6.21    3    pass    focus ring against page
+sky       ridge    ui      4.72    3    pass    focus ring against raised surfaces
+stone     deep     ui      5.18    3    pass    borders and dividers
+stone     timber   ui      4.58    3    pass    form field borders on cards
+stone     ridge    ui      3.94    3    pass    form field borders on raised surfaces
+ink       paper    normal  21.00   4.5  pass    QR sheet and printed page
+
+24 pairs, 0 below minimum
+
+===== build =====
+
+> hico@0.1.0 build
+> vite build && vite build --config vite.sw.config.ts
+
+vite v8.3.5 building hico_preview environment for production...
+transforming...
+✓ 368 modules transformed.
+rendering chunks...
+Using secrets defined in .dev.vars
+computing gzip size...
+dist/hico_preview/.dev.vars              0.01 kB
+dist/hico_preview/.vite/manifest.json    0.15 kB │ gzip:   0.11 kB
+dist/hico_preview/wrangler.json          1.63 kB │ gzip:   0.83 kB
+dist/hico_preview/index.js             819.08 kB │ gzip: 173.96 kB
+
+✓ built in 148ms
+vite v8.3.5 building client environment for production...
+transforming...
+✓ 69 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/client/.assetsignore                  0.02 kB
+dist/client/index.html                     1.00 kB │ gzip:  0.51 kB
+dist/client/assets/index-dzaZLlo8.css      7.46 kB │ gzip:  2.12 kB
+dist/client/assets/index-Bn3Xybaw.js      65.96 kB │ gzip: 22.22 kB
+dist/client/assets/StaffApp-DeqMER2w.js  101.60 kB │ gzip: 29.82 kB
+
+✓ built in 134ms
+vite v8.3.5 building client environment for production...
+
+ WARN  inlineDynamicImports option is ignored because codeSplitting: false is set.
+
+transforming...
+✓ 4 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/client/sw.js  2.17 kB │ gzip: 1.03 kB
+
+✓ built in 29ms
+
+===== worker names =====
+wrangler.jsonc: hico-preview, hico-prod  ok
+dist/hico_preview/wrangler.json: hico-preview  ok
+
+===== bundle size =====
+/assets/index-Bn3Xybaw.js                raw   65963  gzip  22031
+/assets/index-dzaZLlo8.css               raw    7466  gzip   2122
+initial JavaScript 22031 bytes gzip (budget 61440), stylesheets 2122 bytes gzip
+/assets/StaffApp-DeqMER2w.js             raw  101600  gzip  29613  (staff chunk, loaded only on /staff)
+staff chunk(s) 29613 bytes gzip (budget 92160)
+within budget
+
+===== built output checks =====
+
+ RUN  v4.1.12 C:/Users/User/dev/hico
+
+
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+   Start at  00:44:19
+   Duration  417ms (transform 36ms, setup 0ms, import 54ms, tests 231ms, environment 0ms)
+
+
+===== browser tests (axe, 360 px, keyboard) =====
+wrangler: Resource location: local
+wrangler: ✅ No migrations to apply!
+wrangler: Resource location: local
+wrangler: 🚣 90 commands executed successfully.
+Seeded local D1 (demo-whistler, vancouver-downtown, vancouver-jericho-beach).
+(node:5796) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 43 tests using 1 worker
+
+(node:8028) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:8028) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+axe hostel choice: 0 violation(s), 0 serious or critical
+axe What's On: 0 violation(s), 0 serious or critical
+  ok  1 [chromium] › tests\e2e\guest.spec.ts:53:1 › first visit: the hostel choice, then What's On; no cookie and nothing stored on the device (961ms)
+axe empty search state: 0 violation(s), 0 serious or critical
+axe only my plan: 0 violation(s), 0 serious or critical
+  ok  2 [chromium] › tests\e2e\guest.spec.ts:67:1 › What's On: category filter, search with no match (empty state), and "I'm In" kept on this device (1.0s)
+  ok  3 [chromium] › tests\e2e\guest.spec.ts:94:1 › keyboard only: pick a day, reach "I'm In" and press it, open Settings and close it with Escape (202ms)
+axe Explore: 0 violation(s), 0 serious or critical
+  ok  4 [chromium] › tests\e2e\guest.spec.ts:120:1 › Explore: places with a stamp, a stale place, a plain Maps link, an offer, and no rating (510ms)
+  ok  5 [chromium] › tests\e2e\guest.spec.ts:142:1 › a labelled QR link: counted once for its property, label removed from the address bar, nothing stored, no cookie (6.0s)
+axe Settings and privacy: 0 violation(s), 0 serious or critical
+  ok  6 [chromium] › tests\e2e\guest.spec.ts:163:1 › Settings and privacy: every feature listed, every switch off and disabled, a visible placeholder for the privacy contact (555ms)
+axe Au programme (French): 0 violation(s), 0 serious or critical
+axe Explorer (French): 0 violation(s), 0 serious or critical
+  ok  7 [chromium] › tests\e2e\guest.spec.ts:183:1 › language switch: French follows through the screens, axe-clean (908ms)
+  ok  8 [chromium] › tests\e2e\guest.spec.ts:222:1 › 200% text and reduced motion: no sideways scroll on any screen, no running animation (1.9s)
+axe not found: 0 violation(s), 0 serious or critical
+  ok  9 [chromium] › tests\e2e\guest.spec.ts:237:1 › an unknown page and an unknown hostel say so plainly (321ms)
+axe Connect, not turned on: 0 violation(s), 0 serious or critical
+  ok 10 [chromium] › tests\e2e\guest.spec.ts:245:1 › Common Room and Connect say "Not turned on for this property" and ask nothing (584ms)
+axe Explore, offline: 0 violation(s), 0 serious or critical
+  ok 11 [chromium] › tests\e2e\guest.spec.ts:258:1 › offline: after one visit with a network, a reload with none shows the last copy and says so (626ms)
+  ok 12 [chromium] › tests\e2e\guest.spec.ts:274:1 › the service worker keeps nothing from the staff area (89ms)
+axe Delete my data confirmation: 0 violation(s), 0 serious or critical
+  ok 13 [chromium] › tests\e2e\guest.spec.ts:288:1 › Delete my data: asks first, then clears storage, caches and the service worker, and starts again from nothing (656ms)
+  ok 14 [chromium] › tests\e2e\guest.spec.ts:319:1 › no emoji without a text alternative, and no third-party request is made by any screen (2.4s)
+axe hostel choice: 0 violation(s) of any impact, 0 serious or critical; 17 rules passed
+  ok 15 [chromium] › tests\e2e\shell.spec.ts:40:1 › hostel choice lists the three seeded properties and shows no HI mark (494ms)
+axe What's On: 0 violation(s) of any impact, 0 serious or critical; 24 rules passed
+axe Explore: 0 violation(s) of any impact, 0 serious or critical; 24 rules passed
+axe Common Room: 0 violation(s) of any impact, 0 serious or critical; 21 rules passed
+axe Connect: 0 violation(s) of any impact, 0 serious or critical; 21 rules passed
+  ok 16 [chromium] › tests\e2e\shell.spec.ts:50:1 › Whistler shell: header, four tabs, sample band, axe-clean on every tab (1.5s)
+  ok 17 [chromium] › tests\e2e\shell.spec.ts:76:1 › the week of activities is shown and no rating or guest name appears (549ms)
+  ok 18 [chromium] › tests\e2e\shell.spec.ts:92:1 › a shared activity is the same record at both Vancouver hostels (D-15) (157ms)
+axe Settings dialog: 0 violation(s) of any impact, 0 serious or critical; 24 rules passed
+  ok 19 [chromium] › tests\e2e\shell.spec.ts:104:1 › keyboard only: skip link, tabs, heading focus, settings dialog trap and Escape (685ms)
+axe French shell: 0 violation(s) of any impact, 0 serious or critical; 24 rules passed
+  ok 20 [chromium] › tests\e2e\shell.spec.ts:147:1 › French: the language choice changes the page, the document language and announces a toast (746ms)
+axe not found: 0 violation(s) of any impact, 0 serious or critical; 15 rules passed
+  ok 21 [chromium] › tests\e2e\shell.spec.ts:163:1 › an unknown hostel or page shows (not-found) a plain not-found page with a way back (484ms)
+  ok 22 [chromium] › tests\e2e\shell.spec.ts:170:1 › 200% text zoom does not scroll sideways (97ms)
+axe staff sign-in: 0 violation(s), 0 serious or critical
+  ok 23 [chromium] › tests\e2e\staff-auth.spec.ts:40:1 › a signed-out visitor sees the sign-in screen, axe-clean at 360 px (495ms)
+axe invalid link: 0 violation(s), 0 serious or critical
+  ok 24 [chromium] › tests\e2e\staff-auth.spec.ts:50:1 › a link with nothing after the # sign, and a made-up link, explain themselves (558ms)
+axe accept invite: 0 violation(s), 0 serious or critical
+axe staff home: 0 violation(s), 0 serious or critical
+  ok 25 [chromium] › tests\e2e\staff-auth.spec.ts:60:1 › first admin: the invite link creates a passkey, signs in, and leaves the address bar (1.0s)
+  ok 26 [chromium] › tests\e2e\staff-auth.spec.ts:82:1 › sign out moves focus to the sign-in heading; the passkey signs back in with no username, by keyboard alone (234ms)
+  ok 27 [chromium] › tests\e2e\staff-auth.spec.ts:93:1 › a fresh visit tabs through the skip link, Settings and the sign-in button in that order (167ms)
+axe my account: 0 violation(s), 0 serious or critical
+axe my account with two passkeys: 0 violation(s), 0 serious or critical
+  ok 28 [chromium] › tests\e2e\staff-auth.spec.ts:105:1 › my account: sessions, a second passkey, and the dialogs for removing one (857ms)
+  ok 29 [chromium] › tests\e2e\staff-auth.spec.ts:138:1 › an invited editor registers on their own device and is limited to editor rights (403ms)
+  ok 30 [chromium] › tests\e2e\staff-auth.spec.ts:152:1 › recovery: an admin hands over a link, the new device works and the old sessions and passkeys stop (595ms)
+axe staff home (French): 0 violation(s), 0 serious or critical
+  ok 31 [chromium] › tests\e2e\staff-auth.spec.ts:172:1 › French: the staff screens follow the language choice (391ms)
+axe console overview: 0 violation(s), 0 serious or critical
+  ok 32 [chromium] › tests\e2e\staff-console.spec.ts:56:1 › sign in with the invite, open the hostel, and the overview is axe-clean at 360 px (808ms)
+axe board: 0 violation(s), 0 serious or critical
+axe activity form: 0 violation(s), 0 serious or critical
+  ok 33 [chromium] › tests\e2e\staff-console.spec.ts:77:1 › board: add an activity, see the check line, and every control has a name (862ms)
+axe conflict screen: 0 violation(s), 0 serious or critical
+  ok 34 [chromium] › tests\e2e\staff-console.spec.ts:98:1 › two people editing: the second save gets the conflict screen, and keeps its choice (587ms)
+axe cancel a date: 0 violation(s), 0 serious or critical
+  ok 35 [chromium] › tests\e2e\staff-console.spec.ts:123:1 › cancel one date: the dialog works, Escape closes it and focus returns to the button (525ms)
+axe where it shows: 0 violation(s), 0 serious or critical
+  ok 36 [chromium] › tests\e2e\staff-console.spec.ts:138:1 › a shared activity: the owner sees where it shows and cannot add a hostel they do not work at (397ms)
+  ok 37 [chromium] › tests\e2e\staff-console.spec.ts:151:1 › keyboard only: open the form, type, submit with Enter, and focus comes back to the button (139ms)
+  ok 38 [chromium] › tests\e2e\staff-console.spec.ts:172:1 › hostile text is shown as text and runs nothing (132ms)
+axe place form: 0 violation(s), 0 serious or critical
+axe places: 0 violation(s), 0 serious or critical
+axe offers: 0 violation(s), 0 serious or critical
+  ok 39 [chromium] › tests\e2e\staff-console.spec.ts:182:1 › places and offers: add, mark as still correct (1.2s)
+axe zones: 0 violation(s), 0 serious or critical
+axe translations: 0 violation(s), 0 serious or critical
+axe QR codes: 0 violation(s), 0 serious or critical
+axe QR code: 0 violation(s), 0 serious or critical
+axe switches: 0 violation(s), 0 serious or critical
+  ok 40 [chromium] › tests\e2e\staff-console.spec.ts:206:1 › zones, translations, QR labels (with the QR code), and switches (2.0s)
+axe invite link: 0 violation(s), 0 serious or critical
+axe people: 0 violation(s), 0 serious or critical
+axe audit log: 0 violation(s), 0 serious or critical
+axe export: 0 violation(s), 0 serious or critical
+  ok 41 [chromium] › tests\e2e\staff-console.spec.ts:241:1 › people: an invite link with its QR code, shown once; then the audit log and the export (1.5s)
+axe board (French): 0 violation(s), 0 serious or critical
+  ok 42 [chromium] › tests\e2e\staff-console.spec.ts:268:1 › French: the console follows the language, and the screens still fit (510ms)
+  ok 43 [chromium] › tests\e2e\staff-console.spec.ts:282:1 › an editor sees no admin sections and the server agrees (739ms)
+
+  43 passed (55.2s)
+
+===== lighthouse mobile (LCP, TBT, CLS printed) =====
+(node:23976) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Lighthouse mobile (simulated slow 4G, 4x CPU), median of 3 runs. Printed, not enforced: the limits are not set yet (O-23).
+/p/demo-whistler/whats-on
+  LCP 2027 ms (runs 2060 / 2027 / 2021)
+  TBT 0 ms (runs 0 / 0 / 0)
+  CLS 0.000 (runs 0.000 / 0.000 / 0.000)
+/p/demo-whistler/explore
+  LCP 2165 ms (runs 2165 / 2161 / 2177)
+  TBT 0 ms (runs 0 / 0 / 0)
+  CLS 0.035 (runs 0.035 / 0.035 / 0.035)
+
+===== summary =====
+pass  typecheck
+pass  lint
+pass  unit and isolation tests
+pass  contrast table
+pass  build
+pass  worker names
+pass  bundle size
+pass  built output checks
+pass  browser tests (axe, 360 px, keyboard)
+pass  lighthouse mobile (LCP, TBT, CLS printed)
+
+validate passed
