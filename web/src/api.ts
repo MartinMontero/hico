@@ -6,6 +6,7 @@ import type {
   PublicPropertyChoice,
 } from '../../shared/types.ts';
 import type { EventName } from '../../shared/schemas.ts';
+import { noteServerDate } from './clock.ts';
 
 export class ApiError extends Error {
   readonly status: number;
@@ -18,6 +19,7 @@ export class ApiError extends Error {
 async function getJson<T>(path: string): Promise<T> {
   const res = await fetch(path, { headers: { Accept: 'application/json' } });
   if (!res.ok) throw new ApiError(res.status);
+  noteServerDate(res.headers.get('Date'), res.headers.has('X-From-Cache'));
   return (await res.json()) as T;
 }
 

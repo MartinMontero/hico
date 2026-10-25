@@ -9,6 +9,11 @@ import { checkNames, collectConfigNames, FORBIDDEN_WORKER_NAMES, resolvedNames }
 
 const ROOT = process.cwd();
 
+// The one third-party address the guest app's code may name: the plain Maps link a guest taps (D-37). Nothing is requested
+// from it until then. Everything else external still fails these tests.
+const MAPS_LINK = 'https://www.google.com/maps/search/?api=1&query=';
+const withoutMapsLink = (text: string) => text.replaceAll(MAPS_LINK, '');
+
 function files(dir: string, exts: string[]): string[] {
   const out: string[] = [];
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -165,7 +170,7 @@ describe('Worker names', () => {
 describe('no third-party hosts or scripts', () => {
   it('web sources, the HTML and the stylesheets name no external host', () => {
     const own = [...files(join(ROOT, 'web'), ['.ts', '.tsx', '.css']), join(ROOT, 'index.html')];
-    const offenders = own.filter((f) => /https?:\/\/(?!localhost|www\.w3\.org\/)/i.test(readFileSync(f, 'utf8'))).map(rel);
+    const offenders = own.filter((f) => /https?:\/\/(?!localhost|www\.w3\.org\/)/i.test(withoutMapsLink(readFileSync(f, 'utf8')))).map(rel);
     expect(offenders).toEqual([]);
   });
 
@@ -205,7 +210,7 @@ describe('no third-party hosts or scripts', () => {
     const built = files(dist, ['.html', '.js', '.css']);
     expect(built.length).toBeGreaterThan(0);
     for (const f of built) {
-      const text = readFileSync(f, 'utf8');
+      const text = withoutMapsLink(readFileSync(f, 'utf8'));
       expect(text, rel(f)).not.toMatch(/googleapis|gstatic|cloudflareinsights|google-analytics|googletagmanager/i);
       // Allowed: the W3C namespace strings frameworks embed, and simplewebauthn.dev, which appears only inside an error
       // message of the passkey library (a documentation link in text; no request is made, and the browser tests fail on any external request).

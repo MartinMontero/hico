@@ -54,6 +54,23 @@ export const en = {
   'picker.empty': 'No hostel is set up at this address.',
   'meta.englishOnly': 'English only',
   'page.titleSuffix': '{property}',
-} as const;
+  'whatson.imIn': "I'm In",
+  'whatson.planAdded': 'Saved to your plan on this device.',
+  'whatson.planRemoved': 'Removed from your plan.',
+  'whatson.onlyPlan': 'Show only my plan',
+  'whatson.planEmpty': 'Nothing from your plan on this day.',
+  'search.whatsOn': "Search what's on",
+  'search.explore': 'Search places and offers',
+  'search.empty': 'Nothing matches your search.',
+  'explore.maps': 'Open in Maps',
+  'explore.mapsNewTab': '(opens in a new tab)',
+  'explore.offers': 'Offers',
+  'explore.offersEmpty': 'No offers right now.',
+  'explore.places': 'Places',
+  'offer.valid': 'Valid {from} to {to}',
+  'offer.validFrom': 'Valid from {from}',
+  'offer.validUntil': 'Valid until {to}',
+  'offer.membership': 'Membership needed',
+  'offer.howWeKnow': 'How we know: {text}',} as const;
 
 export type MessageKey = keyof typeof en;
