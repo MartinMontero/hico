@@ -11,7 +11,7 @@ import { makeActivity, makeException, makeOffer, makePlace, makeProperty, makeSt
 const bilingual = [...PUBLIC_FIELDS.bilingual];
 const allow: Record<string, string[]> = {
   'GET /api/hosts/properties': [...PUBLIC_FIELDS.propertyChoice, ...bilingual],
-  'GET /api/p/:slug/config': [...PUBLIC_FIELDS.property, ...PUBLIC_FIELDS.features, ...bilingual],
+  'GET /api/p/:slug/config': [...PUBLIC_FIELDS.property, ...PUBLIC_FIELDS.features, ...PUBLIC_FIELDS.privacyContact, ...bilingual],
   'GET /api/p/:slug/activities': [...PUBLIC_FIELDS.activity, ...bilingual],
   'GET /api/p/:slug/places': [...PUBLIC_FIELDS.place, ...bilingual],
   'GET /api/p/:slug/offers': [...PUBLIC_FIELDS.offer, ...bilingual],

@@ -480,3 +480,19 @@ h2 + .cards,
 h2 + .state {
   margin-top: 0.5rem;
 }
+
+/* Settings and privacy */
+details > summary {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  cursor: pointer;
+  color: var(--c-white);
+}
+dt {
+  font-weight: 700;
+  color: var(--c-white);
+}
+dd {
+  margin: 0 0 0.5rem;
+}

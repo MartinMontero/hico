@@ -35,6 +35,7 @@ decisions that are still yours to make are listed in `03-DECISIONS.md`.
 | `10-BUILD-PLAN.md` | Phases 0 to 8 with the full Claude Code prompt for each | Project knowledge and repo `docs\` |
 | `11-DEPLOY.md` | Environments, secrets, migrations, deploy and rollback in PowerShell | Project knowledge and repo `docs\` |
 | `12-EVIDENCE-REGISTER.md` | Every checkable claim: status, source, date | Project knowledge and repo `docs\` |
+| `13-MISSING-ITEMS.md` | What a property or HI Canada still owes; the app shows a visible placeholder for each | Repo `docs\` |
 | `CLAUDE.md` | Working rules for Claude Code in the repo | Repo root |
 
 A second file, `hico-framework-benchmark.zip`, is delivered beside this package but is

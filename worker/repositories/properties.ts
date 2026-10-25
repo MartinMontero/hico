@@ -7,13 +7,15 @@ export interface PropertyRow {
   nameFr: string;
   timezone: string;
   languages: string;
+  privacyContactTitle: string;
+  privacyContactAddress: string;
   hasPlaceholders: boolean;
 }
 
 export async function getOwn(ctx: TenantContext): Promise<PropertyRow | null> {
   const row = await ctx.db
     .prepare(
-      `SELECT p.slug, p.name_en, p.name_fr, p.timezone, p.languages,
+      `SELECT p.slug, p.name_en, p.name_fr, p.timezone, p.languages, p.privacy_contact_title, p.privacy_contact_address,
          (EXISTS (SELECT 1 FROM activity_offered_at o
                   JOIN activities a ON a.id = o.activity_id AND a.property_id = o.owner_property_id
                   WHERE o.property_id = ?1 AND a.is_placeholder = 1)
@@ -30,6 +32,8 @@ export async function getOwn(ctx: TenantContext): Promise<PropertyRow | null> {
       name_fr: string;
       timezone: string;
       languages: string;
+      privacy_contact_title: string;
+      privacy_contact_address: string;
       has_placeholders: number;
     }>();
   return row
@@ -39,6 +43,8 @@ export async function getOwn(ctx: TenantContext): Promise<PropertyRow | null> {
         nameFr: row.name_fr,
         timezone: row.timezone,
         languages: row.languages,
+        privacyContactTitle: row.privacy_contact_title,
+        privacyContactAddress: row.privacy_contact_address,
         hasPlaceholders: row.has_placeholders === 1,
       }
     : null;

@@ -26,6 +26,7 @@ export function projectProperty(p: PropertyRow, features: Record<FeatureName, bo
     timezone: p.timezone,
     languages: p.languages.split(','),
     features: { common_room: features.common_room, connect: features.connect },
+    privacyContact: { title: p.privacyContactTitle, address: p.privacyContactAddress },
     hasPlaceholders: p.hasPlaceholders,
   };
 }

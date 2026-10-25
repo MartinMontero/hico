@@ -15,7 +15,7 @@ import { weekdayOf, ymdInZone } from '../../web/src/time.ts';
 // stamp, the Maps link, offers, and what is never shown (a rating).
 
 const TZ = 'America/Vancouver';
-const property: PublicProperty = { slug: 'demo', name: { en: 'Demo', fr: 'Démo' }, timezone: TZ, languages: ['en', 'fr'], features: { common_room: false, connect: false }, hasPlaceholders: false };
+const property: PublicProperty = { slug: 'demo', name: { en: 'Demo', fr: 'Démo' }, timezone: TZ, languages: ['en', 'fr'], features: { common_room: false, connect: false }, privacyContact: { title: '', address: '' }, hasPlaceholders: false };
 const nowSec = () => Math.floor(nowMs() / 1000);
 const todayWeekday = () => weekdayOf(ymdInZone(new Date(nowMs()), TZ));
 

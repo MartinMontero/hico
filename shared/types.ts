@@ -16,6 +16,8 @@ export interface PublicProperty {
   timezone: string;
   languages: string[];
   features: Record<FeatureName, boolean>;
+  /** The property's privacy contact (06 §5). Both empty until the property supplies one: the app then says so. */
+  privacyContact: { title: string; address: string };
   hasPlaceholders: boolean;
 }
 
@@ -72,7 +74,7 @@ export interface PublicOffer {
 
 /** Field allow-lists, used by projections and by tests/worker/anonymous-surface.test.ts. */
 export const PUBLIC_FIELDS = {
-  property: ['slug', 'name', 'timezone', 'languages', 'features', 'hasPlaceholders'],
+  property: ['slug', 'name', 'timezone', 'languages', 'features', 'privacyContact', 'hasPlaceholders'],
   propertyChoice: ['slug', 'name'],
   activity: [
     'id', 'title', 'description', 'category', 'zone', 'hostLabel', 'timezone', 'weekday',
@@ -88,6 +90,7 @@ export const PUBLIC_FIELDS = {
     'verifiedOn', 'isPlaceholder',
   ],
   bilingual: ['en', 'fr'],
+  privacyContact: ['title', 'address'],
   features: ['common_room', 'connect'],
 } as const;
 

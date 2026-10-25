@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { Language } from '../../shared/schemas.ts';
 import type { PublicProperty } from '../../shared/types.ts';
-import { pick } from '../../shared/i18n/index.ts';
+import { pick, translate } from '../../shared/i18n/index.ts';
 import { api } from './api.ts';
 import { ToastRegion, UiProvider, useUi } from './context.tsx';
 import { Dialog } from './Dialog.tsx';
 import { useLoad } from './load.ts';
 import { Explore, FeatureOff, LoadState, WhatsOn } from './pages.tsx';
+import { Privacy } from './Privacy.tsx';
 import type { ComponentType } from 'preact';
 import { consumeNavigation, Link, navigate, parseRoute, tabPath, usePath, type Tab } from './router.tsx';
 import { takeScanLabel } from './scan.ts';
@@ -19,15 +20,19 @@ const TAB_LABEL = {
 } as const;
 const TAB_ORDER: Tab[] = ['whats-on', 'explore', 'common-room', 'connect'];
 
-function SettingsDialog({ open, onClose, opener }: { open: boolean; onClose: () => void; opener: HTMLElement | null }) {
+function SettingsBody({ slug }: { slug: string | null }) {
   const { t, lang, setLang, toast } = useUi();
+  const config = useLoad(`settings-config:${slug ?? ''}`, () => (slug ? api.config(slug) : Promise.reject(new Error('no property'))));
+  useEffect(() => {
+    if (slug) void api.event(slug, 'opened_settings');
+  }, [slug]);
   const choose = (next: Language) => {
     setLang(next);
     // The message is built in the new language so it is announced in it.
-    toast(next === 'fr' ? 'Langue : Français' : 'Language set to English');
+    toast(translate(next, 'toast.language', { language: translate(next, `lang.${next}`) }));
   };
   return (
-    <Dialog open={open} onClose={onClose} title={t('settings.title')} returnFocusTo={opener}>
+    <>
       <fieldset class="field">
         <legend>{t('settings.language')}</legend>
         {(['en', 'fr'] as const).map((code) => (
@@ -38,13 +43,59 @@ function SettingsDialog({ open, onClose, opener }: { open: boolean; onClose: () 
         ))}
       </fieldset>
       <p class="muted">{t('settings.note')}</p>
+      <Privacy property={config.status === 'ready' ? config.data : null} />
+      <section aria-labelledby="a2hs-h">
+        <h3 id="a2hs-h">{t('a2hs.title')}</h3>
+        <p>{t('a2hs.body')}</p>
+      </section>
+    </>
+  );
+}
+
+function SettingsDialog({ open, onClose, opener, slug }: { open: boolean; onClose: () => void; opener: HTMLElement | null; slug: string | null }) {
+  const { t, toast, resetDevice } = useUi();
+  const [confirming, setConfirming] = useState(false);
+  useEffect(() => {
+    if (!open) setConfirming(false);
+  }, [open]);
+
+  if (confirming) {
+    return (
+      <Dialog key="delete" open={open} onClose={() => setConfirming(false)} title={t('delete.title')} returnFocusTo={opener}>
+        <p>{t('delete.confirm')}</p>
+        <p class="actions">
+          <button
+            type="button"
+            class="btn btn-primary"
+            onClick={async () => {
+              const next = await resetDevice();
+              onClose();
+              toast(translate(next, 'delete.done'));
+            }}
+          >
+            {t('delete.yes')}
+          </button>
+          <button type="button" class="btn" onClick={() => setConfirming(false)}>
+            {t('delete.cancel')}
+          </button>
+        </p>
+      </Dialog>
+    );
+  }
+  return (
+    <Dialog key="settings" open={open} onClose={onClose} title={t('settings.title')} returnFocusTo={opener}>
+      <SettingsBody slug={slug} />
+      <p>
+        <button type="button" class="btn" onClick={() => setConfirming(true)}>
+          {t('delete.title')}
+        </button>
+      </p>
       <button type="button" class="btn btn-primary" onClick={onClose}>
         {t('settings.close')}
       </button>
     </Dialog>
   );
 }
-
 function Shell({ slug, tab, property }: { slug: string; tab: Tab; property: PublicProperty }) {
   const { t, lang } = useUi();
   const main = useRef<HTMLElement>(null);
@@ -209,14 +260,14 @@ function StaffLoader({ path }: { path: string }) {
 function Content() {
   const path = usePath();
   const route = parseRoute(path);
-  const { t, toastMessage } = useUi();
+  const { t, toastMessage, epoch } = useUi();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const settingsOpener = useRef<HTMLElement | null>(null);
   const slug = route.name === 'tab' || route.name === 'property' ? route.slug : null;
 
   return (
     <>
-      <div class="app-content" inert={settingsOpen}>
+      <div class="app-content" inert={settingsOpen} key={epoch}>
         <a class="skip" href="#main">
           {t('skip.main')}
         </a>
@@ -233,7 +284,7 @@ function Content() {
         {route.name === 'staff' ? <StaffLoader path={path} /> : null}
         {route.name === 'unknown' ? <NotFound /> : null}
       </div>
-      <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} opener={settingsOpener.current} />
+      <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} opener={settingsOpener.current} slug={slug} />
       <ToastRegion message={toastMessage} />
     </>
   );
