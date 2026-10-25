@@ -10,6 +10,8 @@ export const LIMITS = {
   title: 120,
   description: 600,
   note: 300,
+  /** A staff note on a changed activity: 120 characters, as Martin accepted in O-24 (D-39). */
+  changeNote: 120,
   terms: 400,
   host: 120,
   timezone: 64,
@@ -74,6 +76,8 @@ export const TEXT_COLUMN_LIMITS: Record<string, LimitName> = {
   'activities.title_fr': 'title',
   'activities.description_en': 'description',
   'activities.description_fr': 'description',
+  'activities.change_note_en': 'changeNote',
+  'activities.change_note_fr': 'changeNote',
   'activities.zone_id': 'id',
   'activities.host_label': 'label',
   'activities.timezone': 'timezone',

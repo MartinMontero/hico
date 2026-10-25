@@ -11,6 +11,8 @@ export interface ActivityRow {
   title_fr: string;
   description_en: string;
   description_fr: string;
+  change_note_en: string;
+  change_note_fr: string;
   category: ActivityCategory;
   zone_en: string | null;
   zone_fr: string | null;
@@ -33,7 +35,7 @@ export interface ActivityWithDates {
   cancelledDates: string[];
 }
 
-const COLUMNS = `a.id, a.title_en, a.title_fr, a.description_en, a.description_fr, a.category,
+const COLUMNS = `a.id, a.title_en, a.title_fr, a.description_en, a.description_fr, a.change_note_en, a.change_note_fr, a.category,
   z.label_en AS zone_en, z.label_fr AS zone_fr, a.host_label, a.timezone, a.weekday,
   a.start_local, a.end_local, a.starts_at, a.ends_at, a.capacity, a.status,
   a.verified_on, a.verified_by, a.is_placeholder`;
@@ -142,6 +144,8 @@ export interface ActivityWrite {
   titleFr: string;
   descriptionEn: string;
   descriptionFr: string;
+  changeNoteEn: string;
+  changeNoteFr: string;
   category: ActivityCategory;
   zoneId: string | null;
   hostLabel: string;
@@ -209,10 +213,11 @@ export async function insert(ctx: TenantContext, f: ActivityWrite, stamp: Stamp,
     ctx.db
       .prepare(
         `INSERT INTO activities (id, property_id, title_en, title_fr, description_en, description_fr, category, zone_id, host_label, timezone,
-           weekday, start_local, end_local, starts_at, ends_at, capacity, status, verified_on, verified_by, is_placeholder, created_at, updated_at)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, 'active', ?17, ?18, 0, ?19, ?19)`,
+           weekday, start_local, end_local, starts_at, ends_at, capacity, status, verified_on, verified_by, is_placeholder, created_at, updated_at,
+           change_note_en, change_note_fr)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, 'active', ?17, ?18, 0, ?19, ?19, ?20, ?21)`,
       )
-      .bind(id, ctx.propertyId, f.titleEn, f.titleFr, f.descriptionEn, f.descriptionFr, f.category, f.zoneId, f.hostLabel, timezone, f.weekday, f.startLocal, f.endLocal, f.startsAt, f.endsAt, f.capacity, stamp.on, stamp.by, now),
+      .bind(id, ctx.propertyId, f.titleEn, f.titleFr, f.descriptionEn, f.descriptionFr, f.category, f.zoneId, f.hostLabel, timezone, f.weekday, f.startLocal, f.endLocal, f.startsAt, f.endsAt, f.capacity, stamp.on, stamp.by, now, f.changeNoteEn, f.changeNoteFr),
     ctx.db.prepare('INSERT INTO activity_offered_at (activity_id, owner_property_id, property_id) VALUES (?1, ?2, ?2)').bind(id, ctx.propertyId),
   ]);
   return id;
@@ -236,10 +241,11 @@ export async function update(ctx: TenantContext, id: string, version: number, f:
       `UPDATE activities SET title_en = ?4, title_fr = ?5, description_en = ?6, description_fr = ?7, category = ?8,
          zone_id = CASE WHEN property_id = ?3 THEN ?9 ELSE zone_id END, host_label = ?10, capacity = ?11,
          weekday = ?12, start_local = ?13, end_local = ?14, starts_at = ?15, ends_at = ?16,
-         verified_on = ?17, verified_by = ?18, is_placeholder = 0, version = version + 1, updated_at = ?19
+         verified_on = ?17, verified_by = ?18, is_placeholder = 0, version = version + 1, updated_at = ?19,
+         change_note_en = ?20, change_note_fr = ?21
        WHERE id = ?1 AND version = ?2 AND ${VISIBLE}`,
     )
-    .bind(id, version, ctx.propertyId, f.titleEn, f.titleFr, f.descriptionEn, f.descriptionFr, f.category, f.zoneId, f.hostLabel, f.capacity, f.weekday, f.startLocal, f.endLocal, f.startsAt, f.endsAt, stamp.on, stamp.by, now)
+    .bind(id, version, ctx.propertyId, f.titleEn, f.titleFr, f.descriptionEn, f.descriptionFr, f.category, f.zoneId, f.hostLabel, f.capacity, f.weekday, f.startLocal, f.endLocal, f.startsAt, f.endsAt, stamp.on, stamp.by, now, f.changeNoteEn, f.changeNoteFr)
     .run();
   return outcome(ctx, id, r.meta.changes);
 }

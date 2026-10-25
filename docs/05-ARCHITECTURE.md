@@ -528,7 +528,7 @@ the audit log, no shared logins.
 ## 13. Language and time
 
 - English and French strings live in catalogs. The lookup rule is: the guest's
-  language if the string exists, else English with a visible "English only" marker.
+  language if the string exists, else English with a visible "English only" marker, written in the language of the person reading ("anglais seulement" for a French reader; before 2026-10-25 it was always English).
   Never a blank and never a raw key. A build test fails if any shipped key has no
   French (`09` §6).
 - Dates are stored in UTC and shown in the property's timezone. British Columbia no longer changes

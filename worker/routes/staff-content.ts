@@ -50,6 +50,7 @@ const idOf = (c: C): string | null => {
 function toWrite(input: ActivityInput, timezone: string): ActivityWrite | 'end_before_start' {
   const base = {
     titleEn: input.titleEn, titleFr: input.titleFr, descriptionEn: input.descriptionEn, descriptionFr: input.descriptionFr,
+    changeNoteEn: input.changeNoteEn, changeNoteFr: input.changeNoteFr,
     category: input.category, zoneId: input.zoneId, hostLabel: input.hostLabel, capacity: input.capacity,
   };
   const s = input.schedule;
@@ -194,6 +195,7 @@ export function createStaffContentRoutes(now: () => number): Hono<AppEnv> {
     const copy = (text: string, suffix: string) => (text === '' ? '' : `${text} (${suffix})`.slice(0, 120));
     const write: ActivityWrite = {
       titleEn: copy(row.title_en, 'copy'), titleFr: copy(row.title_fr, 'copie'), descriptionEn: row.description_en, descriptionFr: row.description_fr,
+      changeNoteEn: '', changeNoteFr: '', // a copy starts with no change note
       category: row.category, zoneId: isOwner ? row.zone_id : null, hostLabel: row.host_label, capacity: row.capacity,
       weekday: row.weekday, startLocal: row.start_local, endLocal: row.end_local, startsAt: row.starts_at, endsAt: row.ends_at,
     };

@@ -293,7 +293,12 @@ slices, each committed only when `npm run validate` passed. Plan: `docs\plans\20
   - **Quality:** guest JavaScript 22.0 KB gzip (budget 60 KB), 550 unit and isolation tests in 34 files and 43 browser tests; Lighthouse mobile in `validate`
     (What's On LCP about 2.0 s, Explore about 2.2 s, TBT 0, CLS 0 and 0.035; printed, not enforced); axe on every screen and
     state; a fresh-clone check.
-  - **Not done:** a "changed" state on the board (O-24), a way to set the privacy contact (O-25), a native French review
+  - **Change note (O-24, D-39, added after the Phase 2 commit):** an activity can carry a note of at most 120 characters in each
+    language ("Moved to 8 pm"); staff set it in the form, guests see a "Changed" label and the note. Migration `0003`
+    (additive, local only). Also fixed: the "English only" marker on a string that fell back to English is now in the
+    reader's language ("anglais seulement"); it was always English, so two tests that asserted no fallback in French
+    were not checking anything and now do.
+  - **Not done:** a way to set the privacy contact (O-25), a native French review
     (D-19), a real phone, VoiceOver or TalkBack, installing the app to a home screen, anything on Cloudflare.
 - **After the walkthrough (D-31):** the console navigation is a single "Menu" button; screenshots 01 to 10 predate it.
 - **Phase 1b-2 final state:** `npm run validate` passes (462 unit and isolation tests in 23 files, 29 browser tests,

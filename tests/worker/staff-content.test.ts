@@ -42,7 +42,7 @@ async function audited<T>(route: string, action: string, property: PropertyFixtu
 
 const weekly = { kind: 'weekly' as const, weekday: 2, startLocal: '19:00', endLocal: '21:00' };
 const activityBody = (over: Record<string, unknown> = {}) => ({
-  titleEn: 'Trivia', titleFr: 'Quiz', descriptionEn: 'Bring a friend', descriptionFr: 'Amenez un ami', category: 'social', zoneId: null, hostLabel: 'Staff', capacity: null, schedule: weekly, ...over,
+  titleEn: 'Trivia', titleFr: 'Quiz', descriptionEn: 'Bring a friend', descriptionFr: 'Amenez un ami', changeNoteEn: '', changeNoteFr: '', category: 'social', zoneId: null, hostLabel: 'Staff', capacity: null, schedule: weekly, ...over,
 });
 const placeBody = (over: Record<string, unknown> = {}) => ({
   category: 'food', name: 'Corner Cafe', staffPick: true, noteEn: 'Good coffee', noteFr: 'Bon café', walkTimeEn: '5 min', walkTimeFr: '5 min', hoursEn: '8 to 4', hoursFr: '8 à 16', phone: null, mapsAddress: '1 Main St', ...over,

@@ -55,7 +55,9 @@ that is not in this file has not been made.
 
 | D-38 | **The installed app is named "Hostel · Auberge" with a plain icon of Claude Code's own drawing** (a green mountain and a gold sun on the dark page colour, `public\icon.svg` and two PNGs from it). The web app manifest is one static file, so it cannot be English for some and French for others; it carries both words and no HI mark (D-21, D-25) | Chosen in the build. The product is called HI CO in the documents, but a name on a guest's home screen that includes "HI" would be an HI mark, which D-21 and D-25 keep out of the app. Martin may supply a name and an icon; both are one file each | Claude Code | 2026-10-25 | Y |
 
-The next free number after D-38 is D-39.
+| D-39 | **An activity can carry a short staff note saying what has changed, at most 120 characters, in English and French** (O-24 accepted as recommended). Guests see a "Changed" label and the note on the card; clearing the note clears it; it is searchable. Staff set it in the activity form, any property that offers a shared activity may set it (D-23), a copy of an activity starts without one, and re-checking keeps it. Stored in two new columns by migration `0003_activity_change_note.sql` (additive: existing rows get the empty note; applied to the local database only, no remote database exists) | Martin, 2026-10-25, "Accept O-24 as recommended: a staff note of at most 120 characters on an activity. Announce the migration before you make it." The migration was announced before it was written. The 120 is Martin's (accepted), declared once as `changeNote` in `shared\limits.ts` and as a CHECK in the migration | Martin | 2026-10-25 | M |
+
+The next free number after D-39 is D-40.
 
 ## Open — decisions Martin owes
 
@@ -310,7 +312,7 @@ invite and recovery links (D-28).
 | What | Current value | Declared in | A guest or staff member sees its effect? | Who supplies the official figure |
 | --- | --- | --- | --- | --- |
 | Check limits for the board, places and offers | 90 days each, demo values (D-33) | `shared\check-limits.ts` | Yes: guests see "Check at the desk" (offers hidden); staff see "Check overdue" | Martin or HI Canada |
-| Text length limits | Title 120, description 600, note 300, terms 400, hours text 200, name and label 80, short text 120, address 200, phone 30, and the rest of `shared\limits.ts`. Also: activity capacity at most 1000 (`shared\staff-content-schemas.ts`) and at most 50 zones in a zones file (`scripts\operator-lib.ts`) | `shared\limits.ts`; the migrations carry matching `CHECK`s | Yes: staff cannot enter more, guests see text cut to what was allowed | Martin, after a staff trial with what Fawzie actually writes |
+| Text length limits | Title 120, description 600, note 300, terms 400, hours text 200, name and label 80, short text 120, address 200, phone 30, and the rest of `shared\limits.ts` (except the 120-character change note, which Martin accepted, D-39). Also: activity capacity at most 1000 (`shared\staff-content-schemas.ts`) and at most 50 zones in a zones file (`scripts\operator-lib.ts`) | `shared\limits.ts`; the migrations carry matching `CHECK`s | Yes: staff cannot enter more, guests see text cut to what was allowed | Martin, after a staff trial with what Fawzie actually writes |
 | Staff sign-in rate limits | Sign-in: 40 requests per 15 minutes per caller (the address, hashed with a daily key) per endpoint group; link inspect, register and accept: 30 per 15 minutes; passkey challenge valid 5 minutes. Creating an invite or recovery link as an admin is not rate limited | `worker\routes\staff-auth.ts` (`WINDOW`, `CHALLENGE_SECONDS`, the `limited(...)` calls) | Staff: "Too many tries" after the count. D-30 point 7 accepted "rate limited in D1", not these numbers | Martin, or a security review |
 | Bundle budgets | Guest initial JavaScript 60 KB gzip; staff chunk 90 KB gzip | `scripts\bundle-size.ts`; `04` §7 and the 1b-2 plan, both `[A]` | No; a build fails if exceeded | Martin |
 | Interaction target | 100 ms | `04` §4.1 `[A]` (not yet measured against it) | Indirectly | Martin |
@@ -347,6 +349,8 @@ hostel or place that a guest or staff member is shown, checked against Martin's 
   seeded. None is missing.
 
 ### O-24 A "changed" state on the board
+**Resolved by D-39.**
+
 `04` §4.1 says an activity shows "a cancelled or changed state when staff set one". Staff can cancel a series or one date, and
 the guest app shows "Cancelled"; there is no way for staff to mark an activity "changed" (a new time, a new place), so the guest
 app has no such state. Found while building Phase 2.

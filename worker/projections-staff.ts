@@ -28,6 +28,7 @@ export function projectStaffActivity(full: StaffActivityFull, who: { propertyId:
     id: r.id,
     title: { en: r.title_en, fr: r.title_fr },
     description: { en: r.description_en, fr: r.description_fr },
+    changeNote: { en: r.change_note_en, fr: r.change_note_fr },
     category: r.category,
     zoneId: r.zone_id,
     zone: r.zone_en !== null && r.zone_fr !== null ? { en: r.zone_en, fr: r.zone_fr } : null,

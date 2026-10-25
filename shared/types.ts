@@ -30,6 +30,8 @@ export interface PublicActivity {
   id: string;
   title: Bilingual;
   description: Bilingual;
+  /** What staff say has changed ("Moved to 8 pm"); both empty when nothing has. */
+  changeNote: Bilingual;
   category: ActivityCategory;
   zone: Bilingual | null;
   hostLabel: string;
@@ -77,7 +79,7 @@ export const PUBLIC_FIELDS = {
   property: ['slug', 'name', 'timezone', 'languages', 'features', 'privacyContact', 'hasPlaceholders'],
   propertyChoice: ['slug', 'name'],
   activity: [
-    'id', 'title', 'description', 'category', 'zone', 'hostLabel', 'timezone', 'weekday',
+    'id', 'title', 'description', 'changeNote', 'category', 'zone', 'hostLabel', 'timezone', 'weekday',
     'startLocal', 'endLocal', 'startsAt', 'endsAt', 'capacity', 'status', 'cancelledDates',
     'verifiedOn', 'isPlaceholder',
   ],
@@ -107,6 +109,7 @@ export interface StaffActivity {
   id: string;
   title: Bilingual;
   description: Bilingual;
+  changeNote: Bilingual;
   category: ActivityCategory;
   zoneId: string | null;
   zone: Bilingual | null;
@@ -185,7 +188,7 @@ export interface StaffAuditEntry {
 
 export const STAFF_FIELDS = {
   activity: [
-    'id', 'title', 'description', 'category', 'zoneId', 'zone', 'hostLabel', 'capacity', 'status', 'schedule', 'timezone',
+    'id', 'title', 'description', 'changeNote', 'category', 'zoneId', 'zone', 'hostLabel', 'capacity', 'status', 'schedule', 'timezone',
     'cancelledDates', 'isOwner', 'offeredAt', 'canChangeList', 'verifiedOn', 'verifiedBy', 'check', 'isPlaceholder', 'version',
   ],
   place: ['id', 'category', 'name', 'staffPick', 'note', 'walkTime', 'hours', 'phone', 'mapsAddress', 'verifiedOn', 'verifiedBy', 'check', 'isPlaceholder', 'version'],

@@ -25,12 +25,19 @@ for (const m of sql.matchAll(/CREATE TABLE (\w+) \(\n([\s\S]*?)\n\);/g)) {
   tables.push({ name, body, columns });
 }
 
+// Columns added later by ALTER TABLE x ADD COLUMN name TEXT ... (one per line) are held to the same rule.
+const added: Column[] = [];
+for (const m of sql.matchAll(/^ALTER TABLE (\w+) ADD COLUMN (\w+) TEXT\b.*$/gm)) {
+  added.push({ table: m[1] as string, name: m[2] as string, line: `  ${m[2]} TEXT${m[0].slice(m[0].indexOf(' TEXT') + 5)}` });
+}
+
 describe('migration text columns carry the shared limits', () => {
-  it('finds the tables', () => {
+  it('finds the tables, and the TEXT columns added by ALTER TABLE', () => {
     expect(tables.length).toBeGreaterThanOrEqual(15);
+    expect(added.map((c) => c.table + '.' + c.name)).toEqual(['activities.change_note_en', 'activities.change_note_fr']);
   });
 
-  const textColumns = tables.flatMap((t) => t.columns);
+  const textColumns = [...tables.flatMap((t) => t.columns), ...added];
 
   it('every TEXT column is an enumeration or is listed with a limit, and its CHECK says the same number', () => {
     const problems: string[] = [];

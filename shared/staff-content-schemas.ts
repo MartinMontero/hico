@@ -29,6 +29,9 @@ export const activityFields = {
   titleFr: text(LIMITS.title),
   descriptionEn: text(LIMITS.description),
   descriptionFr: text(LIMITS.description),
+  /** A short note on an activity that has changed (O-24, D-39). Empty means nothing has changed. */
+  changeNoteEn: text(LIMITS.changeNote),
+  changeNoteFr: text(LIMITS.changeNote),
   category: v.picklist(ACTIVITY_CATEGORIES),
   zoneId: v.nullable(idSchema),
   hostLabel: text(LIMITS.label),

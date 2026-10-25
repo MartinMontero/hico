@@ -53,7 +53,7 @@ or changes another property's data, including operators acting through the app.
   phone is set to another timezone still sees the property's day.
 - Filter by category (Adventure, Social, Wellness, Culture, Outdoor).
 - Each activity shows: title, time range, place within the hostel, host, a short
-  description, and a cancelled or changed state when staff set one.
+  description, and a cancelled state when staff cancel it, and a "Changed" label with a short staff note (at most 120 characters, in both languages, D-39) when staff set one.
 - Recurring activities repeat weekly at the same local time across daylight-saving
   changes. Staff can cancel a single date.
 - "I'm In" saves the activity to the guest's own plan on their device (D-18). It

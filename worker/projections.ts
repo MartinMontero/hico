@@ -36,6 +36,7 @@ export function projectActivity({ row, cancelledDates }: ActivityWithDates): Pub
     id: row.id,
     title: { en: row.title_en, fr: row.title_fr },
     description: { en: row.description_en, fr: row.description_fr },
+    changeNote: { en: row.change_note_en, fr: row.change_note_fr },
     category: row.category,
     zone: row.zone_en !== null && row.zone_fr !== null ? { en: row.zone_en, fr: row.zone_fr } : null,
     hostLabel: row.host_label,

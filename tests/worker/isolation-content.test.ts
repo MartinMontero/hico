@@ -16,7 +16,7 @@ const NOW = 1_800_000_000;
 const STAMP = { on: NOW, by: 'Tester' };
 const ctxFor = (p: PropertyFixture) => createTenantContext(env.DB, { propertyId: p.id, slug: p.slug, timezone: 'America/Vancouver' });
 const write = (over: Partial<ActivityWrite> = {}): ActivityWrite => ({
-  titleEn: 'Edited', titleFr: 'Modifié', descriptionEn: 'd', descriptionFr: 'd', category: 'social', zoneId: null, hostLabel: 'Staff', capacity: null,
+  titleEn: 'Edited', titleFr: 'Modifié', descriptionEn: 'd', descriptionFr: 'd', changeNoteEn: '', changeNoteFr: '', category: 'social', zoneId: null, hostLabel: 'Staff', capacity: null,
   weekday: 3, startLocal: '18:00', endLocal: null, startsAt: null, endsAt: null, ...over,
 });
 const placeWrite = { category: 'food' as const, name: 'Edited place', staffPick: true, noteEn: 'n', noteFr: 'n', walkTimeEn: '', walkTimeFr: '', hoursEn: '', hoursFr: '', phone: null, mapsAddress: '' };

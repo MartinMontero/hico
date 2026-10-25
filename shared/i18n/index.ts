@@ -7,6 +7,11 @@ export type { MessageKey };
 
 const catalogs: Record<Language, Partial<Record<MessageKey, string>>> = { en, fr };
 
+/** The marker on a string that fell back to English, in the language of the person reading (the French catalog has its own). */
+function englishOnly(lang: Language): string {
+  return (lang === 'fr' ? fr : en)['meta.englishOnly'];
+}
+
 function fill(template: string, params?: Record<string, string>): string {
   return template.replace(/\{(\w+)\}/g, (_, name: string) => params?.[name] ?? '');
 }
@@ -25,7 +30,7 @@ export function translate(
   if (own !== undefined && own !== '') return fill(own, params);
   const fallback = en[key];
   const text = fill(fallback, params);
-  return lang === 'en' ? text : `${text} (${en['meta.englishOnly']})`;
+  return lang === 'en' ? text : `${text} (${englishOnly(lang)})`;
 }
 
 /** The same rule for bilingual content fields that come from the API. */
@@ -33,7 +38,7 @@ export function pick(value: Bilingual, lang: Language): string {
   const own = value[lang];
   if (own !== '') return own;
   const other = value.en !== '' ? value.en : value.fr;
-  return lang === 'en' || other === '' ? other : `${other} (${en['meta.englishOnly']})`;
+  return lang === 'en' || other === '' ? other : `${other} (${englishOnly(lang)})`;
 }
 
 export const ALL_KEYS = Object.keys(en) as MessageKey[];
@@ -49,6 +54,6 @@ export function makeTranslator<K extends string>(english: Record<K, string>, fre
     const own = lang === 'fr' ? french[key] : english[key];
     if (own !== undefined && own !== '') return fill(own, params);
     const text = fill(english[key], params);
-    return lang === 'en' ? text : `${text} (${en['meta.englishOnly']})`;
+    return lang === 'en' ? text : `${text} (${englishOnly(lang)})`;
   };
 }

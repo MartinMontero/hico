@@ -22,6 +22,7 @@ export const en = {
   'whatson.empty': 'Nothing on today. Check tomorrow.',
   'whatson.emptyDay': 'Nothing on this day. Try another day.',
   'whatson.cancelled': 'Cancelled',
+  'whatson.changed': 'Changed',
   'whatson.meets': 'Meets: {place}',
   'whatson.host': 'Hosted by {name}',
   'explore.title': 'Explore',

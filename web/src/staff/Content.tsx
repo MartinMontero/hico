@@ -68,19 +68,19 @@ function scheduleText(a: StaffActivity, lang: string, t: StaffT): string {
 function activityToForm(a: StaffActivity): Values {
   const s = a.schedule;
   return {
-    titleEn: a.title.en, titleFr: a.title.fr, descriptionEn: a.description.en, descriptionFr: a.description.fr, category: a.category, zoneId: a.zoneId ?? '',
+    titleEn: a.title.en, titleFr: a.title.fr, descriptionEn: a.description.en, descriptionFr: a.description.fr, changeNoteEn: a.changeNote.en, changeNoteFr: a.changeNote.fr, category: a.category, zoneId: a.zoneId ?? '',
     hostLabel: a.hostLabel, capacity: numberString(a.capacity), kind: s.kind, weekday: s.kind === 'weekly' ? String(s.weekday) : '1',
     date: s.kind === 'one_off' ? s.date : '', startLocal: s.startLocal, endLocal: s.endLocal ?? '',
   };
 }
 const emptyActivity: Values = {
-  titleEn: '', titleFr: '', descriptionEn: '', descriptionFr: '', category: 'social', zoneId: '', hostLabel: '', capacity: '', kind: 'weekly', weekday: '1', date: '', startLocal: '19:00', endLocal: '',
+  titleEn: '', titleFr: '', descriptionEn: '', descriptionFr: '', changeNoteEn: '', changeNoteFr: '', category: 'social', zoneId: '', hostLabel: '', capacity: '', kind: 'weekly', weekday: '1', date: '', startLocal: '19:00', endLocal: '',
 };
 function activityBody(v: Values) {
   const s = (k: string) => (typeof v[k] === 'string' ? (v[k] as string) : '');
   const end = s('endLocal') === '' ? null : s('endLocal');
   return {
-    titleEn: s('titleEn'), titleFr: s('titleFr'), descriptionEn: s('descriptionEn'), descriptionFr: s('descriptionFr'), category: s('category'),
+    titleEn: s('titleEn'), titleFr: s('titleFr'), descriptionEn: s('descriptionEn'), descriptionFr: s('descriptionFr'), changeNoteEn: s('changeNoteEn'), changeNoteFr: s('changeNoteFr'), category: s('category'),
     zoneId: s('zoneId') === '' ? null : s('zoneId'), hostLabel: s('hostLabel'), capacity: s('capacity') === '' ? null : Number(s('capacity')),
     schedule: s('kind') === 'weekly' ? { kind: 'weekly', weekday: Number(s('weekday')), startLocal: s('startLocal'), endLocal: end } : { kind: 'one_off', date: s('date'), startLocal: s('startLocal'), endLocal: end },
   };
@@ -92,6 +92,8 @@ function activitySpecs(t: StaffT, lang: string, zones: StaffZone[]): FieldSpec[]
     { key: 'titleFr', label: 'f.titleFr', kind: 'text', max: LIMITS.title, help: 'f.frHelp' },
     { key: 'descriptionEn', label: 'f.descEn', kind: 'area', max: LIMITS.description },
     { key: 'descriptionFr', label: 'f.descFr', kind: 'area', max: LIMITS.description },
+    { key: 'changeNoteEn', label: 'f.changeNoteEn', kind: 'text', max: LIMITS.changeNote, help: 'f.changeNoteHelp' },
+    { key: 'changeNoteFr', label: 'f.changeNoteFr', kind: 'text', max: LIMITS.changeNote },
     { key: 'category', label: 'f.category', kind: 'select', options: ACTIVITY_CATEGORIES.map((c) => ({ value: c, label: t(`cat.${c}`) })) },
     { key: 'zoneId', label: 'f.zone', kind: 'select', options: [{ value: '', label: t('f.noZone') }, ...zones.map((z) => ({ value: z.id, label: pick(z.label, lang as 'en' | 'fr') }))] },
     { key: 'hostLabel', label: 'f.host', kind: 'text', max: LIMITS.label },
@@ -162,6 +164,7 @@ export function Board({ api, ctx }: Props) {
                     {a.offeredAt.length > 1 ? <span class="chip">{t('chip.shared', { n: String(a.offeredAt.length) })} </span> : null}
                     {!a.isOwner ? <span class="chip">{t('chip.ownedElsewhere')}</span> : null}
                   </p>
+                  {a.changeNote.en || a.changeNote.fr ? <p class="card-meta">{t('board.changeNote', { note: pick(a.changeNote, lang as 'en' | 'fr') })}</p> : null}
                   <CheckedLine on={a.verifiedOn} by={a.verifiedBy} overdue={a.check === 'overdue'} placeholder={a.isPlaceholder} tz={a.timezone} />
                   <p class="actions">
                     <button type="button" class="btn" onClick={open({ kind: 'edit', activity: a })}>
@@ -638,7 +641,7 @@ export function Translations({ api, ctx }: Props) {
   if (acts.state.status !== 'ready' || places.state.status !== 'ready' || offers.state.status !== 'ready') return <output class="muted">{t('staff.loading')}</output>;
   const missing: { key: string; name: string; where: 'board' | 'places' | 'offers'; what: string[] }[] = [];
   for (const a of acts.state.data) {
-    const what = [a.title.fr === '' && t('f.titleFr'), a.description.en !== '' && a.description.fr === '' && t('f.descFr')].filter((x): x is string => typeof x === 'string');
+    const what = [a.title.fr === '' && t('f.titleFr'), a.description.en !== '' && a.description.fr === '' && t('f.descFr'), a.changeNote.en !== '' && a.changeNote.fr === '' && t('f.changeNoteFr')].filter((x): x is string => typeof x === 'string');
     if (what.length) missing.push({ key: a.id, name: a.title.en, where: 'board', what });
   }
   for (const p of places.state.data) {

@@ -37,7 +37,7 @@ test.beforeAll(async ({ browser }) => {
     INSERT INTO entry_codes (id, property_id, label, token_hash, created_at) SELECT 'a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1', id, 'desk', '', ${now} FROM properties WHERE slug = 'demo-whistler';
     INSERT INTO offers (id, property_id, partner_name, terms_en, terms_fr, valid_from, valid_to, requires_membership, how_we_know_en, how_we_know_fr, verified_on, verified_by, is_placeholder, created_at)
       SELECT 'b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2', id, 'E2E Rafting', '10% off a trip', '10 % de rabais sur une sortie', NULL, NULL, 1, 'We phoned them', '', ${now} - ${DAY}, 'Staff', 0, ${now} FROM properties WHERE slug = 'demo-whistler';
-    UPDATE activities SET verified_on = ${now} - ${DAY} WHERE property_id = ${whistler} AND title_en = 'Trivia Night';
+    UPDATE activities SET verified_on = ${now} - ${DAY}, change_note_en = 'Moved to 8 pm', change_note_fr = 'Déplacé à 20 h' WHERE property_id = ${whistler} AND title_en = 'Trivia Night';
     UPDATE places SET verified_on = ${now} - 100 * ${DAY} WHERE property_id = ${whistler} AND name = 'Brandywine Falls';
     UPDATE places SET verified_on = ${now} - ${DAY}, maps_address = '1 Main St, Whistler' WHERE property_id = ${whistler} AND name = 'Purebread';
   `);
@@ -47,7 +47,7 @@ test.beforeAll(async ({ browser }) => {
 test.afterAll(async () => {
   await page.context().close();
   // Leave the local database as the seed made it for the specs that run after this one.
-  sql("DELETE FROM offers WHERE id = 'b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2'; DELETE FROM entry_codes WHERE id = 'a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1'; DELETE FROM event_counts WHERE event LIKE 'qr:%';");
+  sql("UPDATE activities SET change_note_en = '', change_note_fr = ''; DELETE FROM offers WHERE id = 'b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2'; DELETE FROM entry_codes WHERE id = 'a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1'; DELETE FROM event_counts WHERE event LIKE 'qr:%';");
 });
 
 test('first visit: the hostel choice, then What\'s On; no cookie and nothing stored on the device', async () => {
@@ -68,6 +68,9 @@ test('What\'s On: category filter, search with no match (empty state), and "I\'m
   await pickDay('Fri');
   await expect(page.getByRole('heading', { name: 'Trivia Night' })).toBeVisible();
   await expect(page.locator('.stamp').first()).toContainText('Checked by staff on');
+  await expect(page.locator('.change-note')).toHaveText('Changed Moved to 8 pm'); // what staff say has changed (O-24)
+  await axe('What\'s On with a change note');
+  await shot('02b-change-note');
   await page.getByRole('button', { name: 'Adventure', exact: true }).click();
   await expect(page.getByText('Nothing matches your search.')).toBeVisible(); // Friday has only a social activity
   await axe('empty search state');
@@ -210,6 +213,9 @@ test('language switch: French follows through the screens, axe-clean', async () 
   });
   expect(cutWords).toEqual([]);
   await shot('06-whats-on-french');
+  await page.getByRole('list', { name: 'Choisir un jour' }).getByRole('button', { name: /^ven/ }).click();
+  await expect(page.locator('.change-note')).toHaveText('Modifié Déplacé à 20 h');
+  await axe('Au programme with a change note (French)');
   await page.goto(`${WHISTLER}/explore`);
   await expect(page.getByRole('heading', { level: 1, name: 'Explorer' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Offres' })).toBeVisible();

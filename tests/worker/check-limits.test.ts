@@ -33,7 +33,7 @@ describe('the check limits', () => {
 
   it('board: 89 days is current, 91 is overdue, for staff; guests receive the stamp to apply the same rule', async () => {
     const make = async (title: string) =>
-      json<StaffActivity>(await staff('/activities', { titleEn: title, titleFr: '', descriptionEn: '', descriptionFr: '', category: 'social', zoneId: null, hostLabel: '', capacity: null, schedule: { kind: 'weekly', weekday: 2, startLocal: '19:00', endLocal: null } }));
+      json<StaffActivity>(await staff('/activities', { titleEn: title, titleFr: '', descriptionEn: '', descriptionFr: '', changeNoteEn: '', changeNoteFr: '', category: 'social', zoneId: null, hostLabel: '', capacity: null, schedule: { kind: 'weekly', weekday: 2, startLocal: '19:00', endLocal: null } }));
     const fresh = await make('Fresh board item');
     const old = await make('Old board item');
     await stamp('activities', fresh.id, CHECK_LIMIT_DAYS.board - 1);

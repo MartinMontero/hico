@@ -20,7 +20,7 @@ const nowSec = () => Math.floor(nowMs() / 1000);
 const todayWeekday = () => weekdayOf(ymdInZone(new Date(nowMs()), TZ));
 
 const activity = (over: Partial<PublicActivity>): PublicActivity => ({
-  id: 'a'.repeat(32), title: { en: 'Trivia Night', fr: 'Soirée-questionnaire' }, description: { en: 'Bring a friend', fr: 'Amenez un ami' }, category: 'social', zone: null, hostLabel: 'Staff',
+  id: 'a'.repeat(32), title: { en: 'Trivia Night', fr: 'Soirée-questionnaire' }, description: { en: 'Bring a friend', fr: 'Amenez un ami' }, changeNote: { en: '', fr: '' }, category: 'social', zone: null, hostLabel: 'Staff',
   timezone: TZ, weekday: todayWeekday(), startLocal: '19:00', endLocal: null, startsAt: null, endsAt: null, capacity: null, status: 'active', cancelledDates: [],
   verifiedOn: nowSec() - DAY_SECONDS, isPlaceholder: false, ...over,
 });
@@ -140,6 +140,26 @@ describe("What's On", () => {
     const stamps = [...container.querySelectorAll('.stamp')].map((s) => s.textContent ?? '');
     expect(stamps.filter((s) => s.includes('Check at the desk'))).toHaveLength(1);
     expect(stamps.filter((s) => s.startsWith('Checked by staff on'))).toHaveLength(1);
+  });
+
+  it('shows what staff say has changed, in the guest\'s language, and finds it by search', async () => {
+    stubNetwork({ activities: [activity({ changeNote: { en: 'Moved to 8 pm', fr: 'Déplacé à 20 h' } }), activity({ id: 'd'.repeat(32), title: { en: 'Yoga', fr: 'Yoga' }, startLocal: '08:00' })] });
+    await show(<WhatsOn property={property} />);
+    const cards = [...container.querySelectorAll('li.card')];
+    expect(cards).toHaveLength(2);
+    expect(cards.filter((c) => c.querySelector('.change-note'))).toHaveLength(1); // only the one with a note
+    expect(container.querySelector('.change-note')?.textContent).toBe('Changed Moved to 8 pm');
+    await type("Search what's on", 'moved');
+    expect(titles()).toEqual(['Trivia Night']);
+  });
+
+  it('shows the change note in French, and says so when only English exists', async () => {
+    window.localStorage.setItem('hc_lang', 'fr');
+    stubNetwork({ activities: [activity({ changeNote: { en: 'Moved to 8 pm', fr: 'Déplacé à 20 h' } }), activity({ id: 'e'.repeat(32), title: { en: 'Yoga', fr: 'Yoga' }, changeNote: { en: 'Indoors today', fr: '' } })] });
+    await show(<WhatsOn property={property} />);
+    const notes = [...container.querySelectorAll('.change-note')].map((n) => n.textContent);
+    expect(notes).toContain('Modifié Déplacé à 20 h');
+    expect(notes).toContain('Modifié Indoors today (anglais seulement)');
   });
 
   it('a cancelled date is shown as cancelled', async () => {

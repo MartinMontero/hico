@@ -67,7 +67,7 @@ describe('daylight saving, spring (8 March 2026: clocks go forward at 02:00 PST)
 
 function activity(over: Partial<PublicActivity>): PublicActivity {
   return {
-    id: 'x'.repeat(32), title: { en: 'T', fr: 'T' }, description: { en: '', fr: '' }, category: 'social', zone: null,
+    id: 'x'.repeat(32), title: { en: 'T', fr: 'T' }, description: { en: '', fr: '' }, changeNote: { en: '', fr: '' }, category: 'social', zone: null,
     hostLabel: '', timezone: VAN, weekday: null, startLocal: null, endLocal: null, startsAt: null, endsAt: null,
     capacity: null, status: 'active', cancelledDates: [], verifiedOn: null, isPlaceholder: false, ...over,
   };

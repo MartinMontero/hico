@@ -39,14 +39,14 @@ describe('lookup rule (05 §13)', () => {
 
   it('falls back to English with a visible marker, never blank, never a raw key', () => {
     const text = translate('fr', 'nav.explore', undefined, { en: partial.en, fr: {} });
-    expect(text).toBe('Explore (English only)');
+    expect(text).toBe('Explore (anglais seulement)'); // the marker is in the language of the person reading
     expect(text).not.toBe('');
     expect(text).not.toBe('nav.explore');
   });
 
   it('an empty French string counts as missing', () => {
     const text = translate('fr', 'nav.explore', undefined, { en: partial.en, fr: { 'nav.explore': '' } });
-    expect(text).toContain('English only');
+    expect(text).toContain('anglais seulement');
   });
 
   it('fills placeholders and drops unknown ones to empty', () => {
@@ -56,7 +56,7 @@ describe('lookup rule (05 §13)', () => {
 
   it('bilingual content fields follow the same rule', () => {
     expect(pick({ en: 'Hello', fr: 'Bonjour' }, 'fr')).toBe('Bonjour');
-    expect(pick({ en: 'Hello', fr: '' }, 'fr')).toBe('Hello (English only)');
+    expect(pick({ en: 'Hello', fr: '' }, 'fr')).toBe('Hello (anglais seulement)');
     expect(pick({ en: 'Hello', fr: '' }, 'en')).toBe('Hello');
     expect(pick({ en: '', fr: '' }, 'fr')).toBe('');
   });
@@ -79,7 +79,7 @@ describe('staff console catalogs (kept apart so guests never download them)', ()
   });
   it('follows the same lookup rule: French, else English with the visible marker', () => {
     const tr = makeTranslator<'a'>({ a: 'Hello {name}' }, { a: '' });
-    expect(tr('fr', 'a', { name: 'Eli' })).toBe('Hello Eli (English only)');
+    expect(tr('fr', 'a', { name: 'Eli' })).toBe('Hello Eli (anglais seulement)');
     expect(tr('en', 'a', { name: 'Eli' })).toBe('Hello Eli');
     const tr2 = makeTranslator<'a'>({ a: 'Hello' }, { a: 'Bonjour' });
     expect(tr2('fr', 'a')).toBe('Bonjour');

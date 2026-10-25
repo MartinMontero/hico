@@ -123,7 +123,7 @@ export function WhatsOn({ property }: { property: PublicProperty }) {
             .filter(({ activity }) => cat === 'all' || activity.category === cat)
             .filter(({ activity }) => !onlyPlan || plan.has(activity.id))
             .filter(({ activity }) =>
-              matches(query, [pick(activity.title, lang), pick(activity.description, lang), activity.zone ? pick(activity.zone, lang) : '', activity.hostLabel]),
+              matches(query, [pick(activity.title, lang), pick(activity.description, lang), pick(activity.changeNote, lang), activity.zone ? pick(activity.zone, lang) : '', activity.hostLabel]),
             );
           if (items.length === 0) {
             const text = onlyPlan ? t('whatson.planEmpty') : day.length > 0 ? t('search.empty') : today ? t('whatson.empty') : t('whatson.emptyDay');
@@ -140,6 +140,11 @@ export function WhatsOn({ property }: { property: PublicProperty }) {
                       <time>{formatLocalTime(start, lang)}</time>
                       {cancelled ? <span class="badge badge-warn">{t('whatson.cancelled')}</span> : null}
                     </p>
+                    {activity.changeNote.en || activity.changeNote.fr ? (
+                      <p class="change-note">
+                        <span class="badge badge-warn">{t('whatson.changed')}</span> {pick(activity.changeNote, lang)}
+                      </p>
+                    ) : null}
                     {activity.description.en || activity.description.fr ? <p>{pick(activity.description, lang)}</p> : null}
                     {activity.zone ? <p class="muted">{t('whatson.meets', { place: pick(activity.zone, lang) })}</p> : null}
                     {activity.hostLabel ? <p class="muted">{t('whatson.host', { name: activity.hostLabel })}</p> : null}

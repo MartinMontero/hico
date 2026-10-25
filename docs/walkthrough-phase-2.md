@@ -14,6 +14,7 @@ home screen, scanning a real printed QR code, a slow real network. Those are `[U
    Outdoor), a search box, a "Show only my plan" toggle, then the day's cards. Each card has the title, the time, the
    description, where it meets, the host, the stamp ("Not checked yet. Ask at the desk." for seeded rows) and an "I'm In"
    button. Nothing says how many people are going (D-18).
+2b. **A change note** (`02b`). When staff set one, the card shows an orange "Changed" label and the note beside it ("Moved to 8 pm"), above the description; in French the label is "Modifié" and the note is the French one (or the English one marked "anglais seulement" if there is no French).
 3. **My plan** (`03`). After "I'm In" on Friday's Trivia Night and "Show only my plan": the toggle turns green and only that
    card shows. The plan is in the browser's storage on that device and in no request.
 4. **Explore** (`04`). Category buttons, a search box, a "Places" heading with cards (name, a gold "Staff pick" label, the

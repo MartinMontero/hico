@@ -25,6 +25,7 @@ export const fr: Record<MessageKey, string> = {
   'whatson.empty': "Rien au programme aujourd'hui. Revenez demain.",
   'whatson.emptyDay': 'Rien au programme ce jour-là. Essayez un autre jour.',
   'whatson.cancelled': 'Annulé',
+  'whatson.changed': 'Modifié',
   'whatson.meets': 'Rendez-vous : {place}',
   'whatson.host': 'Animé par {name}',
   'explore.title': 'Explorer',

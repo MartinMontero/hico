@@ -86,12 +86,17 @@ test('board: add an activity, see the check line, and every control has a name',
   await shot('03-activity-form');
   await dialog.getByLabel('Title (English)').fill('E2E Trivia');
   await dialog.getByLabel('Description (English)').fill('Bring a friend');
+  await dialog.getByLabel('Change note (English)').fill('Moved to 8 pm');
+  await dialog.getByLabel('Change note (French)').fill('Déplacé à 20 h');
+  await expect(dialog.getByText('Leave both empty when nothing has changed.')).toBeVisible();
+  await expect(dialog.getByLabel('Change note (English)')).toHaveAttribute('maxlength', '120');
   await dialog.getByRole('button', { name: 'Save' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Saved.' })).toBeVisible();
   await expect(dialog).toBeHidden();
   const card = page.getByRole('listitem').filter({ has: page.getByRole('heading', { name: 'E2E Trivia' }) });
   await expect(card).toContainText('Every Monday, 19:00');
   await expect(card).toContainText('by Fawzie Both');
+  await expect(card).toContainText('Change note: Moved to 8 pm');
   await noSideScroll();
 });
 
@@ -104,7 +109,7 @@ test('two people editing: the second save gets the conflict screen, and keeps it
   const theirs = list.find((a) => a.title.en === 'E2E Trivia');
   expect(theirs).toBeTruthy();
   const res = await send(`/activities/${theirs?.id}`, {
-    titleEn: 'E2E Trivia, their version', titleFr: '', descriptionEn: 'Bring a friend', descriptionFr: '', category: 'social', zoneId: null, hostLabel: '', capacity: null,
+    titleEn: 'E2E Trivia, their version', titleFr: '', descriptionEn: 'Bring a friend', descriptionFr: '', changeNoteEn: '', changeNoteFr: '', category: 'social', zoneId: null, hostLabel: '', capacity: null,
     schedule: { kind: 'weekly', weekday: 1, startLocal: '19:00', endLocal: null }, version: theirs?.version,
   });
   expect(res.status()).toBe(200);
