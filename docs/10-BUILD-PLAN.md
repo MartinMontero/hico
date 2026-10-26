@@ -42,7 +42,7 @@ phase. Every prompt below is whole and ready to paste. Labels as in `00-README.m
 Vancouver hostels. Phase 0 is done and Phase 0.2 is waived. Phase 3b onward is not part
 of the demo. Every phase waits for your GO. O-12 (source control and CI) blocks nothing:
 the remote is a public GitHub repository (D-32), and CI that runs `npm run validate` is
-not set up yet.
+on (D-42). Building happens in Claude Code cloud sessions (D-41).
 
 ## What only HI Canada can supply
 

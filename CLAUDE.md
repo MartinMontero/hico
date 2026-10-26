@@ -17,6 +17,11 @@ to `docs\plans\<date>-<slug>.md` and wait for my GO before implementing. Announc
 any destructive or irreversible action in advance and wait for approval: deploys,
 schema changes on a live database, secret rotation, deleting files.
 
+Building is done in Claude Code cloud sessions from the GitHub repository (D-41). My
+machine is for review, merging, deploys, and anything that needs my logins or secrets.
+A cloud session's work is done when `npm run validate` passes in the session and the
+CI run on its branch is green (D-42); it reports both.
+
 When I call a decision, including "accept O-01 as recommended", append a row to the
 Decided table in docs\03-DECISIONS.md with the next D number and the date, and mark
 the open item "Resolved by D-nn". A decision that is not in that file has not been
@@ -33,17 +38,19 @@ steps.
 
 In a cloud session (Linux, D-40) use bash and forward-slash paths; the PowerShell rules
 above are for my machine. Every other rule applies unchanged: never deploy, create
-remote resources, push, or store a secret without my GO. A cloud session sees only what
-is on GitHub: `docs\external\` and anything else untracked on my machine is not there.
-Setup is `npm ci` and `npx playwright install --with-deps chromium`
-(`docs\14-CLOUD-BUILD.md`).
+remote resources, push to `main`, or store a secret without my GO. A cloud session may
+push its work to a branch named `cloud/<task>` (D-41), never to `main`; I review and
+merge. A cloud session sees only what is on GitHub: `docs\external\` and anything else
+untracked on my machine is not there. Setup is `npm ci` and
+`npx playwright install --with-deps chromium` (`docs\14-CLOUD-BUILD.md`).
 
 ## Files
 
 - Copy, never move. Never edit `reference\hi-co-prototype.jsx`.
 - The original prototype and the shared gate live in `C:\Users\User\dev\Serendipty`.
   Read them if needed. Do not modify that repository.
-- Git has one remote, `origin` (github.com/MartinMontero/hico), which is public (D-32). No push unless I say so.
+- Git has one remote, `origin` (github.com/MartinMontero/hico), which is public (D-32). No push unless I say so,
+  except a cloud session's own `cloud/<task>` branch (D-41).
 - Secrets never go in tracked files. `.dev.vars` is gitignored.
 
 ## Deploying

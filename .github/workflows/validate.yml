@@ -1,0 +1,35 @@
+# CI (D-42): the same `npm run validate` that runs on Martin's machine, on a clean Linux machine, for every push to any
+# branch (cloud sessions push to cloud/<task>, D-41). It needs no secret, writes nothing to GitHub, deploys nothing and touches
+# no Cloudflare account. Turned on 2026-10-26; it had never run on GitHub before that, so a failure on its first run may be the
+# workflow's own fault and not the code's `[U]`. The text it started from is docs/ci/github-actions-validate.yml.example.
+name: validate
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer push to the same branch replaces a run that is still going.
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CI: 'true'
+      WRANGLER_SEND_METRICS: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # The browser tests and Lighthouse use Playwright's Chromium.
+      - run: npx playwright install --with-deps chromium
+      - run: npm run validate

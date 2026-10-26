@@ -1,9 +1,5 @@
-# NOT ACTIVE. This file is an example and lives outside .github/workflows on purpose: GitHub runs a workflow the moment
-# one is pushed there, and CI is still open (03 O-12, D-32). To turn it on, Martin says so, and the file is copied to
-# .github/workflows/validate.yml in a commit of its own. It has not been run `[U]`: nobody has tried it on GitHub.
-#
-# What it does: the same `npm run validate` that runs on Martin's machine, on a clean Linux machine from a fresh checkout.
-# It needs no secret, writes nothing to GitHub, deploys nothing, and touches no Cloudflare account.
+# SUPERSEDED. CI was turned on on 2026-10-26 (D-42) as .github/workflows/validate.yml, which is now the real file. This copy is
+# kept only as the text that was proposed first; do not edit it.
 name: validate
 
 on:
