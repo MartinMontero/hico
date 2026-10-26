@@ -1,7 +1,7 @@
 # CLOUD BUILD — HI CO
 
 What it takes to build and test this repository somewhere other than Martin's Windows machine, what was checked, and what was
-not. Written 2026-10-25 by Claude Code, updated 2026-10-26. Labels as in `00-README.md`. **Nothing here had been run on Linux when this was written; the first cloud session and the first CI run are how that gets found out `[U]`.**
+not. Written 2026-10-25 by Claude Code, updated 2026-10-26. Labels as in `00-README.md`. **The first run on Linux happened on 2026-10-26 (CI, below); no cloud session has run yet `[U]`.**
 
 "Cloud build" can mean three different things. This file prepares the first two and only names the third.
 
@@ -38,11 +38,23 @@ database command is `--local`.
 - **Node.** Scripts are run as `node file.ts`, which needs Node's built-in TypeScript support; Lighthouse 13.5.0 needs 22.19 or
   later. Only 24.16.0 has been used, so the repository claims 24.
 
+## The first run on Linux (2026-10-26, `[V]`)
+
+GitHub Actions ran `npm run validate` on `ubuntu-latest` (Node 24.21.0, Playwright's Chromium) from a fresh checkout of commit
+`c71be4e` (run 40248020029, about 4 minutes). **Nine of the ten steps passed first time**, including all 43 browser tests with axe
+at 360 px, the service worker and offline tests, and Lighthouse (What's On LCP 2031 ms, Explore 2168 ms, TBT 0, CLS 0 and 0.035,
+the same as on Windows). The tenth, unit and isolation tests, failed on two tests with one cause: `scripts\operator-common.ps1`
+built the path to `operator.ts` with a literal backslash, which is not a path on Linux. (The runner has PowerShell, so the
+wrapper tests ran there; on a machine without `pwsh` they skip themselves.) Fixed with `Join-Path`. The other 558 unit tests
+passed on Linux.
+
+GitHub also warned that the `actions/checkout@v4` and `actions/setup-node@v4` actions run on Node 20, which is being retired; they
+were forced onto Node 24 and worked. A newer major version of each is probably out; not checked.
 ## What was not checked, and why
 
-- **A real Linux run.** This machine has WSL (an Ubuntu that is stopped) and Docker Desktop (its engine is not running), and
-  using either would mean installing Node, the Playwright browser or a container image: downloads Claude Code does not make
-  without being told to. The first run on Linux is the real test; it may find problems this list does not.
+- **A run in a Claude Code cloud session.** CI is a clean Linux machine, but a cloud session is a different environment (its own
+  Node, its own network rules, the environment called `Default`, whose contents Claude Code cannot see). The first session is the
+  test of that.
 - **Playwright's Chromium on Linux** (system libraries; `--with-deps` installs them and needs permission to).
 - **The Cloudflare local runtime on Linux** (`workerd` is published for Linux x64 and the tests use it; not run here).
 - **Timing.** Lighthouse numbers on a shared cloud machine will differ from Martin's; they are printed, not enforced.

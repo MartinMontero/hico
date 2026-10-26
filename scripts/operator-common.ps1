@@ -9,7 +9,8 @@ function Invoke-Operator {
         [string]$StateDir
     )
     $repo = Split-Path -Parent $PSScriptRoot
-    $all = @('scripts\operator.ts', $Command) + $Arguments
+    # Join-Path uses the separator of the machine it runs on: a literal backslash is not a path on Linux (found by CI).
+    $all = @((Join-Path 'scripts' 'operator.ts'), $Command) + $Arguments
     if ($StateDir) { $all += @('--state-dir', $StateDir) }
     if ($Remote) { $all += '--remote' }
     Push-Location $repo
