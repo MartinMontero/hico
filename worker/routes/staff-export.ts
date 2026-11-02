@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import * as v from 'valibot';
 import { epochToLocal } from '../../shared/time.ts';
+import { buildContentHealth } from '../../shared/content-health.ts';
 import { LIMITS } from '../../shared/limits.ts';
 import { projectAuditEntry, projectStaffActivity, projectStaffCode, projectStaffOffer, projectStaffPlace, projectStaffZone } from '../projections-staff.ts';
 import type { AppEnv } from '../middleware/tenant.ts';
@@ -31,6 +32,23 @@ export function createStaffExportRoutes(now: () => number): Hono<AppEnv> {
     const day = query.day;
     if (day && !/^\d{4}-\d{2}-\d{2}$/.test(day)) return c.json({ error: 'bad_request' }, 400);
     return c.json(await events.listFor(c.get('tenant'), day));
+  });
+
+  // Actionable content health, built from the same tenant-scoped repository reads as the staff editors.
+  r.get('/content-health', requireAdmin, async (c) => {
+    const t = c.get('tenant');
+    const [activityRows, placeRows, offerRows, zoneRows] = await Promise.all([
+      activities.listForStaff(t), places.listForStaff(t), offers.listForStaff(t), zones.list(t),
+    ]);
+    const stamped = (row: { id: string; verified_on: number | null; is_placeholder: number }, title: string) => ({
+      id: row.id, title, verifiedOn: row.verified_on, isPlaceholder: row.is_placeholder,
+    });
+    return c.json(buildContentHealth({
+      activities: activityRows.map(({ row }) => stamped(row, row.title_en)),
+      places: placeRows.map((row) => stamped(row, row.name)),
+      offers: offerRows.map((row) => stamped(row, row.partner_name)),
+      zones: zoneRows.length,
+    }, now()));
   });
 
   // One file of the property's own content, for its own records. No staff list, no emails, no other property's rows.

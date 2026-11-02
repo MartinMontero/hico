@@ -1,6 +1,8 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import * as v from 'valibot';
 import { LIMITS } from '../shared/limits.ts';
 import { displayNameSchema, emailSchema } from '../shared/staff-schemas.ts';
@@ -46,19 +48,24 @@ export interface D1Target {
 /** Runs SQL on the local D1 (wrangler d1 execute --local, which contacts nothing) and returns the result rows. */
 export function runSql(sql: string, target: D1Target): Record<string, unknown>[] {
   if (target.remote) throw new Error('Remote execution is refused here: use the -Remote path in operator.ts, which asks first.');
-  mkdirSync('.wrangler', { recursive: true });
-  const file = '.wrangler/operator.sql';
-  writeFileSync(file, sql);
-  const persist = target.stateDir ? ['--persist-to', target.stateDir] : [];
-  const r = spawnSync('npx', ['wrangler', 'd1', 'execute', 'DB', '--local', ...persist, '--file', file, '--json'], {
-    encoding: 'utf8',
-    shell: true,
-    env: { ...process.env, WRANGLER_SEND_METRICS: 'false', FORCE_COLOR: '0' },
-  });
-  if (r.status !== 0) throw new Error(`wrangler failed:\n${r.stdout}${r.stderr}`);
-  const start = r.stdout.indexOf('[');
-  const parsed = JSON.parse(r.stdout.slice(start)) as { results?: Record<string, unknown>[] }[];
-  return parsed.flatMap((p) => p.results ?? []);
+  // A unique file avoids collisions between operator invocations; it is removed even when Wrangler fails.
+  const dir = mkdtempSync(join(tmpdir(), 'hico-operator-sql-'));
+  const file = join(dir, 'operator.sql');
+  try {
+    writeFileSync(file, sql);
+    const persist = target.stateDir ? ['--persist-to', target.stateDir] : [];
+    const r = spawnSync('npx', ['wrangler', 'd1', 'execute', 'DB', '--local', ...persist, '--file', file, '--json'], {
+      encoding: 'utf8',
+      shell: true,
+      env: { ...process.env, WRANGLER_SEND_METRICS: 'false', FORCE_COLOR: '0' },
+    });
+    if (r.status !== 0) throw new Error(`wrangler failed:\n${r.stdout}${r.stderr}`);
+    const start = r.stdout.indexOf('[');
+    const parsed = JSON.parse(r.stdout.slice(start)) as { results?: Record<string, unknown>[] }[];
+    return parsed.flatMap((p) => p.results ?? []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 }
 
 export const timezoneOf = (value: unknown): string => {
@@ -109,7 +116,7 @@ export function createPropertySql(o: { slug: string; nameEn: string; nameFr: str
 }
 
 export function addHostnameSql(o: { slug: string; host: string; isDefault: boolean; now: number }): string {
-  const insert = `INSERT INTO property_hosts (id, host, property_id, is_default)
+  const insert = `INSERT INTO property_hosts (id, host, is_default)
     SELECT ${sqlText(randomId())}, ${sqlText(o.host)}, id, ${o.isDefault ? 1 : 0} FROM properties WHERE slug = ${sqlText(o.slug)};`;
   return `${insert}\n${auditSql(propertyIdSql(o.slug), 'operator.host.added', 'property', 'NULL', o.now)}\n`;
 }
