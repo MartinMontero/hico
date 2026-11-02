@@ -6,7 +6,7 @@ import { ROUTES } from '../support/staff-routes.ts';
 // route test asserts it (through the `audited` helper or an explicit count).
 describe('audit coverage of the staff routes', () => {
   const tests = readdirSync('tests/worker').filter((f) => /^staff-.*\.test\.ts$/.test(f) && f !== 'staff-matrix.test.ts').map((f) => readFileSync(`tests/worker/${f}`, 'utf8')).join('\n');
-  const routes = ['staff-content.ts', 'staff-people.ts', 'staff-export.ts'].map((f) => readFileSync(`worker/routes/${f}`, 'utf8')).join('\n');
+  const routes = ['staff-content.ts', 'staff-people.ts', 'staff-export.ts', 'staff-import.ts'].map((f) => readFileSync(`worker/routes/${f}`, 'utf8')).join('\n') + readFileSync('worker/repositories/imports.ts', 'utf8');
   // Documented exempt list: mutations that write no audit row. None among the property-scoped routes.
   const exempt = new Set<string>();
 
