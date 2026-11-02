@@ -7,6 +7,7 @@ import { Link } from '../router.tsx';
 import type { Me } from './api.ts';
 import { Audit, Codes, Counts, Export, Import, People, Switches, Zones } from './Admin.tsx';
 import { Board, Gate, Offers, Places, PropertyHome, Translations } from './Content.tsx';
+import { ContentHealth } from './ContentHealth.tsx';
 import { useApi, useResource, type PropertyContext } from './data.ts';
 import { useStaffT } from './t.ts';
 import { Heading } from './ui.tsx';
@@ -31,6 +32,7 @@ const SECTIONS: Section[] = [
   { path: 'people', nav: 'nav.people', title: 'nav.people', adminOnly: true },
   { path: 'audit', nav: 'nav.audit', title: 'nav.audit', adminOnly: true },
   { path: 'counts', nav: 'nav.counts', title: 'nav.counts', adminOnly: true },
+  { path: 'content-health', nav: 'nav.health', title: 'nav.health', adminOnly: true },
   { path: 'import', nav: 'nav.import', title: 'nav.import', adminOnly: true },
   { path: 'export', nav: 'nav.export', title: 'nav.export', adminOnly: true },
 ];
@@ -150,6 +152,8 @@ export function PropertyConsole({ path, me, onSignedOut }: { path: string; me: M
               return <Audit {...props} />;
             case 'counts':
               return <Counts {...props} />;
+            case 'content-health':
+              return <ContentHealth {...props} />;
             case 'import':
               return <Import {...props} />;
             case 'export':
