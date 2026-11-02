@@ -36,5 +36,5 @@ describe('isolation coverage', () => {
 
   it('append-only and increment-only tables export no update or delete function', () => {
     expect(Object.keys(repositories.audit).sort()).toEqual(['append', 'appendForPerson', 'list']);
-    expect(Object.keys(repositories.events).sort()).toEqual(['countFor', 'increment']);
+    expect(Object.keys(repositories.events).sort()).toEqual(['countFor', 'increment', 'listFor']);
   });});

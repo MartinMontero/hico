@@ -31,7 +31,7 @@ export const ROUTES: Row[] = [
   { method: 'POST', path: '/offers/:id/reverify', admin: false, audit: 'staff.offer.reverified' },
   { method: 'POST', path: '/offers/:id/delete', admin: true, audit: 'staff.offer.deleted' },
   { method: 'GET', path: '/codes', admin: false, audit: null },
-  { method: 'POST', path: '/codes', admin: true, audit: 'staff.code.created' },
+  { method: 'POST', path: '/codes', admin: false, audit: 'staff.code.created' },
   { method: 'POST', path: '/codes/:id/retire', admin: true, audit: 'staff.code.retired' },
   { method: 'GET', path: '/features', admin: false, audit: null },
   { method: 'POST', path: '/features/:name', admin: true, audit: 'staff.feature.enabled' },
@@ -43,6 +43,7 @@ export const ROUTES: Row[] = [
   { method: 'POST', path: '/people/:id/revoke-sessions', admin: true, audit: 'staff.sessions.revoked' },
   { method: 'GET', path: '/audit', admin: true, audit: null },
   { method: 'GET', path: '/counts', admin: true, audit: null },
+  { method: 'GET', path: '/content-health', admin: true, audit: null },
   { method: 'POST', path: '/export', admin: true, audit: 'staff.export' },
   { method: 'POST', path: '/import', admin: true, audit: 'staff.import.applied' },
 ];
