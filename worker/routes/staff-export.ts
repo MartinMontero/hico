@@ -4,7 +4,7 @@ import { epochToLocal } from '../../shared/time.ts';
 import { LIMITS } from '../../shared/limits.ts';
 import { projectAuditEntry, projectStaffActivity, projectStaffCode, projectStaffOffer, projectStaffPlace, projectStaffZone } from '../projections-staff.ts';
 import type { AppEnv } from '../middleware/tenant.ts';
-import { activities, audit, codes, offers, places, properties, zones } from '../repositories/index.ts';
+import { activities, audit, codes, events, offers, places, properties, zones } from '../repositories/index.ts';
 import { requireAdmin } from './staff-people.ts';
 
 const auditQuery = v.object({
@@ -22,6 +22,15 @@ export function createStaffExportRoutes(now: () => number): Hono<AppEnv> {
     if (!q.success) return c.json({ error: 'bad_request' }, 400);
     const rows = await audit.list(c.get('tenant'), { limit: Number(q.output.limit ?? 50), before: q.output.before ? Number(q.output.before) : undefined, action: q.output.action });
     return c.json(rows.map(projectAuditEntry));
+  });
+
+  // Aggregate counts only: no guest identifier, device detail or request metadata is returned.
+  r.get('/counts', requireAdmin, async (c) => {
+    const query = c.req.query();
+    if (Object.keys(query).some((key) => key !== 'day')) return c.json({ error: 'bad_request' }, 400);
+    const day = query.day;
+    if (day && !/^\d{4}-\d{2}-\d{2}$/.test(day)) return c.json({ error: 'bad_request' }, 400);
+    return c.json(await events.listFor(c.get('tenant'), day));
   });
 
   // One file of the property's own content, for its own records. No staff list, no emails, no other property's rows.
