@@ -18,7 +18,7 @@
 
 ## Local raw validation
 
-`[V]` On 2026-11-02 the complete validation script ran with Node 24.22.2 in a clean Linux directory and exited 0. The exact invocation was `npx -y -p node@24 node scripts/validate.ts`; this runs the same steps as `npm run validate` while selecting the required Node version. Raw output, including all produced values, is in `docs\spikes\kimi-mvp-preview-validate.txt`.
+`[V]` On 2026-11-02 the complete validation script ran with Node 24.22.2 in a clean Linux directory and exited 0. The exact invocation was `npx -y -p node@24 node scripts/validate.ts`; this runs the same steps as `npm run validate` while selecting the required Node version. The captured output, including every step result, test total, and produced value, is in `docs\spikes\kimi-mvp-preview-validate.txt`; its header discloses that repetitive per-request JSON and per-test stdout context were omitted.
 
 - 39 unit/isolation test files passed: 587 tests passed, 2 skipped.
 - 43 browser tests passed, including the automated axe, 360-pixel, keyboard, offline, and staff/guest flows.
