@@ -116,7 +116,7 @@ export function createPropertySql(o: { slug: string; nameEn: string; nameFr: str
 }
 
 export function addHostnameSql(o: { slug: string; host: string; isDefault: boolean; now: number }): string {
-  const insert = `INSERT INTO property_hosts (id, host, is_default)
+  const insert = `INSERT INTO property_hosts (id, host, property_id, is_default)
     SELECT ${sqlText(randomId())}, ${sqlText(o.host)}, id, ${o.isDefault ? 1 : 0} FROM properties WHERE slug = ${sqlText(o.slug)};`;
   return `${insert}\n${auditSql(propertyIdSql(o.slug), 'operator.host.added', 'property', 'NULL', o.now)}\n`;
 }
