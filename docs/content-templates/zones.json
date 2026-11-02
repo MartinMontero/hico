@@ -1,0 +1,11 @@
+{
+  "format": "hico-zones-v1",
+  "items": [
+    {
+      "clientKey": "REPLACE_WITH_PROPERTY_CONTENT_unique_stable_key",
+      "labelEn": "REPLACE_WITH_PROPERTY_CONTENT",
+      "labelFr": "REPLACE_WITH_PROPERTY_CONTENT",
+      "ring": "in_hostel"
+    }
+  ]
+}

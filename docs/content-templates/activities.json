@@ -1,0 +1,27 @@
+{
+  "format": "hico-activities-v1",
+  "items": [
+    {
+      "clientKey": "REPLACE_WITH_PROPERTY_CONTENT_unique_stable_key",
+      "titleEn": "REPLACE_WITH_PROPERTY_CONTENT",
+      "titleFr": "REPLACE_WITH_PROPERTY_CONTENT",
+      "descriptionEn": "REPLACE_WITH_PROPERTY_CONTENT",
+      "descriptionFr": "REPLACE_WITH_PROPERTY_CONTENT",
+      "changeNoteEn": "",
+      "changeNoteFr": "",
+      "category": "social",
+      "zoneLabelEn": "REPLACE_WITH_PROPERTY_CONTENT_existing_zone_label_or_empty",
+      "hostLabel": "REPLACE_WITH_PROPERTY_CONTENT",
+      "capacity": null,
+      "schedule": {
+        "kind": "weekly",
+        "weekday": 1,
+        "startLocal": "18:00",
+        "endLocal": null
+      },
+      "offeredAt": [
+        "REPLACE_WITH_PROPERTY_CONTENT_property_slug"
+      ]
+    }
+  ]
+}

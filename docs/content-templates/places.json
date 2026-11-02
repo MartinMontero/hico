@@ -1,0 +1,19 @@
+{
+  "format": "hico-places-v1",
+  "items": [
+    {
+      "clientKey": "REPLACE_WITH_PROPERTY_CONTENT_unique_stable_key",
+      "category": "food",
+      "name": "REPLACE_WITH_PROPERTY_CONTENT",
+      "staffPick": false,
+      "noteEn": "REPLACE_WITH_PROPERTY_CONTENT",
+      "noteFr": "REPLACE_WITH_PROPERTY_CONTENT",
+      "walkTimeEn": "REPLACE_WITH_PROPERTY_CONTENT",
+      "walkTimeFr": "REPLACE_WITH_PROPERTY_CONTENT",
+      "hoursEn": "REPLACE_WITH_PROPERTY_CONTENT",
+      "hoursFr": "REPLACE_WITH_PROPERTY_CONTENT",
+      "phone": null,
+      "mapsAddress": "REPLACE_WITH_PROPERTY_CONTENT"
+    }
+  ]
+}

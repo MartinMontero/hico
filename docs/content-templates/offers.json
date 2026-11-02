@@ -1,0 +1,16 @@
+{
+  "format": "hico-offers-v1",
+  "items": [
+    {
+      "clientKey": "REPLACE_WITH_PROPERTY_CONTENT_unique_stable_key",
+      "partnerName": "REPLACE_WITH_PROPERTY_CONTENT",
+      "termsEn": "REPLACE_WITH_PROPERTY_CONTENT",
+      "termsFr": "REPLACE_WITH_PROPERTY_CONTENT",
+      "validFrom": null,
+      "validTo": null,
+      "requiresMembership": false,
+      "howWeKnowEn": "REPLACE_WITH_PROPERTY_CONTENT",
+      "howWeKnowFr": "REPLACE_WITH_PROPERTY_CONTENT"
+    }
+  ]
+}
