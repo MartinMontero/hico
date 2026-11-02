@@ -59,21 +59,35 @@ One full-run supervising shell expired during Lighthouse and left no valid exit 
 - `[V]` GitHub Actions run `41509225065`, job `125497166788`, completed successfully for that exact commit on `cloud/kimi-mvp-preview`. Run 33, attempt 1, completed at `2026-11-02T19:30:36Z`: https://github.com/MartinMontero/hico/actions/runs/41509225065
 - `[V]` Independent verifier v2 ran against that downloaded archive with `node verifier/v2/check.mjs`, exited 0, and produced 52 passed checks with 0 failures. The run is recorded in `verifier\runs\2026-11-02T19-31-56Z-v2-remote-pass.md`.
 
+## Exact-head review of the preview/offline code
+
+- `[V]` Commit `5138d00c4b2faa075015a6206ec55f999903712c` was downloaded as a fresh GitHub archive. After aligning two local end-of-file newlines with the published bytes, `diff -qr --exclude=.wrangler` against the validated local tree produced no differences. No application content differed.
+- `[V]` GitHub Actions run `41520202549`, job `125534567778`, completed successfully for that exact commit. Run 36, attempt 1, completed at `2026-11-02T20:39:11Z`: https://github.com/MartinMontero/hico/actions/runs/41520202549
+- `[V]` Independent verifier v3 ran against that downloaded archive with `node verifier/v3/check.mjs`, exited 0, and produced 98 passed checks with 0 failures. The run is recorded in `verifier\runs\2026-11-02T20-34-42Z-v3-remote-5138-pass.md`.
+
+The following evidence-only commit adds this exact-head record and the read-only Workers Builds result. It changes no application code. Its own Actions result is checked after publication rather than being asserted inside the commit before that run can exist.
+
 ## Security and architecture review
 
 `[V]` The same-model OWASP A01–A10 review is in `docs\spikes\kimi-mvp-preview-security-review.md`. It leaves medium findings open for last-admin/last-passkey races, non-atomic account recovery, non-atomic content/audit writes, and development-tool advisories. `[U]` It is not an independent human security review.
 
 `[V]` Three architecture-deepening candidates are recorded in `docs\spikes\kimi-mvp-preview-architecture.md`. None has been selected or implemented; no refactor issue was created.
 
+## Workers Builds read-only feasibility check
+
+`[V]` Cloudflare documentation says the repository connection requires the Cloudflare GitHub App, GitHub account/repository IDs, a build token UUID, and a Worker name matching the Wrangler configuration: https://developers.cloudflare.com/workers/ci-cd/builds/api-reference/ and https://developers.cloudflare.com/workers/ci-cd/builds/ . `[V]` Read-only API calls confirmed access to one Cloudflare account, reported that its build-minute limit had not been reached, and listed nine build-token metadata entries. No token value was read or exposed.
+
+`[U]` Repository configuration autofill returned `authorization required`, and a subsequent specification lookup failed the same way. GitHub App authorization, the exact preview Worker build configuration, and a deployed `hico-preview` therefore remain unconfirmed. No Cloudflare write was attempted.
+
 ## What has not been proved
 
-- `[U]` GitHub Actions status for the subsequent preview/offline branch head. It must be checked after that push; commit `2fa16f2` does not establish the later result.
+- `[U]` GitHub Actions status for the final evidence-only commit after code commit `5138d00`. It must be checked after that push; the code commit's successful run does not by itself establish the evidence commit's result.
 - `[U]` A deployed `hico-preview` Worker or preview D1. No Cloudflare resource was created or changed in this session.
 - `[U]` Real Cloudflare hostname, WebAuthn relying-party configuration, secret setup, remote migrations, and deployed gate behavior.
 - `[U]` Real Downtown or Jericho Beach content and property approval. No such content was invented.
 - `[U]` Real-device installation, QR scanning with a reader, physical passkeys, screen-reader review, native French review, and human guest/staff usability.
 - `[U]` Independent security review. A same-model review is not independent. Production requires the separate reviewer and all other project gates.
-- `[U]` Workers Builds access and prerequisites. No GitHub-to-Cloudflare connection was configured.
+- `[U]` GitHub App authorization for Workers Builds and the exact preview build configuration. Basic Builds API access was readable, but repository autofill was not authorized. No GitHub-to-Cloudflare connection was configured.
 
 ## Boundaries preserved
 
