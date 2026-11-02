@@ -42,5 +42,7 @@ export const ROUTES: Row[] = [
   { method: 'POST', path: '/people/:id/recovery', admin: true, audit: 'staff.recovery.issued' },
   { method: 'POST', path: '/people/:id/revoke-sessions', admin: true, audit: 'staff.sessions.revoked' },
   { method: 'GET', path: '/audit', admin: true, audit: null },
+  { method: 'GET', path: '/counts', admin: true, audit: null },
   { method: 'POST', path: '/export', admin: true, audit: 'staff.export' },
+  { method: 'POST', path: '/import', admin: true, audit: 'staff.import.applied' },
 ];
