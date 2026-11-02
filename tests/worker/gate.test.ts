@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { GATE_COOKIE } from '../../worker/preview-gate/index.ts';
+import { cacheable } from '../../web/sw/logic.ts';
 import { call } from '../support/app.ts';
 
 // A made-up key for the tests only. The real preview key is never in any file.
@@ -56,13 +57,20 @@ describe('preview gate', () => {
     expect(await res.text()).not.toContain(KEY);
   });
 
-  it('the cookie then passes every path, including /api/*, and never serves from a shared cache', async () => {
+  it('the cookie passes every path, shared caches stay out, and guest offline storage still works', async () => {
     const cookie = `${GATE_COOKIE}=${await sha256hex(KEY)}`;
     const page = await call('/p/demo/whats-on', { env: gated, headers: { Cookie: cookie } });
     expect(page.status).toBe(200);
-    expect(page.headers.get('Cache-Control')).toBe('private, no-store');
+    expect(page.headers.get('Cache-Control')).toBe('private, no-cache');
+    expect(cacheable(page)).toBe(true);
     const api = await call('/api/hosts/properties', { env: gated, headers: { Cookie: cookie } });
     expect(api.status).toBe(200);
+    expect(api.headers.get('Cache-Control')).toBe('private, no-cache');
+    expect(cacheable(api)).toBe(true);
+    const staff = await call('/api/staff/auth/me', { env: gated, headers: { Cookie: cookie } });
+    expect(staff.status).toBe(401);
+    expect(staff.headers.get('Cache-Control')).toBe('private, no-store');
+    expect(cacheable(staff)).toBe(false);
   });
 
   it('a wrong key, a forged cookie and a differently named cookie are all 404', async () => {

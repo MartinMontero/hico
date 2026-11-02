@@ -98,11 +98,13 @@ export const previewGate: MiddlewareHandler<{ Bindings: Env }> = async (c, next)
   const cookie = readCookie(c.req.header('Cookie') ?? null, GATE_COOKIE);
   if (cookie !== null && (await timingSafeEqual(cookie, expected))) {
     await next();
-    // Authorised responses are never cached by shared caches or indexed.
-    const res = new Response(c.res.body, c.res);
-    for (const [k, v] of Object.entries(SECURITY_HEADERS)) res.headers.set(k, v);
-    res.headers.set('Cache-Control', 'private, no-store');
-    c.res = res;
+    // Authorised responses are never cached by shared caches or indexed. Guest pages, public reads and assets may still
+    // use this browser's origin-scoped offline Cache Storage; every upstream no-store (including all staff APIs) wins.
+    const upstreamCache = c.res.headers.get('Cache-Control') ?? '';
+    c.res = new Response(c.res.body, c.res);
+    // Hono merges the previous headers during this assignment, so the gate's final values must be set afterwards.
+    for (const [k, v] of Object.entries(SECURITY_HEADERS)) c.res.headers.set(k, v);
+    c.res.headers.set('Cache-Control', /\bno-store\b/i.test(upstreamCache) ? 'private, no-store' : 'private, no-cache');
     return;
   }
 

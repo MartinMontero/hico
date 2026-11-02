@@ -70,12 +70,13 @@ describe('what the service worker handles', () => {
 
 describe('what is kept', () => {
   const res = (headers: Record<string, string> = {}, status = 200) => new Response('{"ok":true}', { status, headers });
-  it('only a normal success that does not say no-store or private', () => {
+  it('only a normal success that does not say no-store; origin-private preview responses may stay on this device', () => {
     expect(cacheable(res())).toBe(true);
     expect(cacheable(res({ 'Cache-Control': 'public, max-age=60' }))).toBe(true);
+    expect(cacheable(res({ 'Cache-Control': 'private, no-cache' }))).toBe(true);
     expect(cacheable(res({ 'Cache-Control': 'private, no-store' }))).toBe(false);
     expect(cacheable(res({ 'Cache-Control': 'no-store' }))).toBe(false);
-    expect(cacheable(res({ 'Cache-Control': 'private' }))).toBe(false);
+    expect(cacheable(res({ 'Cache-Control': 'private' }))).toBe(true);
     expect(cacheable(res({}, 404))).toBe(false);
     expect(cacheable(res({}, 500))).toBe(false);
   });
@@ -122,8 +123,8 @@ describe('content, network first', () => {
     await expect(handle(get('/api/p/w/offers'), 'content', d, names)).rejects.toThrow('offline');
   });
 
-  it('never keeps an error, a no-store response or a private one, so a stale error cannot replace good content', async () => {
-    for (const make of [() => new Response('x', { status: 500 }), () => new Response('x', { status: 200, headers: { 'Cache-Control': 'no-store' } }), () => new Response('x', { status: 200, headers: { 'Cache-Control': 'private' } })]) {
+  it('never keeps an error or a no-store response, so a stale error cannot replace good content', async () => {
+    for (const make of [() => new Response('x', { status: 500 }), () => new Response('x', { status: 200, headers: { 'Cache-Control': 'no-store' } }), () => new Response('x', { status: 200, headers: { 'Cache-Control': 'private, no-store' } })]) {
       const { d, caches } = deps({ fetch: async () => make() });
       await handle(get('/api/p/w/config'), 'content', d, names);
       expect(caches.keysOf(names.content)).toEqual([]);

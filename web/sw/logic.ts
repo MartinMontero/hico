@@ -18,9 +18,10 @@ export function classify(req: { method: string; mode: string; url: string }, ori
   return null;
 }
 
-/** A response worth keeping: a normal success from this site that says nothing against being kept. */
+/** A response worth keeping: a normal success from this site that does not forbid storage. `private` only excludes shared
+ * caches; this Cache Storage belongs to one browser profile. The preview gate uses it for offline guest content. */
 export function cacheable(res: Response): boolean {
-  return res.ok && res.type !== 'opaque' && res.type !== 'error' && !/no-store|private/i.test(res.headers.get('Cache-Control') ?? '');
+  return res.ok && res.type !== 'opaque' && res.type !== 'error' && !/\bno-store\b/i.test(res.headers.get('Cache-Control') ?? '');
 }
 
 /** The kept copy, marked so the page does not trust its Date header as "now" (web/src/clock.ts). */
