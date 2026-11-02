@@ -9,6 +9,7 @@ import { publicTenant, requestHost, staffTenant, type AppEnv, type StaffResolver
 import { createStaffAuthRoutes } from './routes/staff-auth.ts';
 import { createStaffContentRoutes } from './routes/staff-content.ts';
 import { createStaffExportRoutes } from './routes/staff-export.ts';
+import { createStaffImportRoutes } from './routes/staff-import.ts';
 import { createStaffPeopleRoutes } from './routes/staff-people.ts';
 import { activities, codes, events, hosts, offers, places, properties } from './repositories/index.ts';
 import {
@@ -115,6 +116,7 @@ export function createApp(options: AppOptions = {}): Hono<AppEnv> {
   staffApi.route('/', createStaffPeopleRoutes(now));
   staffApi.route('/', createStaffContentRoutes(now));
   staffApi.route('/', createStaffExportRoutes(now));
+  staffApi.route('/', createStaffImportRoutes(now));
   app.route('/api/staff/p/:slug', staffApi);
   app.all('/api/*', (c) => c.json({ error: 'not_found' }, 404));
 
