@@ -5,7 +5,7 @@ import type { StaffKey } from '../../../shared/i18n/staff-en.ts';
 import { useUi } from '../context.tsx';
 import { Link } from '../router.tsx';
 import type { Me } from './api.ts';
-import { Audit, Codes, Export, People, Switches, Zones } from './Admin.tsx';
+import { Audit, Codes, Counts, Export, Import, People, Switches, Zones } from './Admin.tsx';
 import { Board, Gate, Offers, Places, PropertyHome, Translations } from './Content.tsx';
 import { useApi, useResource, type PropertyContext } from './data.ts';
 import { useStaffT } from './t.ts';
@@ -30,6 +30,8 @@ const SECTIONS: Section[] = [
   { path: 'switches', nav: 'nav.switches', title: 'nav.switches', adminOnly: false },
   { path: 'people', nav: 'nav.people', title: 'nav.people', adminOnly: true },
   { path: 'audit', nav: 'nav.audit', title: 'nav.audit', adminOnly: true },
+  { path: 'counts', nav: 'nav.counts', title: 'nav.counts', adminOnly: true },
+  { path: 'import', nav: 'nav.import', title: 'nav.import', adminOnly: true },
   { path: 'export', nav: 'nav.export', title: 'nav.export', adminOnly: true },
 ];
 
@@ -146,6 +148,10 @@ export function PropertyConsole({ path, me, onSignedOut }: { path: string; me: M
               return <People {...props} />;
             case 'audit':
               return <Audit {...props} />;
+            case 'counts':
+              return <Counts {...props} />;
+            case 'import':
+              return <Import {...props} />;
             case 'export':
               return <Export {...props} />;
             default:
