@@ -25,7 +25,7 @@ export const staffEn = {
   'accept.create': 'Create my passkey',
   'accept.working': 'Waiting for your device',
   'accept.cancelled': 'Creating the passkey was cancelled.',
-  'accept.failed': 'The link is still valid; try again.',
+  'accept.failed': 'That did not work. The link is still valid; try again.',
   'accept.invalid': 'This link is not valid any more. Ask the admin for a new one.',
   'accept.none': 'Open the link you were given. It has a long code after the # sign.',
   'accept.existing': 'You already have an account. Sign in, then open the link again to join.',
