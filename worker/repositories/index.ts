@@ -7,6 +7,7 @@ export * as places from './places.ts';
 export * as offers from './offers.ts';
 export * as audit from './audit.ts';
 export * as events from './events.ts';
+export * as imports from './imports.ts';
 export * as people from './people.ts';
 export * as sessions from './sessions.ts';
 export * as credentials from './credentials.ts';
