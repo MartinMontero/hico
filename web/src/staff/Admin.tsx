@@ -1,558 +1,412 @@
 import { useEffect, useState } from 'preact/hooks';
-import { LIMITS } from '../../../shared/limits.ts';
-import { pick } from '../../../shared/i18n/index.ts';
-import { staffEn, type StaffKey } from '../../../shared/i18n/staff-en.ts';
-import { RINGS } from '../../../shared/staff-content-schemas.ts';
-import type { StaffAuditEntry, StaffCode, StaffZone } from '../../../shared/types.ts';
+import type { StaffKey } from '../../../shared/i18n/staff-en.ts';
+import type { ImportIssue, ImportReport } from '../../../shared/import-schemas.ts';
+import { asText, pick } from '../../../shared/i18n/index.ts';
 import { useUi } from '../context.tsx';
-import { Dialog } from '../Dialog.tsx';
-import type { Api, PropertyContext } from './data.ts';
-import { useResource } from './data.ts';
+import { Link } from '../router.tsx';
+import { QRCode } from '../QRCode.tsx';
+import { Api, useResource, type PropertyContext } from './data.ts';
 import { Gate } from './Content.tsx';
-import { QrCode } from './qr.tsx';
-import { formatMoment, useStaffT } from './t.ts';
-import { Confirm, EditDialog, errorText, focusHeading, useOpener, type FieldSpec, type Values } from './ui.tsx';
+import { useStaffT } from './t.ts';
+import { Dialog, Field, Heading, Stamp, Submit, useForm } from './ui.tsx';
 
-interface Props {
-  api: Api;
-  ctx: PropertyContext;
-}
-
-// ---- Zones ----------------------------------------------------------------------------------------------------
-
-const zoneToForm = (z: StaffZone): Values => ({ labelEn: z.label.en, labelFr: z.label.fr, ring: z.ring });
-
-export function Zones({ api, ctx }: Props) {
+export function Zones({ api, ctx }: { api: Api; ctx: PropertyContext }) {
   const t = useStaffT();
-  const { lang, toast } = useUi();
-  const list = useResource<StaffZone[]>(api, '/zones');
-  const [dialog, setDialog] = useState<null | { kind: 'edit'; zone: StaffZone | null } | { kind: 'delete'; zone: StaffZone }>(null);
-  const [message, setMessage] = useState('');
-  const opener = useOpener();
+  const { lang } = useUi();
+  const zones = useResource<any[]>(api, '/zones');
+  const [edit, setEdit] = useState<any | 'new' | null>(null);
   const admin = ctx.role === 'admin';
-  const specs: FieldSpec[] = [
-    { key: 'labelEn', label: 'f.labelEn', kind: 'text', max: LIMITS.label },
-    { key: 'labelFr', label: 'f.labelFr', kind: 'text', max: LIMITS.label, help: 'f.frHelp' },
-    { key: 'ring', label: 'f.ring', kind: 'select', options: RINGS.map((r) => ({ value: r, label: t(`ring.${r}`) })) },
-  ];
   return (
-    <>
-      <p>{t('zones.intro')}</p>
-      {admin ? (
-        <p class="actions">
-          <button type="button" class="btn btn-primary" onClick={(e) => { opener.capture(e); setDialog({ kind: 'edit', zone: null }); }}>
-            {t('zones.add')}
-          </button>
-        </p>
-      ) : (
-        <p class="muted">{t('admin.only')}</p>
-      )}
-      {message ? <p class="error" role="alert">{message}</p> : null}
-      <Gate state={list.state} reload={list.reload}>
-        {(items) =>
-          items.length === 0 ? (
-            <p class="state">{t('zones.empty')}</p>
-          ) : (
-            <ul class="cards">
-              {items.map((z) => (
-                <li key={z.id} class="card">
-                  <h2 class="card-title">{pick(z.label, lang as 'en' | 'fr') || z.label.en}</h2>
-                  <p class="card-meta">
-                    {t(`ring.${z.ring}`)}
-                    {z.inUse ? ` · ${t('zones.inUse')}` : ''}
-                  </p>
-                  {admin ? (
-                    <p class="actions">
-                      <button type="button" class="btn" onClick={(e) => { opener.capture(e); setDialog({ kind: 'edit', zone: z }); }}>
-                        {t('act.edit')}<span class="sr-only"> {z.label.en}</span>
-                      </button>
-                      <button type="button" class="btn" onClick={(e) => { opener.capture(e); setMessage(''); setDialog({ kind: 'delete', zone: z }); }}>
-                        {t('act.delete')}<span class="sr-only"> {z.label.en}</span>
-                      </button>
-                    </p>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          )
-        }
-      </Gate>
-      {dialog?.kind === 'edit' ? (
-        <EditDialog<StaffZone>
-          title={dialog.zone ? t('zones.edit') : t('zones.add')}
-          specs={specs}
-          initial={dialog.zone ? zoneToForm(dialog.zone) : { labelEn: '', labelFr: '', ring: 'in_hostel' }}
-          version={dialog.zone?.version ?? null}
-          toBody={(v) => ({ labelEn: v['labelEn'], labelFr: v['labelFr'], ring: v['ring'] })}
-          toForm={zoneToForm}
-          send={(body, version) => (dialog.zone ? api.post(`/zones/${dialog.zone.id}`, { ...(body as object), version }) : api.post('/zones', body))}
-          onSaved={() => { setDialog(null); toast(t('toast.saved')); void list.reload(); }}
-          onClose={() => setDialog(null)}
-          returnFocusTo={opener.ref.current}
-        />
-      ) : null}
-      {dialog?.kind === 'delete' ? (
-        <Confirm
-          title={t('act.delete')}
-          text={t('zones.confirmDelete', { name: dialog.zone.label.en })}
-          yes={t('act.delete')}
-          returnFocusTo={opener.ref.current}
-          onClose={() => setDialog(null)}
-          onYes={async () => {
-            const z = dialog.zone;
-            setDialog(null);
-            const res = await api.post(`/zones/${z.id}/delete`, { version: z.version });
-            if (res.status === 200) toast(t('toast.deleted'));
-            else setMessage(errorText(t, res.status, res.error));
-            await list.reload();
-            focusHeading();
-          }}
-        />
-      ) : null}
-    </>
-  );
-}
-
-// ---- QR labels (Stage 0: labelled links only) -----------------------------------------------------------------
-
-export function Codes({ api, ctx }: Props) {
-  const t = useStaffT();
-  const { lang, toast } = useUi();
-  const list = useResource<StaffCode[]>(api, '/codes');
-  const [label, setLabel] = useState('');
-  const [message, setMessage] = useState('');
-  const [show, setShow] = useState<StaffCode | null>(null);
-  const [retire, setRetire] = useState<StaffCode | null>(null);
-  const opener = useOpener();
-  const admin = ctx.role === 'admin';
-  const linkFor = (c: StaffCode) => `${window.location.origin}/p/${ctx.slug}#l=${c.label}`;
-
-  const add = async (event: Event) => {
-    event.preventDefault();
-    setMessage('');
-    const res = await api.post('/codes', { label });
-    if (res.status === 200) {
-      setLabel('');
-      toast(t('codes.added'));
-    } else setMessage(res.status === 409 ? t('codes.exists') : res.status === 400 ? t('codes.badLabel') : errorText(t, res.status, res.error));
-    await list.reload();
-  };
-
-  return (
-    <>
-      <p>{t('codes.intro')}</p>
-      {admin ? (
-        <form onSubmit={add}>
-          <div class="field">
-            <label for="code-label">{t('codes.label')}</label>
-            <input id="code-label" type="text" maxLength={40} autoComplete="off" value={label} aria-describedby="code-label-help" onInput={(e) => setLabel((e.target as HTMLInputElement).value)} />
-            <p id="code-label-help" class="muted">{t('codes.labelHelp')}</p>
-          </div>
-          <button type="submit" class="btn btn-primary" disabled={label.trim() === ''}>
-            {t('codes.add')}
-          </button>
-        </form>
-      ) : (
-        <p class="muted">{t('admin.only')}</p>
-      )}
-      {message ? <p class="error" role="alert">{message}</p> : null}
-      <Gate state={list.state} reload={list.reload}>
-        {(items) =>
-          items.length === 0 ? (
-            <p class="state">{t('codes.empty')}</p>
-          ) : (
-            <ul class="cards">
-              {items.map((c) => (
-                <li key={c.id} class="card">
-                  <h2 class="card-title">{c.label}</h2>
-                  <p class="card-meta">
-                    {c.retiredAt ? t('codes.retired', { date: formatMoment(c.retiredAt, lang, ctx.timezone) }) : t('codes.active')}
-                  </p>
-                  {!c.retiredAt ? (
-                    <p class="actions">
-                      <button type="button" class="btn" onClick={(e) => { opener.capture(e); setShow(c); }}>
-                        {t('codes.show')}<span class="sr-only"> {c.label}</span>
-                      </button>
-                      {admin ? (
-                        <button type="button" class="btn" onClick={(e) => { opener.capture(e); setRetire(c); }}>
-                          {t('codes.retire')}<span class="sr-only"> {c.label}</span>
-                        </button>
-                      ) : null}
-                    </p>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          )
-        }
-      </Gate>
-      <p class="muted">{t('codes.stage2')}</p>
-      {show ? (
-        <Dialog open onClose={() => setShow(null)} title={t('codes.qrTitle', { label: show.label })} returnFocusTo={opener.ref.current}>
-          <div class="qr-sheet">
-            <QrCode text={linkFor(show)} label={t('codes.qrAlt', { label: show.label })} />
-            <p class="qr-label">{show.label}</p>
-            <p class="muted qr-link">{linkFor(show)}</p>
-          </div>
-          <p class="actions no-print">
-            <button type="button" class="btn btn-primary" onClick={() => window.print()}>
-              {t('codes.print')}
+    <Gate state={zones.state} reload={zones.reload}>
+      {(rows) => (
+        <>
+          <p>{t('zones.intro')}</p>
+          {!admin && <p class="muted">{t('admin.only')}</p>}
+          {admin && (
+            <button class="btn" type="button" onClick={() => setEdit('new')}>
+              {t('zones.add')}
             </button>
-            <button type="button" class="btn" onClick={() => setShow(null)}>
-              {t('form.close')}
-            </button>
-          </p>
-        </Dialog>
-      ) : null}
-      {retire ? (
-        <Confirm
-          title={t('codes.retire')}
-          text={t('codes.confirmRetire', { label: retire.label })}
-          yes={t('codes.retire')}
-          returnFocusTo={opener.ref.current}
-          onClose={() => setRetire(null)}
-          onYes={async () => {
-            const c = retire;
-            setRetire(null);
-            const res = await api.post(`/codes/${c.id}/retire`);
-            if (res.status === 200) toast(t('codes.retiredToast'));
-            else setMessage(errorText(t, res.status, res.error));
-            await list.reload();
-            focusHeading();
-          }}
-        />
-      ) : null}
-    </>
-  );
-}
-
-// ---- Feature switches -----------------------------------------------------------------------------------------
-
-export function Switches({ api, ctx }: Props) {
-  const t = useStaffT();
-  const { toast } = useUi();
-  const list = useResource<Record<'common_room' | 'connect', boolean>>(api, '/features');
-  const [message, setMessage] = useState('');
-  const admin = ctx.role === 'admin';
-  return (
-    <>
-      <p>{t('sw.intro')}</p>
-      {admin ? null : <p class="muted">{t('admin.only')}</p>}
-      {message ? <p class="error" role="alert">{message}</p> : null}
-      <Gate state={list.state} reload={list.reload}>
-        {(flags) => (
+          )}
+          {rows.length === 0 && <p>{t('zones.empty')}</p>}
           <ul class="cards">
-            {(['common_room', 'connect'] as const).map((name) => (
-              <li key={name} class="card">
-                <label class="radio" for={`sw-${name}`}>
-                  <input
-                    id={`sw-${name}`}
-                    type="checkbox"
-                    checked={flags[name]}
-                    disabled={!admin}
-                    aria-describedby={`sw-${name}-help`}
-                    onChange={async (e) => {
-                      const enabled = (e.target as HTMLInputElement).checked;
-                      setMessage('');
-                      const res = await api.post(`/features/${name}`, { enabled });
-                      if (res.status === 200) toast(t(enabled ? 'sw.on' : 'sw.off', { name: t(`sw.${name}`) }));
-                      else setMessage(errorText(t, res.status, res.error));
-                      await list.reload();
-                    }}
-                  />
-                  <span>{t(`sw.${name}`)}</span>
-                </label>
-                <p id={`sw-${name}-help`} class="muted">{t(`sw.${name}.help`)}</p>
+            {rows.map((z) => (
+              <li key={z.id} class="card">
+                <h2>{pick(z.label, lang as 'en' | 'fr')}</h2>
+                <p class="muted">
+                  {t(z.ring)} · {z.activityCount} {t('zones.inUse')}
+                </p>
+                <Stamp {...z} />
+                {admin && (
+                  <button class="btn btn-quiet" type="button" onClick={() => setEdit(z)}>
+                    {t('act.edit')}
+                  </button>
+                )}
               </li>
             ))}
           </ul>
-        )}
-      </Gate>
-    </>
+          {edit && <ZoneDialog api={api} zone={edit === 'new' ? null : edit} close={() => { setEdit(null); zones.reload(); }} />}
+        </>
+      )}
+    </Gate>
   );
 }
 
-// ---- People ---------------------------------------------------------------------------------------------------
-
-interface Person {
-  id: string;
-  displayName: string;
-  email: string;
-  role: 'editor' | 'admin';
-  passkeys: number;
-  lastSignInAt: number | null;
-}
-interface HandOver {
-  title: string;
-  url: string;
-  expiresAt: number;
-}
-
-export function People({ api, ctx }: Props) {
+function ZoneDialog({ api, zone, close }: { api: Api; zone: any | null; close: () => void }) {
   const t = useStaffT();
-  const { lang, toast } = useUi();
-  const list = useResource<Person[]>(api, '/people');
-  const [invite, setInvite] = useState({ displayName: '', email: '', role: 'editor' });
-  const [message, setMessage] = useState('');
-  const [link, setLink] = useState<HandOver | null>(null);
-  const [ask, setAsk] = useState<null | { kind: 'remove' | 'sessions' | 'recovery'; person: Person }>(null);
-  const opener = useOpener();
-
-  const origin = window.location.origin;
-  const showLink = (title: string, kind: 'invite' | 'recover', token: string, expiresAt: number) => setLink({ title, url: `${origin}/staff/accept#${kind}=${token}`, expiresAt });
-
-  const send = async (event: Event) => {
-    event.preventDefault();
-    setMessage('');
-    const res = await api.post<{ token: string; expiresAt: number }>('/people/invite', invite);
-    if (res.status === 200 && res.data) {
-      showLink(t('people.linkFor', { name: invite.displayName }), 'invite', res.data.token, res.data.expiresAt);
-      setInvite({ displayName: '', email: '', role: 'editor' });
-      await list.reload();
-    } else setMessage(errorText(t, res.status, res.error));
-  };
-
-  const setRole = async (p: Person, role: 'editor' | 'admin') => {
-    setMessage('');
-    const res = await api.post(`/people/${p.id}/role`, { role });
-    if (res.status === 200) toast(t('toast.saved'));
-    else setMessage(errorText(t, res.status, res.error));
-    await list.reload();
-  };
-
-  const doAsk = async () => {
-    const a = ask;
-    setAsk(null);
-    if (!a) return;
-    setMessage('');
-    if (a.kind === 'remove') {
-      const res = await api.post(`/people/${a.person.id}/remove`);
-      if (res.status === 200) toast(t('people.removed'));
-      else setMessage(errorText(t, res.status, res.error));
-      await list.reload();
-      focusHeading();
-    } else if (a.kind === 'sessions') {
-      const res = await api.post(`/people/${a.person.id}/revoke-sessions`);
-      if (res.status === 200) toast(t('people.sessionsEnded'));
-      else setMessage(errorText(t, res.status, res.error));
-    } else {
-      const res = await api.post<{ token: string; expiresAt: number }>(`/people/${a.person.id}/recovery`);
-      if (res.status === 200 && res.data) showLink(t('people.recoveryFor', { name: a.person.displayName }), 'recover', res.data.token, res.data.expiresAt);
-      else setMessage(errorText(t, res.status, res.error));
-    }
-  };
-
+  const { f, set, busy, error, submit } = useForm({ labelEn: zone?.label.en ?? '', labelFr: zone?.label.fr ?? '', ring: zone?.ring ?? 'in_hostel', delete: false });
   return (
-    <>
-      <p>{t('people.intro')}</p>
-      <section aria-labelledby="invite-h">
-        <h2 id="invite-h">{t('people.invite')}</h2>
-        <form onSubmit={send}>
-          <div class="field">
-            <label for="inv-name">{t('people.name')}</label>
-            <input id="inv-name" type="text" maxLength={LIMITS.person} autoComplete="off" value={invite.displayName} onInput={(e) => setInvite({ ...invite, displayName: (e.target as HTMLInputElement).value })} />
-          </div>
-          <div class="field">
-            <label for="inv-email">{t('people.email')}</label>
-            <input id="inv-email" type="email" maxLength={LIMITS.email} autoComplete="off" value={invite.email} aria-describedby="inv-email-help" onInput={(e) => setInvite({ ...invite, email: (e.target as HTMLInputElement).value })} />
-            <p id="inv-email-help" class="muted">{t('people.emailHelp')}</p>
-          </div>
-          <div class="field">
-            <label for="inv-role">{t('people.role')}</label>
-            <select id="inv-role" value={invite.role} onChange={(e) => setInvite({ ...invite, role: (e.target as HTMLSelectElement).value })}>
-              <option value="editor">{t('home.role.editor')}</option>
-              <option value="admin">{t('home.role.admin')}</option>
-            </select>
-          </div>
-          <button type="submit" class="btn btn-primary" disabled={invite.displayName.trim() === '' || invite.email.trim() === ''}>
-            {t('people.createLink')}
-          </button>
+    <Dialog title={t(zone ? 'zones.edit' : 'zones.add')} close={close}>
+      <form onSubmit={submit(async () => { await api(zone ? `/zones/${zone.id}` : '/zones', { labelEn: f.labelEn, labelFr: f.labelFr, ring: f.ring }, 'POST'); close(); })}>
+        <Field id="zl-en" label={t('f.labelEn')} value={f.labelEn} set={set('labelEn')} required max={60} />
+        <Field id="zl-fr" label={t('f.labelFr')} value={f.labelFr} set={set('labelFr')} max={60} />
+        <label class="field">
+          <span>{t('f.ring')}</span>
+          <select value={f.ring} onChange={(e) => set('ring')(e.currentTarget.value)}>
+            {(['in_hostel', 'short_walk', 'further'] as const).map((r) => <option key={r} value={r}>{t(r)}</option>)}
+          </select>
+        </label>
+        {error && <p class="error">{t(error)}</p>}
+        <Submit busy={busy} />
+      </form>
+      {zone && (
+        <form onSubmit={submit(async () => { await api(`/zones/${zone.id}/delete`, {}); close(); })}>
+          <label class="check">
+            <input type="checkbox" checked={f.delete} onChange={(e) => set('delete')(e.currentTarget.checked)} />
+            <span>{t('zones.confirmDelete', { name: zone.label.en })}</span>
+          </label>
+          {f.delete && <Submit busy={busy} label={t('act.delete')} danger />}
         </form>
-      </section>
-      {message ? <p class="error" role="alert">{message}</p> : null}
-      <section aria-labelledby="people-h">
-        <h2 id="people-h">{t('people.list')}</h2>
-        <Gate state={list.state} reload={list.reload}>
-          {(items) => (
-            <ul class="cards">
-              {items.map((p) => (
-                <li key={p.id} class="card">
-                  <h3 class="card-title">{p.displayName}</h3>
-                  <p class="card-meta">{p.email}</p>
-                  <p class="card-meta">
-                    {t(p.role === 'admin' ? 'home.role.admin' : 'home.role.editor')} · {t('people.passkeys', { n: String(p.passkeys) })} ·{' '}
-                    {p.lastSignInAt ? t('people.lastIn', { when: formatMoment(p.lastSignInAt, lang, ctx.timezone) }) : t('people.neverIn')}
-                  </p>
-                  <p class="actions">
-                    <button type="button" class="btn" onClick={() => void setRole(p, p.role === 'admin' ? 'editor' : 'admin')}>
-                      {t(p.role === 'admin' ? 'people.makeEditor' : 'people.makeAdmin')}
-                      <span class="sr-only"> {p.displayName}</span>
-                    </button>
-                    <button type="button" class="btn" onClick={(e) => { opener.capture(e); setAsk({ kind: 'recovery', person: p }); }}>
-                      {t('people.recovery')}<span class="sr-only"> {p.displayName}</span>
-                    </button>
-                    <button type="button" class="btn" onClick={(e) => { opener.capture(e); setAsk({ kind: 'sessions', person: p }); }}>
-                      {t('people.endSessions')}<span class="sr-only"> {p.displayName}</span>
-                    </button>
-                    <button type="button" class="btn" onClick={(e) => { opener.capture(e); setAsk({ kind: 'remove', person: p }); }}>
-                      {t('people.remove')}<span class="sr-only"> {p.displayName}</span>
-                    </button>
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Gate>
-      </section>
-      {ask ? (
-        <Confirm
-          title={t(ask.kind === 'remove' ? 'people.remove' : ask.kind === 'sessions' ? 'people.endSessions' : 'people.recovery')}
-          text={t(ask.kind === 'remove' ? 'people.confirmRemove' : ask.kind === 'sessions' ? 'people.confirmSessions' : 'people.confirmRecovery', { name: ask.person.displayName })}
-          yes={t('account.confirmYes')}
-          returnFocusTo={opener.ref.current}
-          onClose={() => setAsk(null)}
-          onYes={() => void doAsk()}
-        />
-      ) : null}
-      {link ? (
-        <Dialog open onClose={() => setLink(null)} title={link.title} returnFocusTo={opener.ref.current}>
-          <p>{t('people.linkHelp', { time: formatMoment(link.expiresAt, lang, ctx.timezone) })}</p>
-          <div class="qr-sheet">
-            <QrCode text={link.url} label={t('people.qrAlt')} size={192} />
-          </div>
-          <div class="field">
-            <label for="hand-link">{t('people.linkLabel')}</label>
-            <input id="hand-link" type="text" readOnly value={link.url} onFocus={(e) => (e.target as HTMLInputElement).select()} />
-          </div>
-          <p class="actions">
-            <button
-              type="button"
-              class="btn btn-primary"
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(link.url);
-                  toast(t('people.copied'));
-                } catch {
-                  toast(t('people.copyFailed'));
-                }
-              }}
-            >
-              {t('people.copy')}
-            </button>
-            <button type="button" class="btn" onClick={() => setLink(null)}>
-              {t('form.close')}
-            </button>
-          </p>
-        </Dialog>
-      ) : null}
-    </>
+      )}
+    </Dialog>
   );
 }
 
-// ---- Audit log ------------------------------------------------------------------------------------------------
+export function Codes({ api, ctx }: { api: Api; ctx: PropertyContext }) {
+  const t = useStaffT();
+  const codes = useResource<any[]>(api, '/codes');
+  const [label, setLabel] = useState('');
+  const [error, setError] = useState('');
+  const [show, setShow] = useState<any | null>(null);
+  const admin = ctx.role === 'admin';
+  const add = async (e: Event) => {
+    e.preventDefault();
+    const r = await api('/codes', { label }, 'POST');
+    if (r.status === 409) { setError('codes.exists'); return; }
+    if (!r.ok) { setError('codes.badLabel'); return; }
+    setLabel(''); setError(''); codes.reload();
+  };
+  return (
+    <Gate state={codes.state} reload={codes.reload}>
+      {(rows) => (
+        <>
+          <p>{t('codes.intro')}</p>
+          {!admin && <p class="muted">{t('admin.only')}</p>}
+          {admin && (
+            <form onSubmit={add}>
+              <label class="field">
+                <span>{t('codes.label')}</span>
+                <input value={label} onInput={(e) => setLabel(e.currentTarget.value)} required maxLength={40} pattern="[a-z0-9-]+" />
+                <small>{t('codes.labelHelp')}</small>
+              </label>
+              {error && <p class="error">{t(error as StaffKey)}</p>}
+              <button class="btn" type="submit">{t('codes.add')}</button>
+            </form>
+          )}
+          {rows.length === 0 && <p>{t('codes.empty')}</p>}
+          <ul class="cards">
+            {rows.map((c) => (
+              <li key={c.id} class="card">
+                <h2>{c.label}</h2>
+                <p class="muted">{c.retiredOn ? t('codes.retired', { date: c.retiredOn }) : t('codes.active')}</p>
+                <button class="btn btn-quiet" type="button" onClick={() => setShow(c)}>{t('codes.show')}</button>
+                {admin && !c.retiredOn && <button class="btn btn-quiet danger" type="button" onClick={async () => { if (confirm(t('codes.confirmRetire', { label: c.label }))) { await api(`/codes/${c.id}/retire`, {}); codes.reload(); } }}>{t('codes.retire')}</button>}
+              </li>
+            ))}
+          </ul>
+          <p class="muted">{t('codes.stage2')}</p>
+          {show && (
+            <Dialog title={t('codes.qrTitle', { label: show.label })} close={() => setShow(null)}>
+              <QRCode path={`/p/${ctx.slug}/qr/${show.label}`} label={t('codes.qrAlt', { label: show.label })} />
+              <button class="btn" type="button" onClick={() => print()}>{t('codes.print')}</button>
+            </Dialog>
+          )}
+        </>
+      )}
+    </Gate>
+  );
+}
 
-export function Audit({ api, ctx }: Props) {
+export function Switches({ api, ctx }: { api: Api; ctx: PropertyContext }) {
+  const t = useStaffT();
+  const features = useResource<any[]>(api, '/features');
+  const admin = ctx.role === 'admin';
+  return (
+    <Gate state={features.state} reload={features.reload}>
+      {(rows) => (
+        <>
+          <p>{t('sw.intro')}</p>
+          {!admin && <p class="muted">{t('admin.only')}</p>}
+          <ul class="cards">
+            {rows.map((f) => (
+              <li key={f.feature} class="card">
+                <h2>{t(`sw.${f.feature}` as StaffKey)}</h2>
+                <p>{t(`sw.${f.feature}.help` as StaffKey)}</p>
+                <p class="muted">{t(f.enabled ? 'sw.on' : 'sw.off', { name: t(`sw.${f.feature}` as StaffKey) })}</p>
+                {admin && (
+                  <button class="btn" type="button" onClick={async () => { await api(`/features/${f.feature}`, { enabled: !f.enabled }); features.reload(); }}>
+                    {t(f.enabled ? 'sw.off' : 'sw.on', { name: t(`sw.${f.feature}` as StaffKey) })}
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </Gate>
+  );
+}
+
+export function People({ api }: { api: Api; ctx: PropertyContext }) {
+  const t = useStaffT();
+  const people = useResource<any[]>(api, '/people');
+  const [invite, setInvite] = useState<any | null>(null);
+  const [showLink, setShowLink] = useState<{ name: string; url: string; recovery: boolean } | null>(null);
+  return (
+    <Gate state={people.state} reload={people.reload}>
+      {(rows) => (
+        <>
+          <p>{t('people.intro')}</p>
+          <button class="btn" type="button" onClick={() => setInvite({})}>{t('people.invite')}</button>
+          <h2>{t('people.list')}</h2>
+          <ul class="cards">
+            {rows.map((p) => (
+              <li key={p.staffUserId} class="card">
+                <h2>{p.displayName}</h2>
+                <p>{p.email}</p>
+                <p class="muted">{t(`role.${p.role}` as StaffKey)} · {t('people.passkeys', { n: p.passkeyCount })}</p>
+                <p class="muted">{p.lastSeenAt ? t('people.lastIn', { when: new Date(p.lastSeenAt * 1000).toLocaleString() }) : t('people.neverIn')}</p>
+                {p.canChangeRole && <button class="btn btn-quiet" type="button" onClick={async () => { await api(`/people/${p.staffUserId}/role`, { role: p.role === 'admin' ? 'editor' : 'admin' }); people.reload(); }}>{t(p.role === 'admin' ? 'people.makeEditor' : 'people.makeAdmin')}</button>}
+                {p.canRemove && <button class="btn btn-quiet danger" type="button" onClick={async () => { if (confirm(t('people.confirmRemove', { name: p.displayName }))) { await api(`/people/${p.staffUserId}/remove`, {}); people.reload(); } }}>{t('people.remove')}</button>}
+                {p.canManageSessions && <button class="btn btn-quiet" type="button" onClick={async () => { if (confirm(t('people.confirmSessions', { name: p.displayName }))) { await api(`/people/${p.staffUserId}/revoke-sessions`, {}); people.reload(); } }}>{t('people.endSessions')}</button>}
+                {p.canIssueRecovery && <button class="btn btn-quiet" type="button" onClick={async () => { if (!confirm(t('people.confirmRecovery', { name: p.displayName }))) return; const r = await api(`/people/${p.staffUserId}/recovery`, {}); if (r.ok) setShowLink({ name: p.displayName, url: (await r.json()).url, recovery: true }); }}>{t('people.recovery')}</button>}
+              </li>
+            ))}
+          </ul>
+          {invite && <InviteDialog api={api} close={() => { setInvite(null); people.reload(); }} show={(name, url) => setShowLink({ name, url, recovery: false })} />}
+          {showLink && <LinkDialog data={showLink} close={() => setShowLink(null)} />}
+        </>
+      )}
+    </Gate>
+  );
+}
+
+function InviteDialog({ api, close, show }: { api: Api; close: () => void; show: (name: string, url: string) => void }) {
+  const t = useStaffT();
+  const { f, set, busy, error, submit } = useForm({ email: '', displayName: '', role: 'editor' });
+  return (
+    <Dialog title={t('people.invite')} close={close}>
+      <form onSubmit={submit(async () => { const r = await api('/people/invite', f); if (r.ok) { show(f.displayName, (await r.json()).url); close(); } })}>
+        <Field id="inv-name" label={t('people.name')} value={f.displayName} set={set('displayName')} required max={80} />
+        <Field id="inv-email" label={t('people.email')} value={f.email} set={set('email')} required max={254} type="email" />
+        <label class="field">
+          <span>{t('people.role')}</span>
+          <select value={f.role} onChange={(e) => set('role')(e.currentTarget.value)}>
+            <option value="editor">{t('role.editor')}</option>
+            <option value="admin">{t('role.admin')}</option>
+          </select>
+        </label>
+        {error && <p class="error">{t(error)}</p>}
+        <Submit busy={busy} label={t('people.createLink')} />
+      </form>
+    </Dialog>
+  );
+}
+
+function LinkDialog({ data, close }: { data: { name: string; url: string; recovery: boolean }; close: () => void }) {
+  const t = useStaffT();
+  const [copied, setCopied] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(data.url); setCopied(true); } catch { setFailed(true); }
+  };
+  return (
+    <Dialog title={t(data.recovery ? 'people.recoveryFor' : 'people.linkFor', { name: data.name })} close={close}>
+      <p>{t('people.linkHelp', { time: new Date(Date.now() + 24 * 3600 * 1000).toLocaleString() })}</p>
+      <QRCode value={data.url} label={t('people.qrAlt')} />
+      <label class="field"><span>{t('people.linkLabel')}</span><input readOnly value={data.url} onFocus={(e) => e.currentTarget.select()} /></label>
+      <button class="btn" type="button" onClick={copy}>{t('people.copy')}</button>
+      {copied && <p role="status">{t('people.copied')}</p>}
+      {failed && <p class="error">{t('people.copyFailed')}</p>}
+    </Dialog>
+  );
+}
+
+export function Audit({ api }: { api: Api; ctx: PropertyContext }) {
   const t = useStaffT();
   const { lang } = useUi();
-  const [rows, setRows] = useState<StaffAuditEntry[]>([]);
-  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
-  const [more, setMore] = useState(false);
-  const PAGE = 50;
-  const load = async (before?: number) => {
-    const res = await api.get<StaffAuditEntry[]>(`/audit?limit=${PAGE}${before ? `&before=${before}` : ''}`);
-    if (res.status !== 200 || !res.data) {
-      setStatus('error');
-      return;
-    }
-    const page = res.data;
-    setRows((cur) => (before ? [...cur, ...page] : page));
-    setMore(page.length === PAGE);
-    setStatus('ready');
-  };
+  const audit = useResource<any[]>(api, '/audit');
+  const [rows, setRows] = useState<any[]>([]);
+  const [before, setBefore] = useState<number | null>(null);
+  const [done, setDone] = useState(false);
   useEffect(() => {
-    void load();
-    // loads once when the screen opens; `load` is re-created each render but reads nothing that changes
-  }, []);
-  // An action this build has no sentence for (a newer server) is shown as its code rather than failing.
-  const name = (a: string) => {
-    const key = `audit.${a}`;
-    return key in staffEn ? t(key as StaffKey) : a;
+    if (audit.state.status === 'ready') { setRows(audit.state.data); setDone(audit.state.data.length < 50); }
+  }, [audit.state]);
+  const more = async () => {
+    if (!before) return;
+    const r = await api(`/audit?before=${before}`);
+    if (!r.ok) return;
+    const older = await r.json();
+    setRows((all) => [...all, ...older]);
+    setBefore(older.at(-1)?.id ?? null);
+    setDone(older.length < 50);
   };
   return (
-    <>
-      <p>{t('audit.intro')}</p>
-      {status === 'loading' ? <output class="muted">{t('staff.loading')}</output> : null}
-      {status === 'error' ? (
+    <Gate state={audit.state} reload={audit.reload}>
+      {() => (
         <>
-          <p class="error" role="alert">{t('staff.error')}</p>
-          <button type="button" class="btn" onClick={() => void load()}>{t('staff.retry')}</button>
+          <p>{t('audit.intro')}</p>
+          {rows.length === 0 && <p>{t('audit.empty')}</p>}
+          <ol class="audit">
+            {rows.map((r) => {
+              const key = `audit.${r.action}`;
+              const action = asText(lang as 'en' | 'fr', key, key) || r.action;
+              return (
+                <li key={r.id}>
+                  <time>{new Date(r.at * 1000).toLocaleString()}</time> · {action} · {r.actorName ?? t('audit.system')}
+                  {r.changeNote && <p>{pick(r.changeNote, lang as 'en' | 'fr')}</p>}
+                </li>
+              );
+            })}
+          </ol>
+          {!done && <button class="btn btn-quiet" type="button" onClick={more}>{t('audit.more')}</button>}
         </>
-      ) : null}
-      {status === 'ready' && rows.length === 0 ? <p class="state">{t('audit.empty')}</p> : null}
-      <ul class="cards">
-        {rows.map((r) => (
-          <li key={r.id} class="card">
-            <p>
-              <strong>{name(r.action)}</strong>
-            </p>
-            <p class="card-meta">
-              {formatMoment(r.createdAt, lang, ctx.timezone)} · {r.actorName ?? t('audit.system')}
-            </p>
-          </li>
-        ))}
-      </ul>
-      {more ? (
-        <button type="button" class="btn" onClick={() => void load(rows[rows.length - 1]?.createdAt)}>
-          {t('audit.more')}
-        </button>
-      ) : null}
+      )}
+    </Gate>
+  );
+}
+
+interface CountRow {
+  day: string;
+  event: string;
+  count: number;
+}
+
+/** Property-scoped aggregate counters. The API returns no guest, device or session fields. */
+export function Counts({ api }: { api: Api; ctx: PropertyContext }) {
+  const t = useStaffT();
+  const [day, setDay] = useState('');
+  const counts = useResource<CountRow[]>(api, `/counts${day ? `?day=${day}` : ''}`);
+  return (
+    <Gate state={counts.state} reload={counts.reload}>
+      {(rows) => (
+        <>
+          <p>{t('counts.intro')}</p>
+          <label class="field">
+            <span>{t('counts.day')}</span>
+            <input type="date" value={day} onChange={(e) => setDay(e.currentTarget.value)} />
+          </label>
+          {day && <button class="btn btn-quiet" type="button" onClick={() => setDay('')}>{t('counts.allDays')}</button>}
+          {rows.length === 0 ? <p>{t('counts.empty')}</p> : (
+            <table>
+              <thead><tr><th scope="col">{t('counts.day')}</th><th scope="col">{t('counts.event')}</th><th scope="col">{t('counts.total')}</th></tr></thead>
+              <tbody>{rows.map((row) => <tr key={`${row.day}-${row.event}`}><td>{row.day}</td><td>{row.event}</td><td>{row.count}</td></tr>)}</tbody>
+            </table>
+          )}
+        </>
+      )}
+    </Gate>
+  );
+}
+
+/** Two-step, new-content-only import. The server, not this screen, decides what is valid. */
+export function Import({ api }: { api: Api; ctx: PropertyContext }) {
+  const t = useStaffT();
+  const [document, setDocument] = useState<unknown | null>(null);
+  const [report, setReport] = useState<ImportReport | null>(null);
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState<number | null>(null);
+
+  const read = async (file: File | undefined) => {
+    setReport(null); setDone(null); setError(''); setDocument(null);
+    if (!file) return;
+    try { setDocument(JSON.parse(await file.text())); } catch { setError('import.invalid'); }
+  };
+
+  const dryRun = async () => {
+    if (!document) return;
+    setBusy(true); setError(''); setDone(null);
+    try {
+      const r = await api('/import', { mode: 'dry_run', document });
+      if (r.ok) setReport(await r.json()); else setError('import.invalid');
+    } finally { setBusy(false); }
+  };
+
+  const apply = async () => {
+    if (!document || !report?.valid || !report.confirmation) return;
+    setBusy(true); setError(''); setDone(null);
+    try {
+      const r = await api('/import', { mode: 'apply', document, confirmation: report.confirmation });
+      if (r.ok) {
+        const body = await r.json();
+        setDone(body.imported); setDocument(null); setReport(null);
+      } else if (r.status === 409 || r.status === 400) {
+        setReport(null); setError('import.confirmationRequired');
+      } else setError('import.invalid');
+    } finally { setBusy(false); }
+  };
+
+  return (
+    <>
+      <p>{t('import.intro')}</p>
+      <label class="field">
+        <span>{t('import.file')}</span>
+        <input type="file" accept="application/json,.json" disabled={busy} onChange={(e) => read(e.currentTarget.files?.[0])} />
+      </label>
+      <p>
+        <button class="btn" type="button" disabled={!document || busy} onClick={dryRun}>{t('import.dryRun')}</button>{' '}
+        <button class="btn" type="button" disabled={!report?.valid || !report.confirmation || busy} onClick={apply}>{t('import.apply')}</button>
+      </p>
+      {busy && <p role="status">{t('form.saving')}</p>}
+      {error && <p class="error">{t(error as StaffKey)}</p>}
+      {done !== null && <p role="status">{t('import.done', { n: done })}</p>}
+      {report && (
+        <output class={`card ${report.valid ? '' : 'error'}`}>
+          <p>{t(report.valid ? 'import.valid' : 'import.invalid', { n: report.itemCount })}</p>
+          {report.issues.length > 0 && <ul>{report.issues.map((issue: ImportIssue, i: number) => <li key={`${issue.item}-${issue.code}-${i}`}>{t('import.item', { n: issue.item + 1, code: issue.code })}</li>)}</ul>}
+        </output>
+      )}
     </>
   );
 }
 
-// ---- Export ---------------------------------------------------------------------------------------------------
-
-export function Export({ api }: Props) {
+export function Export({ api }: { api: Api; ctx: PropertyContext }) {
   const t = useStaffT();
-  const { toast } = useUi();
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState('');
+  const [done, setDone] = useState(false);
   const download = async () => {
-    setBusy(true);
-    setMessage('');
+    setBusy(true); setDone(false);
     try {
-      const res = await fetch(`${api.base}/export`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
-      if (!res.ok) {
-        setMessage(errorText(t, res.status, null));
-      } else {
-        const blob = await res.blob();
-        const match = /filename="([^"]+)"/.exec(res.headers.get('Content-Disposition') ?? '');
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = match?.[1] ?? 'export.json';
-        document.body.append(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-        toast(t('export.done'));
-      }
-    } catch {
-      setMessage(t('staff.error'));
-    }
-    setBusy(false);
+      const r = await api('/export', {}, 'POST');
+      if (!r.ok) return;
+      const blob = await r.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${ctx.slug}-export.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setDone(true);
+    } finally { setBusy(false); }
   };
   return (
     <>
+      <Heading>{t('nav.export')}</Heading>
       <p>{t('export.intro')}</p>
-      <ul>
-        <li>{t('export.has')}</li>
-        <li>{t('export.hasNot')}</li>
-      </ul>
-      <button type="button" class="btn btn-primary" onClick={() => void download()} disabled={busy}>
-        {busy ? t('form.saving') : t('export.button')}
-      </button>
-      {message ? <p class="error" role="alert">{message}</p> : null}
+      <p>{t('export.has')}</p>
+      <p>{t('export.hasNot')}</p>
+      <button class="btn" type="button" disabled={busy} onClick={download}>{t('export.button')}</button>
+      {done && <p role="status">{t('export.done')}</p>}
     </>
   );
 }
