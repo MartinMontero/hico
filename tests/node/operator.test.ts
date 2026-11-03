@@ -75,7 +75,8 @@ const rows = (sql: string) => runSql(sql, state);
 const count = (sql: string) => Number(rows(sql)[0]?.['n']);
 
 beforeAll(() => {
-  const r = spawnSync('npx', ['wrangler', 'd1', 'migrations', 'apply', 'DB', '--local', '--persist-to', state.stateDir], { encoding: 'utf8', shell: true, env });
+  // Direct Node invocation, not npx: the npm CLI startup costs ~2s per call on Windows (see operator-lib.ts runSql).
+  const r = spawnSync(process.execPath, [join('node_modules', 'wrangler', 'bin', 'wrangler.js'), 'd1', 'migrations', 'apply', 'DB', '--local', '--persist-to', state.stateDir], { encoding: 'utf8', env });
   if (r.status !== 0) throw new Error(`migrations failed:\n${r.stdout}${r.stderr}`);
 }, 120_000);
 afterAll(() => rmSync(dir, { recursive: true, force: true }));

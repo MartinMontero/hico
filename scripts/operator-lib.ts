@@ -54,9 +54,11 @@ export function runSql(sql: string, target: D1Target): Record<string, unknown>[]
   try {
     writeFileSync(file, sql);
     const persist = target.stateDir ? ['--persist-to', target.stateDir] : [];
-    const r = spawnSync('npx', ['wrangler', 'd1', 'execute', 'DB', '--local', ...persist, '--file', file, '--json'], {
+    // Invoke the installed Wrangler directly with this Node: through npx it pays the npm CLI startup
+    // (~2s per call on Windows), which pushes spawn-heavy tests over their timeout.
+    const wrangler = join('node_modules', 'wrangler', 'bin', 'wrangler.js');
+    const r = spawnSync(process.execPath, [wrangler, 'd1', 'execute', 'DB', '--local', ...persist, '--file', file, '--json'], {
       encoding: 'utf8',
-      shell: true,
       env: { ...process.env, WRANGLER_SEND_METRICS: 'false', FORCE_COLOR: '0' },
     });
     if (r.status !== 0) throw new Error(`wrangler failed:\n${r.stdout}${r.stderr}`);
