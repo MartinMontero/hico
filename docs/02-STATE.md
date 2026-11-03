@@ -308,6 +308,13 @@ slices, each committed only when `npm run validate` passed. Plan: `docs\plans\20
   60 KB); staff chunk 29 KB gzip (budget 90 KB). Not tried: a real phone or security key, scanning a printed QR code,
   a screen reader, anything on Cloudflare (nothing was deployed or created remotely). Staff sign-in answers 503 on
   `hico-preview` and `hico-prod` until `RP_ID`, `ALLOWED_ORIGINS` and `RATE_LIMIT_SECRET` are set (O-03).
+- **Local green run on Windows, 2026-11-02 (on `cloud/kimi-mvp-preview`):** `npm run validate` passes all ten steps,
+  exit code 0, on bd4d4d4 plus the Wrangler-invocation fix `21cd9fe` (new head after both commits: see git). 39 unit and
+  isolation files / 589 tests, 43 browser tests, axe 0 violations; worker bundle 836.72 kB (gzip 177.57), guest 66.23 kB
+  (gzip 22.30), staff 110.33 kB (gzip 32.02); Lighthouse mobile LCP 2061/2172 ms, TBT 0, CLS 0.000/0.035. Complete raw
+  output: `docs\spikes\2026-11-02-local-validate-run.txt`. Two environment problems were found and fixed first: a Goose-app
+  portable Node 22 npx shim ahead of the real Node in PATH ran tools under Node 22 (Martin reorders PATH; the repo now
+  calls Wrangler directly, see `21cd9fe`), and each `npx wrangler` call cost ~3.3s on Windows versus ~1s on Linux.
 ## 5. Stale documents
 
 - `docs\05-ARCHITECTURE.md` §4, §11, §13 and §16 are up to date (Phase 1b-2 and 2026-10-24).
