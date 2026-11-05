@@ -1,0 +1,5 @@
+[31;1mWrite-Error: [0mC:\Users\User\dev\hico\scripts\verify-deploy.ps1:52[0m
+[31;1m[0m[36;1mLine |[0m
+[31;1m[0m[36;1m[36;1m  52 | [0m     $failures | ForEach-Object { [36;1mWrite-Error $_[0m }[0m
+[31;1m[0m[36;1m[36;1m[0m[36;1m[0m[36;1m     | [31;1m                                  ~~~~~~~~~~~~~~[0m
+[31;1m[0m[36;1m[36;1m[0m[36;1m[0m[36;1m[31;1m[31;1m[36;1m     | [31;1m/ is missing private, no-store[0m

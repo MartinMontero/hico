@@ -325,3 +325,44 @@ slices, each committed only when `npm run validate` passed. Plan: `docs\plans\20
   variables and secret (see above).
 - `docs\spikes\preflight.md` says PowerShell 7 and Wrangler are not installed; true when
   written, no longer true. It is a dated record and is left as written.
+
+## 6. Preview launch record — 2026-11-05
+
+`[V]` On `cloud/kimi-mvp-preview`, the local WebAuthn configuration fix and preview values were committed as
+`0946a6b93937e8674bb02bed4be8ebb99a2d8ffe` and `bc17f50fdc02e415527b20099eda273aeb1080f4`, then pushed. The complete local
+launch check exited 0 with 43 browser tests passing and all ten validation steps green; its raw output is
+`docs\spikes\2026-11-03-preview-launch-check-local-webauthn-rebuild-green.txt`. The configuration chain and the two repaired
+registration symptoms are recorded in `docs\spikes\2026-11-03-preview-webauthn-local-config.md`.
+
+`[V]` The preview D1 target was confirmed as `hico-preview` (`ea3d953f-9eca-4ab9-8829-15cf7f5022a3`). An export was saved at
+`C:\Users\User\dev\hico-backups\hico-preview-20261105-014035.sql`; migrations `0001` through `0003` then applied successfully,
+and a follow-up list reported none remaining. `ACCESS_KEY`, `SESSION_PEPPER` and `RATE_LIMIT_SECRET` were uploaded to
+`hico-preview` with exit 0. The clipboard-held access key was not echoed and the clipboard was cleared. No secret values are in
+the evidence files.
+
+`[V]` Deploy dry-run and deploy both exited 0 with no `--env` flag. The deployed commit was
+`bc17f50fdc02e415527b20099eda273aeb1080f4`; the Worker is `hico-preview`, version
+`d7b2ec7e-b9ff-48b2-b51b-4a87637777cb`. Raw output: `docs\spikes\2026-11-05-preview-deploy.txt`.
+
+The original `verify-deploy.ps1` check exited 1 because it required `Cache-Control: private, no-store` in that exact order; a direct GET returned
+`no-store, private`, with the same directives reversed, plus the expected flat 404 and robots header. The cache assertion is now corrected locally
+`[V]` to compare a case-insensitive, unordered set and require exactly `private` and `no-store`, with no other assertion changed. The final script's
+deployed-preview rerun exited 0; raw output is `docs\spikes\2026-11-05-preview-verify-deploy-cache-set.txt`. No redeploy or other Cloudflare write
+was made. Original deployment evidence remains in `docs\spikes\2026-11-05-preview-d1-migrations.txt`,
+`docs\spikes\2026-11-05-preview-secrets.txt`, and `docs\spikes\2026-11-05-preview-verify-deploy.txt`.
+
+GitHub Actions run `41995854415` remains a recorded failure at `tests\e2e\staff-auth.spec.ts:50`: the made-up invite link did not show its
+invalid-link message, 35 tests passed and seven did not run `[V]`. The failure did not reproduce locally on 2026-11-05: the staff-auth spec passed
+9 of 9 alone, the browser suite passed 43 of 43, and the same case had passed in earlier CI run `41586738015` with byte-identical test and Accept
+screen source `[V]`. The failed run uploaded no artifacts, so its referenced `error-context.md` and page content are unavailable `[V]`. A hash-change
+listener timing race is a hypothesis `[I]`, not a proven cause; no application fix or timeout change was applied. The final local `npm run validate`
+passed all ten steps under Node 24.16.0 with the system Node directory prepended so child `npx` processes did not use Goose's Node 22 shim `[V]`.
+
+Authorized guest/staff redemption, passkey use on a real device, QR, install/offline, screen-reader, French and human security
+checks remain undone `[U]`. The statements above that nothing exists on Cloudflare are historical and are superseded by this
+section.
+
+`[V]` The single evidence commit containing this paragraph is the direct child of deployed commit
+`bc17f50fdc02e415527b20099eda273aeb1080f4` and contains no application-code changes. The branch head therefore advances beyond
+the deployed commit without changing what is live: Worker version `d7b2ec7e-b9ff-48b2-b51b-4a87637777cb` at `bc17f50` remains
+the accurate deployed description. No redeploy accompanied this evidence commit.

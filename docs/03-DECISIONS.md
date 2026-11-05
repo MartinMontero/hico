@@ -378,3 +378,23 @@ and no operator script option.
 ## Gates
 
 **G0 — framework gate. Closed by waiver on 2026-10-23 (D-12).** Phase 0.2 was not run. The evidence is the sandbox benchmark, summarised in `docs\spikes\G0-framework-report.md`, which says what was and was not measured. Phase 1 adds D-13 (the validation library).
+
+## Session close — 2026-11-05
+
+No new product or project decision was made in the preview-launch execution. Martin's existing GO authorised the two named
+commits and branch push, preview-only D1 migrations, three preview secret uploads, and the inspected `hico-preview` deploy. This
+session record does not resolve D-43 or any open item.
+
+Decisions owed before follow-up implementation: whether to authorise investigation and repair of the CI invalid-link browser
+failure at `tests\e2e\staff-auth.spec.ts:50`, and whether to authorise a correction to the deployed-preview check's exact-order
+`Cache-Control` assertion (the response carries the same `private` and `no-store` directives in reverse order). The authorized
+human preview checklist also remains to be scheduled. Existing open decisions, including O-25, are unchanged.
+
+## Session close — 2026-11-05 follow-up
+
+Martin authorised the local cache-assertion correction, the deployed-preview GET-only rerun, read-only CI investigation and local
+reproduction runs. No new product or project decision was made, and this follow-up does not resolve D-43 or any open item. The
+cache assertion is corrected and its deployed-preview check is green. The CI case did not reproduce locally; a one-line
+`useLayoutEffect` hash-listener change and a focused regression probe are only a proposal `[I]`, not an established fix. Whether
+to apply that proposal remains Martin's call. No timeout, application test or application source was changed, and nothing was
+committed, pushed, redeployed or written to Cloudflare in this follow-up.

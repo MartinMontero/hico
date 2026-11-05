@@ -28,8 +28,14 @@ foreach ($path in $protectedPaths) {
         $response = Get-PreviewResponse $path
         if ([int]$response.StatusCode -ne 404) { $failures.Add("$path returned $([int]$response.StatusCode), expected 404") }
         if ($response.Content -ne "Not Found`n") { $failures.Add("$path did not return the flat gate response") }
-        if ($response.Headers['Cache-Control'] -notcontains 'private, no-store' -and $response.Headers['Cache-Control'] -ne 'private, no-store') {
-            $failures.Add("$path is missing private, no-store")
+        $cacheDirectives = @(
+            [string]($response.Headers['Cache-Control'] -join ',') -split ',' |
+                ForEach-Object { $_.Trim().ToLowerInvariant() } |
+                Where-Object { $_ } |
+                Sort-Object -Unique
+        )
+        if (($cacheDirectives -join ',') -cne 'no-store,private') {
+            $failures.Add("$path Cache-Control must be exactly private, no-store (any order)")
         }
         if ([string]$response.Headers['X-Robots-Tag'] -notmatch 'noindex') { $failures.Add("$path is missing noindex") }
     }

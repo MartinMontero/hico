@@ -1,0 +1,3 @@
+Unauthenticated deployed-preview checks passed. No remote resource was changed.
+Next: a person must redeem the preview link privately and complete the authorized human test checklist.
+VERIFY_DEPLOY_EXIT=0

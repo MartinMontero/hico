@@ -1,0 +1,73 @@
+
+ Γ¢à∩╕Å wrangler 4.152.0 (update available 4.157.0)
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Using redirected Wrangler configuration.
+ - Configuration being used: "dist\hico_preview\wrangler.json"
+ - Original user's configuration: "wrangler.jsonc"
+ - Deploy configuration file: ".wrangler\deploy\config.json"
+Γ£¿ Read 17 files from the assets directory C:\Users\User\dev\hico\dist\client
+Total Upload: 817.11 KiB / gzip: 172.52 KiB
+Your Worker has access to the following bindings:
+Binding                                                               Resource                  
+env.DB (hico-preview)                                                 D1 Database               
+env.ASSETS                                                            Assets                    
+env.PREVIEW_GATE ("on")                                               Environment Variable      
+env.RP_ID ("hico-preview.these3remain.workers.dev")                   Environment Variable      
+env.ALLOWED_ORIGINS ("https://hico-preview.these3remain.wor...")      Environment Variable      
+
+--dry-run: exiting now.
+
+ Γ¢à∩╕Å wrangler 4.152.0 (update available 4.157.0)
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Using redirected Wrangler configuration.
+ - Configuration being used: "dist\hico_preview\wrangler.json"
+ - Original user's configuration: "wrangler.jsonc"
+ - Deploy configuration file: ".wrangler\deploy\config.json"
+≡ƒîÇ Building list of assets...
+Γ£¿ Read 17 files from the assets directory C:\Users\User\dev\hico\dist\client
+≡ƒîÇ Starting asset upload...
+≡ƒîÇ Found 14 new or modified static assets to upload. Proceeding with upload...
++ /sw-status.json
++ /index.html
++ /fonts/DM-Sans-OFL-LICENSE.txt
++ /fonts/dm-sans-latin-400-normal.woff2
++ /assets/index-BIE_AV_e.js
++ /icon.svg
++ /sw.js
++ /assets/index-dzaZLlo8.css
++ /fonts/dm-sans-latin-500-normal.woff2
++ /assets/StaffApp-DgdVlauV.js
++ /manifest.webmanifest
++ /icon-192.png
++ /icon-512.png
++ /fonts/dm-sans-latin-700-normal.woff2
+Uploaded 4 of 14 assets
+Uploaded 9 of 14 assets
+Uploaded 14 of 14 assets
+Γ£¿ Success! Uploaded 14 files (1.00 sec)
+
+Total Upload: 817.11 KiB / gzip: 172.52 KiB
+Worker Startup Time: 14 ms
+Your Worker has access to the following bindings:
+Binding                                                               Resource                  
+env.DB (hico-preview)                                                 D1 Database               
+env.ASSETS                                                            Assets                    
+env.PREVIEW_GATE ("on")                                               Environment Variable      
+env.RP_ID ("hico-preview.these3remain.workers.dev")                   Environment Variable      
+env.ALLOWED_ORIGINS ("https://hico-preview.these3remain.wor...")      Environment Variable      
+
+Uploaded hico-preview (4.20 sec)
+Γû▓ [WARNING] Because 'workers_dev' is not in your wrangler.jsonc, it will be enabled for this deployment by default.
+
+  To override this setting, you can disable workers.dev by explicitly setting 'workers_dev = false' in your wrangler.jsonc.
+
+
+Γû▓ [WARNING] Because your 'workers.dev' route is enabled and your 'preview_urls' setting is not in your wrangler.jsonc, Preview URLs will be enabled for this deployment by default.
+
+  To override this setting, you can disable Preview URLs by explicitly setting 'preview_urls = false' in your wrangler.jsonc.
+
+
+Deployed hico-preview triggers (0.72 sec)
+  https://hico-preview.these3remain.workers.dev
+  schedule: 17 3 * * *
+Current Version ID: d7b2ec7e-b9ff-48b2-b51b-4a87637777cb
