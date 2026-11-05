@@ -24,6 +24,6 @@ export default defineConfig({
     url: 'http://localhost:4173/',
     reuseExistingServer: false,
     timeout: 120_000,
-    env: { CLOUDFLARE_INCLUDE_PROCESS_ENV: 'true', PREVIEW_GATE: 'off', WRANGLER_SEND_METRICS: 'false' },
+    env: { CLOUDFLARE_INCLUDE_PROCESS_ENV: 'true', PREVIEW_GATE: 'off', RP_ID: 'localhost', ALLOWED_ORIGINS: 'http://localhost:4173', WRANGLER_SEND_METRICS: 'false' },
   },
 });
