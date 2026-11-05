@@ -17,12 +17,12 @@
   // RP_ID and ALLOWED_ORIGINS are the WebAuthn relying party for LOCAL use (vite dev 5173, vite preview 4173).
   // A passkey is bound to its RP_ID: before a deploy these must be set to the real hostname (a GO), and the prod
   // environment sets neither, so staff sign-in answers 503 there until they are set on purpose.
-  "vars": { "PREVIEW_GATE": "on", "RP_ID": "localhost", "ALLOWED_ORIGINS": "http://localhost:5173,http://localhost:4173" },
+  "vars": { "PREVIEW_GATE": "on", "RP_ID": "hico-preview.these3remain.workers.dev", "ALLOWED_ORIGINS": "https://hico-preview.these3remain.workers.dev" },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "hico-preview",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "ea3d953f-9eca-4ab9-8829-15cf7f5022a3",
       "migrations_dir": "migrations"
     }
   ],
